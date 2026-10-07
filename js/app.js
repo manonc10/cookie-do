@@ -690,6 +690,14 @@ const PANTRY_EMO=[
   [/curry|paprika|cumin|curcuma|epice|cannelle|muscade/,'🌶️'],
   [/huile/,'🫗'], [/olive/,'🫒'],
   [/sel|poivre/,'🧂'], [/sucre|miel/,'🍯'],
+  [/poulet|volaille|dinde/,'🍗'], [/boeuf|bœuf|steak|hache|veau|agneau|porc|lardon|jambon|saucisse|chorizo|echine/,'🥩'],
+  [/saumon|cabillaud|thon|poisson|hoki|sardine|maquereau|anchois/,'🐟'], [/crevette|gambas/,'🦐'],
+  [/chocolat|cacao|pepite/,'🍫'], [/vanille|levure|bicarbonate/,'🧁'], [/amande|noisette|noix|cacahuete|pistache|sesame/,'🥜'],
+  [/poire/,'🍐'], [/fraise|framboise|myrtille|fruit rouge/,'🍓'], [/orange|clementine|mandarine/,'🍊'], [/raisin|datte|abricot sec|pruneau/,'🍇'], [/peche|abricot|nectarine/,'🍑'], [/cerise/,'🍒'], [/mangue|ananas/,'🥭'],
+  [/potiron|potimarron|courge|butternut/,'🎃'], [/poireau|celeri|fenouil|asperge/,'🥬'], [/petit pois|edamame|haricot vert/,'🫛'], [/radis|betterave|navet/,'🥕'],
+  [/tortilla|wrap|pita|burger|brioche/,'🫓'], [/pizza|pate brisee|pate feuilletee|pate a pizza/,'🥧'],
+  [/vin|biere|cidre/,'🍷'], [/eau/,'💧'], [/the|cafe/,'☕'], [/sauce|ketchup|moutarde|mayonnaise|vinaigre|nuoc|tamari|teriyaki/,'🫙'], [/lait de coco|creme de coco/,'🥥'],
+  [/nori|sushi|wasabi/,'🍣'], [/cornichon|capre/,'🥒'], [/lentille corail|dahl|dal/,'🫘'], [/flocon|avoine|granola|cereale/,'🥣'],
 ];
 function pantryEmo(name){ const n=norm(name); for(const[re,e]of PANTRY_EMO)if(re.test(n))return e; return '🛒'; }
 function wordInText(word, text){
@@ -768,17 +776,27 @@ function renderPantry(){
   $('#pantryCount').textContent=pantry.length+' article'+(pantry.length>1?'s':'');
   const order=pantry.map((p,i)=>({p,i})).sort((a,b)=>(b.p.at||0)-(a.p.at||0));
   order.forEach(({p,i})=>{
+    const wrap=document.createElement('div'); wrap.className='swrow';
     const row=document.createElement('div'); row.className='rw';
     const qtyStr=fmtPantryQty(p);
-    row.innerHTML=`<div class="b"><div class="t" style="font-weight:500">${p.name}</div><div class="m">${p.from==='courses'?'des courses':'ajouté'}${p.at?' · '+relDay(p.at):''}</div></div>
-      <span class="val mono">${qtyStr||'1'}</span>
-      <div class="stepper" style="font-size:13px"><button data-m aria-label="Moins">−</button><button data-p aria-label="Plus" style="border-left:1px solid var(--ln)">+</button></div>
-      <button class="x" aria-label="Retirer"><svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12" stroke-linecap="round"/></svg></button>`;
+    row.innerHTML=`<span class="tile">${pantryEmo(p.name)}</span><div class="b"><div class="t" style="font-weight:500">${p.name}</div><div class="m">${p.from==='courses'?'des courses':'ajouté'}${p.at?' · '+relDay(p.at):''}</div></div>
+      <div class="pm"><button data-m aria-label="Moins">−</button><span class="qty">${qtyStr||'1'}</span><button data-p aria-label="Plus">+</button></div>`;
     row.querySelector('[data-m]').onclick=()=>pantrySetQty(i,-1);
     row.querySelector('[data-p]').onclick=()=>pantrySetQty(i,+1);
-    row.querySelector('.x').onclick=()=>pantryRemove(i);
-    list.appendChild(row);
+    const del=document.createElement('button'); del.className='del'; del.textContent='Retirer'; del.onclick=()=>pantryRemove(i);
+    wrap.appendChild(del); wrap.appendChild(row); bindSwipe(wrap);
+    list.appendChild(wrap);
   });
+}
+/* glisser une ligne vers la gauche découvre « Retirer » (comme Rappels ou Mail) */
+let openSwipe=null;
+function bindSwipe(wrap){
+  const row=wrap.querySelector('.rw'); const W=84; let x0=0,y0=0,dx=0,drag=false,cancel=false;
+  const setX=v=>{ row.style.transform=v?`translateX(${v}px)`:''; };
+  wrap.addEventListener('touchstart',e=>{ const t=e.touches[0]; x0=t.clientX; y0=t.clientY; dx=0; drag=false; cancel=false; row.style.transition='none'; },{passive:true});
+  wrap.addEventListener('touchmove',e=>{ const t=e.touches[0]; const mx=t.clientX-x0, my=t.clientY-y0; if(cancel) return; if(!drag){ if(Math.abs(my)>8&&Math.abs(my)>Math.abs(mx)){ cancel=true; return; } if(Math.abs(mx)>8) drag=true; else return; } dx=Math.max(-W-20,Math.min(0,mx+(wrap.classList.contains('open')?-W:0))); setX(dx); },{passive:true});
+  wrap.addEventListener('touchend',()=>{ row.style.transition=''; if(!drag) return; const open=dx<-W/2; wrap.classList.toggle('open',open); setX(open?-W:0); if(open){ if(openSwipe&&openSwipe!==wrap){ openSwipe.classList.remove('open'); openSwipe.querySelector('.rw').style.transform=''; } openSwipe=wrap; } row.dataset.swiped=drag?'1':''; setTimeout(()=>{ row.dataset.swiped=''; },50); });
+  row.addEventListener('click',e=>{ if(row.dataset.swiped){ e.stopImmediatePropagation(); return; } if(wrap.classList.contains('open')){ wrap.classList.remove('open'); setX(0); e.stopImmediatePropagation(); } },true);
 }
 function relDay(ts){ const d=Math.floor((Date.now()-ts)/86400000); return d<=0?"aujourd'hui":d===1?'hier':'il y a '+d+' j'; }
 function renderFridge(){
@@ -931,14 +949,17 @@ function renderShop(){
       const fromArr=[...e.from];
       const nz=settings.nz?nzName(e.item):'';
       const stock=!settings.hidePantry&&inPantryByName(e.item);
+      const wrap=document.createElement('div'); wrap.className='swrow';
       const row=document.createElement('div'); row.className='rw'+(isDone?' d':'');
-      row.innerHTML=`<div class="chk">${checkSvg()}</div><span class="q mono">${qtyStr}</span>`
+      row.innerHTML=`<div class="chk">${checkSvg()}</div><span class="tile">${pantryEmo(e.item)}</span>`
         +`<div class="n">${e.item}<small>${nz?nz+' · ':''}${stock?'<span style="color:var(--ok)">en stock</span> · ':''}${fromArr.length>1?fromArr.length+' recettes':fromArr[0]}</small></div>`
-        +`<button class="x" aria-label="Retirer de la liste"><svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12" stroke-linecap="round"/></svg></button>`;
+        +`<span class="qty">${qtyStr}</span>`;
       const tog=()=>{ if(shopChecked.has(k))shopChecked.delete(k);else shopChecked.add(k); save(LS.shopChecked,[...shopChecked]); touch(); renderShop(); };
-      row.querySelector('.n').onclick=tog; row.querySelector('.chk').onclick=tog; row.querySelector('.q').onclick=tog;
-      row.querySelector('.x').onclick=(ev)=>{ ev.stopPropagation(); if(k.startsWith('libre|')){ freeItems=freeItems.filter(f=>'libre|'+norm(f.name)!==k); save(LS.freeShop,freeItems); } else { removedShopItems.add(k); save(LS.removedShop,[...removedShopItems]); } touch(); toast('Retiré de la liste'); renderShop(); };
-      sec.appendChild(row);
+      row.onclick=tog;
+      const del=document.createElement('button'); del.className='del'; del.textContent='Retirer';
+      del.onclick=(ev)=>{ ev.stopPropagation(); if(k.startsWith('libre|')){ freeItems=freeItems.filter(f=>'libre|'+norm(f.name)!==k); save(LS.freeShop,freeItems); } else { removedShopItems.add(k); save(LS.removedShop,[...removedShopItems]); } touch(); toast('Retiré de la liste'); renderShop(); };
+      wrap.appendChild(del); wrap.appendChild(row); bindSwipe(wrap);
+      sec.appendChild(wrap);
     });
     cont.appendChild(sec);
   });
@@ -1051,7 +1072,7 @@ function openRecipeDetail(id){
   openSheet(); bindStars(sh);
   function renderIng(){
     const miss=missingFor(r); const missSet=new Set(miss.map(m=>singular(m)));
-    const rows=r.ingredients.map(([q,u,item])=>{ const sq=scaledQty(r,q); const qs=sq!=null?fmtQty(sq)+(u?' '+unitLabel(u,sq):''):(u||''); const base=baseIngredientName(item); const st=base&&!isStaple(base)?(missSet.has(singular(base))?'<span class="miss">manque</span>':(pantry.length?'<span class="have">en stock</span>':'')):''; const nz=settings.nz?nzName(item):''; return `<div class="ing-row"><span class="q mono">${qs}</span><span class="n">${item}${nz?`<small style="display:block;font-size:12px;color:var(--mut)">${nz}</small>`:''}</span>${st}</div>`; }).join('');
+    const rows=r.ingredients.map(([q,u,item])=>{ const sq=scaledQty(r,q); const qs=sq!=null?fmtQty(sq)+(u?' '+unitLabel(u,sq):''):(u||''); const base=baseIngredientName(item); const st=base&&!isStaple(base)?(missSet.has(singular(base))?'<span class="miss">manque</span>':(pantry.length?'<span class="have">en stock</span>':'')):''; const nz=settings.nz?nzName(item):''; return `<div class="ing-row"><span class="tile">${pantryEmo(item)}</span><span class="n">${qs?`<b class="q">${qs}</b> `:''}${item}${nz?`<small>${nz}</small>`:''}</span>${st}</div>`; }).join('');
     $('#rdIngList').innerHTML=rows;
     $('#rdServ').textContent=servingsFor(r)+' portion'+(servingsFor(r)>1?'s':'');
     $('#rdMeals').textContent=mealsLabel(servingsFor(r))+' pour '+settings.persons+' pers.';
@@ -1129,7 +1150,7 @@ function renderCookBody(){
     <button class="tbtn" id="shareBtn"><svg viewBox="0 0 24 24"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8M16 6l-4-4-4 4M12 2v13" stroke-linecap="round" stroke-linejoin="round"/></svg>Partager</button>
   </div>`;
   html+=`<div class="sec" style="padding-left:0;padding-right:0"><span>Ingrédients</span></div><div class="grp">`;
-  r.ingredients.forEach(([q,u,item])=>{ const sc=q!=null?q*factor:null; const qs=sc!=null?fmtQty(sc)+(u?' '+unitLabel(u,sc):''):(u||''); html+=`<div class="ing-row"><span class="q mono">${qs}</span><span class="n">${item}</span></div>`; });
+  r.ingredients.forEach(([q,u,item])=>{ const sc=q!=null?q*factor:null; const qs=sc!=null?fmtQty(sc)+(u?' '+unitLabel(u,sc):''):(u||''); html+=`<div class="ing-row"><span class="tile">${pantryEmo(item)}</span><span class="n">${qs?`<b class="q">${qs}</b> `:''}${item}</span></div>`; });
   html+=`</div>`;
   if(anyAssigned) html+=`<div class="legend" style="margin-top:10px"><span><span class="sw" style="background:var(--acc)"></span>Moi</span><span><span class="sw" style="background:var(--warn)"></span>L’autre</span></div>`;
   html+=`<div class="sec" style="padding-left:0;padding-right:0"><span>Préparation</span><span class="mono">${doneCount}/${r.steps.length}</span></div>`;
@@ -1369,7 +1390,7 @@ $('#calToday').onclick=()=>{ const n=new Date(); calYear=n.getFullYear(); calMon
 $('#logMealBtn').onclick=openLogMealPicker;
 function openLogMealPicker(){
   const sh=$('#sheet');
-  const item=r=>`<button class="pick-recipe" data-r="${r.id}"><span class="th">${hasPhoto(r.id)?`<img src="photos/${r.id}.jpg" alt="" loading="lazy">`:recipeEmoji(r)}</span><span>${r.title}</span></button>`;
+  const item=r=>`<button class="pick-recipe" data-r="${r.id}"><span class="th">${hasPhoto(r.id)?`<img src="photos/${r.id}.jpg" alt="" loading="lazy">`:recipeEmoji(r)}</span><span class="b"><span class="t">${r.title}</span><span class="m">${r.time} min · ${kicker(r)}</span></span></button>`;
   sh.innerHTML=`<div class="grab"></div>
     <div class="sh-head"><h3>Quel plat as-tu fait ?</h3><button class="sh-x" id="lpClose" aria-label="Fermer"><svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12" stroke-linecap="round"/></svg></button></div>
     <div class="sh-sub">Choisis une recette, tu indiqueras le jour ensuite.</div>
