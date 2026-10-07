@@ -428,7 +428,9 @@ function splitIngredient(item){
 const UNIT_PLURAL={'boîte':'boîtes','feuille':'feuilles','tranche':'tranches','poignée':'poignées','sachet':'sachets','paquet':'paquets','verre':'verres','tasse':'tasses','gousse':'gousses','morceau':'morceaux','boule':'boules','branche':'branches','brin':'brins','cube':'cubes','pot':'pots','bouquet':'bouquets'};
 /* pluriel d'affichage d'un nom : les mots avant « de / à / au » prennent un s,
    ceux d'après restent (« pommes de terre », « citrons verts ») */
+const NO_PLURAL=new Set(['basilic','persil','menthe','coriandre','aneth','ciboulette','sauge','thym','romarin','roquette','estragon','laurier','ail','pain','riz','sel','poivre','huile','beurre','lait','sucre','farine','miel','moutarde','vinaigre','passata','parmesan','cheddar','gruyere','maïs','cumin','curry','paprika','curcuma','chapelure','houmous','pesto','miso']);
 function pluralName(name){
+  if(NO_PLURAL.has(norm(name).split(' ')[0])) return name;
   const words=name.split(' '); const out=[]; let stop=false;
   for(const w of words){
     if(stop||/^(de|du|des|d'|d’|à|au|aux|en|et|sans)$/i.test(w)){ stop=true; out.push(w); continue; }
@@ -460,7 +462,7 @@ const ENVIES=[['rapide','Rapide'],['sansfour','Sans four'],['cheap','Économique
 const COURSES=[['all','Tout'],['main','Plats'],['dessert','Desserts']];
 const TRIS=[['default','Par défaut'],['rating','Mieux notées'],['fav','Favoris d\'abord'],['time','Plus rapides'],['recent','Pas fait récemment'],['protdesc','Plus de protéines'],['protasc','Moins de protéines']];
 /* tags deja proposes par les deux rangees du dessus : inutile de les repeter */
-const TAGS_DEJA_COUVERTS=new Set(['végé','poulet','poisson','viande','boeuf','rapide','léger','sans four','sans cuisson']);
+const TAGS_DEJA_COUVERTS=new Set(['végé','poulet','poisson','viande','boeuf','rapide','léger','sans four','sans cuisson','dessert']);
 function activeFilterCount(){
   return (courseFilter!=='all'?1:0)+(dietFilter?1:0)+(quickFilter?1:0)+(activeTag?1:0)+(sortMode!=='default'?1:0);
 }
@@ -478,12 +480,14 @@ function clearFilter(kind){
   else if(kind==='qf')quickFilter=null; else if(kind==='tag')activeTag=null;
   else if(kind==='tri')sortMode='default';
 }
-const QUICK=[['all','Tout'],['vege','Végé'],['rapide','Rapide'],['poisson','Poisson'],['poulet','Poulet'],['viande','Viande'],['dessert','Dessert'],['leger','Léger'],['fav','Favoris']];
+const QUICK=[['all','Tout'],['vege','Végé'],['rapide','Rapide'],['poulet','Poulet'],['poisson','Poisson'],['viande','Viande'],['soupe','Soupes'],['asiatique','Asiatique'],['mexicain','Mexicain'],['méditerranéen','Méditerranéen'],['dessert','Dessert'],['leger','Léger'],['fav','Favoris']];
+const QUICK_TAGS=new Set(['soupe','asiatique','mexicain','méditerranéen']);
 function quickIsOn(k){
   if(k==='all') return courseFilter==='all'&&!dietFilter&&!quickFilter&&!showFavOnly&&!activeTag;
   if(k==='dessert') return courseFilter==='dessert';
   if(k==='fav') return showFavOnly;
   if(k==='rapide'||k==='leger') return quickFilter===k;
+  if(QUICK_TAGS.has(k)) return activeTag===k;
   return dietFilter===k;
 }
 function quickToggle(k){
@@ -491,6 +495,7 @@ function quickToggle(k){
   else if(k==='dessert'){ courseFilter=courseFilter==='dessert'?'all':'dessert'; }
   else if(k==='fav'){ showFavOnly=!showFavOnly; }
   else if(k==='rapide'||k==='leger'){ quickFilter=quickFilter===k?null:k; }
+  else if(QUICK_TAGS.has(k)){ activeTag=activeTag===k?null:k; }
   else { dietFilter=dietFilter===k?null:k; if(dietFilter&&courseFilter==='dessert') courseFilter='all'; }
   renderChips(); renderRecipes();
 }
