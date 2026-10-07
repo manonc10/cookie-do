@@ -3716,6 +3716,16 @@ function splitIngredient(item){
 }
 /* unités au pluriel dans la liste : « 2 boîtes », pas « 2 boîte » */
 const UNIT_PLURAL={'boîte':'boîtes','feuille':'feuilles','tranche':'tranches','poignée':'poignées','sachet':'sachets','paquet':'paquets','verre':'verres','tasse':'tasses','gousse':'gousses','morceau':'morceaux','boule':'boules','branche':'branches','brin':'brins','cube':'cubes','pot':'pots','bouquet':'bouquets'};
+/* pluriel d'affichage d'un nom : les mots avant « de / à / au » prennent un s,
+   ceux d'après restent (« pommes de terre », « citrons verts ») */
+function pluralName(name){
+  const words=name.split(' '); const out=[]; let stop=false;
+  for(const w of words){
+    if(stop||/^(de|du|des|d'|d’|à|au|aux|en|et|sans)$/i.test(w)){ stop=true; out.push(w); continue; }
+    out.push(/(s|x|z)$/i.test(w)?w:(/(eau|au|eu)$/i.test(w)?w+'x':(/al$/i.test(w)?w.slice(0,-2)+'aux':w+'s')));
+  }
+  return out.join(' ');
+}
 function unitLabel(u,q){ if(!u) return ''; if(q!=null&&q>1&&UNIT_PLURAL[u]) return UNIT_PLURAL[u]; return u; }
 /* Nom générique / anglais qu'on trouve en rayon à New World ou Woolworths (NZ).
    Clé = nom normalisé (sans accents, minuscule). Aide à repérer le produit en magasin. */
@@ -4213,6 +4223,8 @@ function buildShopping(){
         const plural=forms.find(n=>/s$/i.test(n)), sing=forms.find(n=>!/s$/i.test(n));
         const many=e.hasQty && e.qty!=null && e.qty>1 && !e.unit;
         e.item=(many?(plural||sing):(sing||plural))||e.item;
+      } else if(e.hasQty && e.qty!=null && e.qty>1 && !e.unit){
+        e.item=pluralName(e.item);   // « 5 oignon » -> « 5 oignons »
       }
     }
   });
