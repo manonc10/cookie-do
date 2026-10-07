@@ -5060,10 +5060,8 @@ function renderSharedViewer(p){
 
 /* ---------- INIT ---------- */
 async function init(){
-  if(Sync.enabled && !Sync.session){
-    // Not logged in: personal data must not linger on the device -> start blank.
-    wipeLocalData();
-  }
+  // Sans compte, tout reste sur l'appareil (semaine, stock, courses) : on ne repart
+  // plus à zéro à chaque ouverture. Le compte sert à synchroniser entre appareils.
   rebuild(); updateSyncDot();
   if(Sync.enabled && Sync.session){
     try{ await Sync.refreshIfNeeded(); await autoSync(); }catch(e){}
