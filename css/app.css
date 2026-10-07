@@ -104,7 +104,11 @@ body.scrolled .hdr .sub{display:none}
 .rlist{display:flex;flex-direction:column;gap:10px;padding:0 16px}
 .rcard{position:relative;border-radius:var(--rL);overflow:hidden;height:150px;background:var(--sur2);box-shadow:var(--sh);isolation:isolate}
 .rcard img{width:100%;height:100%;object-fit:cover}
-.rcard .noph{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:52px;background:var(--sur2)}
+.rcard .noph{width:100%;height:100%;display:flex;align-items:flex-start;justify-content:center;padding-top:22px;color:var(--accT);background:linear-gradient(135deg,var(--accW),var(--sur3))}
+.rcard .noph svg{width:54px;height:54px}
+.rd-hero .noph{color:var(--accT);background:linear-gradient(135deg,var(--accW),var(--sur3))}
+.rd-hero .noph svg{width:84px;height:84px}
+.rw .noph svg{width:26px;height:26px;color:var(--accT)}
 .rcard .ov{position:absolute;inset:0;background:linear-gradient(180deg,var(--ov0) 38%,var(--ov1) 100%)}
 .rcard .t{position:absolute;left:14px;right:56px;bottom:12px;color:#fff;font-weight:600;font-size:16px;line-height:1.15;text-shadow:0 1px 2px rgba(0,0,0,.35)}
 .rcard .t small{display:block;font-size:12px;font-weight:500;color:rgba(255,255,255,.82);margin-top:3px}
