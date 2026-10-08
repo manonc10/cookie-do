@@ -1,8 +1,8 @@
 /* Cookie Do hors ligne : le site, ses scripts et les photos déjà vues restent disponibles sans réseau.
    Pages et scripts : réseau d'abord (pour recevoir les mises à jour), cache si pas de réseau.
    Photos : cache d'abord. */
-const CACHE='cookiedo-v1';
-const SHELL=['./','index.html','css/app.css','js/qrcode.js','js/data.js','js/app.js','js/plus.js','manifest.webmanifest','favicon.png','apple-touch-icon.png'];
+const CACHE='cookiedo-v2';
+const SHELL=['./','index.html','css/app.css','js/qrcode.js','js/data.js','js/app.js','js/plus.js','js/foyer.js','manifest.webmanifest','favicon.png','apple-touch-icon.png'];
 self.addEventListener('install',e=>{ e.waitUntil(caches.open(CACHE).then(c=>c.addAll(SHELL)).then(()=>self.skipWaiting())); });
 self.addEventListener('activate',e=>{ e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim())); });
 self.addEventListener('fetch',e=>{
