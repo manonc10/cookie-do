@@ -17,7 +17,7 @@
 /* Thème avant le premier rendu, pour éviter un flash : system | light | dark */
 (function(){ try{ var t=localStorage.getItem('cd_theme'); if(t==='light'||t==='dark'||t==='system') document.documentElement.setAttribute('data-theme',t); }catch(e){} })();
 </script>
-<link rel="stylesheet" href="css/app.css?v=9">
+<link rel="stylesheet" href="css/app.css?v=10">
 </head>
 <body>
 
@@ -27,9 +27,6 @@
     <div class="top">
       <h1>Recettes</h1>
       <div class="acts">
-        <button class="tbtn" id="randomBtn" title="Composer la semaine au hasard">
-          <svg viewBox="0 0 24 24"><path d="M18 4l3 3-3 3M21 7H9a6 6 0 0 0-6 6M6 20l-3-3 3-3M3 17h12a6 6 0 0 0 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg>Au hasard
-        </button>
         <button class="tbtn ic" id="accountBtn" aria-label="Réglages et compte">
           <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0" stroke-linecap="round"/></svg>
           <span class="dot hide" id="syncDot"></span>
@@ -50,8 +47,8 @@
     <div class="ill"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3" stroke-linecap="round"/></svg></div>
     <h3>Aucune recette trouvée</h3>
     <p>Enlève un filtre ou change les mots de recherche.</p>
+    <button type="button" class="btn" id="resetFind" style="margin:14px auto 0;flex:none;padding:10px 18px">Tout afficher</button>
   </div>
-  <div class="sec" style="justify-content:center"><button type="button" id="pcOpen" style="color:var(--mut);font-weight:500">Crédits photos</button></div>
 </section>
 
 <!-- ======= SEMAINE ======= -->
@@ -61,7 +58,7 @@
       <h1>Semaine</h1>
       <div class="acts">
         <button class="tbtn" id="weekRandomBtn"><svg viewBox="0 0 24 24"><path d="M18 4l3 3-3 3M21 7H9a6 6 0 0 0-6 6M6 20l-3-3 3-3M3 17h12a6 6 0 0 0 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg>Au hasard</button>
-        <button class="tbtn ic" id="logMealBtn" aria-label="Noter un plat déjà fait" title="Noter un plat déjà fait"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" stroke-linecap="round"/></svg></button>
+        <button class="tbtn ic" id="logMealBtn" aria-label="Noter un plat déjà fait" title="Noter un plat déjà fait"><svg viewBox="0 0 24 24"><path d="M12 8v4l3 2" stroke-linecap="round" stroke-linejoin="round"/><path d="M3.05 11a9 9 0 1 1 .5 4M3 4v4h4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
       </div>
     </div>
     <div class="sub" id="weekSub"></div>
@@ -116,7 +113,7 @@
     <p>Ajoute des recettes à la semaine et la liste se construit toute seule, rayon par rayon.</p>
   </div>
   <div class="fbar hide" id="validateBar">
-    <span><span id="vbCount">0</span> coché(s)<br><span class="sub">à ranger en rentrant</span></span>
+    <span><span id="vbCount">0</span><br><span class="sub">à ranger en rentrant</span></span>
     <button id="validateShop">Ranger au stock <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
   </div>
 </section>
@@ -186,8 +183,8 @@
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-<script src="js/qrcode.js?v=9"></script>
-<script src="js/data.js?v=9"></script>
-<script src="js/app.js?v=9"></script>
+<script src="js/qrcode.js?v=10"></script>
+<script src="js/data.js?v=10"></script>
+<script src="js/app.js?v=10"></script>
 </body>
 </html>
