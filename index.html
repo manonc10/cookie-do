@@ -17,7 +17,7 @@
 /* Thème avant le premier rendu, pour éviter un flash : system | light | dark */
 (function(){ try{ var t=localStorage.getItem('cd_theme'); if(t==='light'||t==='dark'||t==='system') document.documentElement.setAttribute('data-theme',t); }catch(e){} })();
 </script>
-<link rel="stylesheet" href="css/app.css?v=11">
+<link rel="stylesheet" href="css/app.css?v=12">
 </head>
 <body>
 
@@ -66,6 +66,7 @@
   <div class="days" id="days"></div>
   <div class="sec" id="weekH"><span>À cuisiner</span><button type="button" id="clearSelBtn">Tout retirer</button></div>
   <div class="grp" id="weekList"></div>
+  <div class="sec" id="weekFoot" style="text-transform:none"><span id="weekBalance" hidden></span><button type="button" id="planBtn" hidden>Répartir sur la semaine</button></div>
   <div class="empty" id="weekEmpty">
     <div class="ill"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4" stroke-linecap="round"/></svg></div>
     <h3>Pas encore de menu</h3>
@@ -183,8 +184,9 @@
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-<script src="js/qrcode.js?v=11"></script>
-<script src="js/data.js?v=11"></script>
-<script src="js/app.js?v=11"></script>
+<script src="js/qrcode.js?v=12"></script>
+<script src="js/data.js?v=12"></script>
+<script src="js/app.js?v=12"></script>
+<script src="js/plus.js?v=12"></script>
 </body>
 </html>
