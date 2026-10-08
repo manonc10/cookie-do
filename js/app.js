@@ -936,6 +936,7 @@ function renderShop(){
   sub.innerHTML=has||hiddenByPantry?`${nRec} recette${nRec>1?'s':''} · ${keys.length+hiddenByPantry} article${keys.length+hiddenByPantry>1?'s':''}${inStock?` · <span style="color:var(--ok);font-weight:600">${inStock} déjà en stock${settings.hidePantry?' (masqués)':''}</span>`:''}`:'Rayon par rayon, avec le nom anglais pour New World.';
   $('#shopEmpty').hidden=has||hiddenByPantry;
   $('#freeAdd').classList.remove('hide');
+  $('#shareShop').classList.toggle('hide',!has); $('#shopMore').classList.toggle('hide',!has&&!hiddenByPantry);
   if(!has){
     $('#validateBar').classList.add('hide');
     if(acquiredInMap.length){ $('#shopEmpty').hidden=true; cont.appendChild(acquiredNote(acquiredInMap)); }
@@ -978,7 +979,8 @@ function renderShop(){
   }
   const checkedCount=keys.filter(k=>shopChecked.has(k)).length;
   const vb=$('#validateBar');
-  vb.classList.toggle('hide',checkedCount===0); $('#vbCount').textContent=checkedCount;
+  vb.classList.toggle('hide',checkedCount===0); $('#vbCount').textContent=checkedCount+' article'+(checkedCount>1?'s cochés':' coché');
+  cont.style.paddingBottom=checkedCount?'84px':'';
   updateShopBadge();
 }
 function acquiredNote(keys){
@@ -1514,7 +1516,7 @@ function renderSettingsSheet(){
     </div>
     <div class="sec"><span>Compte</span></div>
     <div id="acBody"></div>
-    <div class="sec" style="justify-content:center;text-transform:none"><span>Cookie Do 3.0 · <button type="button" id="pcOpen2">crédits photos</button></span></div>`;
+    <div class="sec" style="justify-content:center;text-transform:none"><span>Cookie Do 3.3 · <button type="button" id="pcOpen2">crédits photos</button></span></div>`;
   $('#acClose').onclick=closeSheet;
   $('#segTheme').querySelectorAll('button').forEach(b=>b.onclick=()=>{ settings.theme=b.dataset.v; saveSettings(); $('#segTheme').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b)); });
   const tg=(id,key,after)=>{ const t=$('#'+id); t.onclick=()=>{ settings[key]=!settings[key]; saveSettings(); t.classList.toggle('on',settings[key]); t.setAttribute('aria-checked',settings[key]); if(after)after(); }; };
@@ -1661,14 +1663,13 @@ function switchView(v){
 $$('.tab').forEach(t=>t.onclick=()=>{ if(currentView===t.dataset.view) window.scrollTo({top:0,behavior:'smooth'}); else switchView(t.dataset.view); });
 window.addEventListener('scroll',()=>{ document.body.classList.toggle('scrolled',window.scrollY>40); },{passive:true});
 $('#accountBtn').onclick=openAccountSheet;
-$('#randomBtn').onclick=()=>{ randomWeek(); switchView('week'); };
 $('#weekRandomBtn').onclick=randomWeek;
 $('#clearSelBtn').onclick=()=>{ if(!selection.size) return; if(!confirm('Retirer toutes les recettes de la semaine ?')) return; selection.clear();save(LS.selection,[]);shopChecked.clear();save(LS.shopChecked,[]);clearAcquired();touch();refreshSelUI();renderRecipes();renderFridge();renderShop();renderWeek();};
 $('#cookClose').onclick=closeCook;
 $('#search').oninput=e=>{searchTerm=e.target.value.trim();$('#searchClr').classList.toggle('hide',!searchTerm);renderRecipes();};
 $('#searchClr').onclick=()=>{ $('#search').value=''; searchTerm=''; $('#searchClr').classList.add('hide'); renderRecipes(); };
 $('#openFilters').onclick=openFilterSheet;
-$('#pcOpen').onclick=openPhotoCredits;
+$('#resetFind').onclick=()=>{ $('#search').value=''; searchTerm=''; $('#searchClr').classList.add('hide'); quickToggle('all'); };
 function shoppingListText(){
   const map=buildShopping(); const acq=acquiredSet(); let out='🛒 Ma liste de courses (Cookie Do)\n';
   AISLE_ORDER.forEach(a=>{const ks=Object.keys(map).filter(k=>map[k].aisle===a&&!acq.has(k)&&!removedShopItems.has(k));if(!ks.length)return;out+='\n'+a+'\n';ks.forEach(k=>{const e=map[k];const q=e.mixed?e.mixed+' ':(e.hasQty?fmtQty(e.qty)+(e.unit?' '+unitLabel(e.unit,e.qty):'')+' ':'');out+='• '+q+e.item+'\n';});});
