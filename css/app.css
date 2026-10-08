@@ -387,3 +387,22 @@ html[data-theme="dark"] .timer-pop .tp-row button,html[data-theme="system"] .tim
   .search,.grp,.pick-list{margin-left:auto;margin-right:auto;width:calc(100% - 32px)}
   .sheet{border-radius:18px;margin-bottom:24px;max-height:calc(100% - 48px)}
 }
+
+/* ---------- 3.5 : menu par jour, saison, photos perso ---------- */
+.days button{flex:1;text-align:center;font-size:10.5px;color:var(--mut);padding:6px 0 5px;border-radius:10px;font-weight:500;background:none;min-height:56px}
+.days button b{display:block;font-size:15px;color:var(--fg);font-weight:600}
+.days button i{display:block;font-style:normal;font-size:9.5px;color:var(--accT);font-weight:600;min-height:12px;margin-top:1px}
+.days button.today{background:var(--acc)}
+.days button.today,.days button.today b,.days button.today i{color:var(--accFg)}
+.days button.done:not(.has)::after{content:"";display:block;width:4px;height:4px;border-radius:50%;background:var(--ok);margin:2px auto 0}
+.rw .when{display:inline-block;margin-top:5px;font-size:12px;font-weight:600;color:var(--accT);background:var(--accW);padding:3px 9px;border-radius:999px;text-align:left;line-height:1.35}
+.rw .when.empty{background:none;border:1px dashed var(--accT);padding:2px 8px}
+.slot{min-width:56px;height:34px;border-radius:9px;border:1px solid var(--ln);background:var(--sur2);color:var(--fg2);font-size:13px;font-weight:600;margin-left:6px}
+.slot.on{background:var(--acc);border-color:var(--acc);color:var(--accFg)}
+.slot.busy{opacity:.45}
+.rcard .tag.season{color:#2E7A4F;background:rgba(232,248,237,.95)}
+.rd-hero .cb.photo{left:auto;right:56px;width:auto;padding:0 10px;gap:5px;border-radius:999px;font-size:12px;font-weight:600;cursor:pointer}
+.rd-hero .cb.photo svg{width:16px;height:16px}
+.rd-hero .cb.photo2{left:auto;right:12px;top:50px;width:auto;padding:0 10px;border-radius:999px;font-size:12px;font-weight:600}
+#weekFoot{padding-top:8px}
+#weekBalance{color:var(--mut);font-size:12.5px}

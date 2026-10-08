@@ -161,7 +161,9 @@ let searchTerm='', activeTag=null, showFavOnly=false, courseFilter='all', quickF
 
 /* ---- réglages (sur l'appareil) ---- */
 const SETTINGS_KEY='cd_settings';
-let settings=Object.assign({theme:'system',persons:2,nz:true,hidePantry:false,bigText:false},load(SETTINGS_KEY,{}));
+let settings=Object.assign({theme:'system',persons:2,nz:true,hidePantry:false,bigText:false,aisles:null,staples:[],vegTarget:3,fishTarget:1},load(SETTINGS_KEY,{}));
+/* menu jour par jour : {recetteId: ['2026-10-08|soir', ...]} */
+let plan=load('cd_plan',{});
 function saveSettings(){ save(SETTINGS_KEY,settings); try{localStorage.setItem('cd_theme',settings.theme);}catch(e){} applyTheme(); }
 function applyTheme(){
   document.documentElement.setAttribute('data-theme',settings.theme||'system');
@@ -185,7 +187,7 @@ const $$=s=>[...document.querySelectorAll(s)];
 /* ---- cloud snapshot: gather + apply ---- */
 function snapshot(){
   return {v:4, custom:customRecipes, selection:[...selection], shopChecked:[...shopChecked],
-    history, cookState, pantry, favorites:[...favorites], ratings, prices, removedShop:[...removedShopItems], acquired:acquiredItems, freeShop:freeItems, notes, savedAt:Date.now()};
+    history, cookState, pantry, favorites:[...favorites], ratings, prices, removedShop:[...removedShopItems], acquired:acquiredItems, freeShop:freeItems, notes, plan, userPhotos, prefs:{persons:settings.persons,aisles:settings.aisles,staples:settings.staples,vegTarget:settings.vegTarget,fishTarget:settings.fishTarget,nz:settings.nz,hidePantry:settings.hidePantry}, savedAt:Date.now()};
 }
 function applySnapshot(s){
   if(!s||typeof s!=='object') return;
@@ -203,6 +205,10 @@ function applySnapshot(s){
   if(s.acquired) acquiredItems=migrateAcquired(s.acquired);
   if(Array.isArray(s.freeShop)) freeItems=s.freeShop;
   if(s.notes&&typeof s.notes==='object') notes=s.notes;
+  if(s.plan&&typeof s.plan==='object') plan=s.plan;
+  if(s.userPhotos&&typeof s.userPhotos==='object') userPhotos=Object.assign({},s.userPhotos,userPhotos);
+  if(s.prefs&&typeof s.prefs==='object'){ Object.assign(settings,s.prefs); save(SETTINGS_KEY,settings); }
+  save('cd_plan',plan); try{localStorage.setItem('cd_userPhotos',JSON.stringify(userPhotos));}catch(e){}
   save(LS.custom,customRecipes); save(LS.selection,[...selection]); save(LS.shopChecked,[...shopChecked]);
   save(LS.history,history); save(LS.cookState,cookState); save(LS.pantry,pantry);
   save(LS.favorites,[...favorites]); save(LS.ratings,ratings); save(LS.prices,prices); save(LS.removedShop,[...removedShopItems]); save('mm_acquired',acquiredItems); save(LS.freeShop,freeItems); save(LS.notes,notes);
@@ -299,8 +305,11 @@ const UI_ICONS={
 };
 function uiIcon(k,sw){ return UI(UI_ICONS[k]||'',sw); }
 /* photos des plats : fichiers du dossier photos/, repli sur le dessin au trait */
-function hasPhoto(id){ return PHOTOS.has(id); }
-function photoHtml(id,cls){ return hasPhoto(id)?`<img class="ph ${cls||''}" src="photos/${id}.jpg" alt="" loading="lazy" decoding="async" onerror="this.remove()">`:''; }
+/* photos perso (prises sur le téléphone) : id -> dataURL jpeg, prioritaires sur le catalogue */
+let userPhotos=load('cd_userPhotos',{});
+function photoSrc(id){ return userPhotos[id]||('photos/'+id+'.jpg'); }
+function hasPhoto(id){ return !!userPhotos[id]||PHOTOS.has(id); }
+function photoHtml(id,cls){ return hasPhoto(id)?`<img class="ph ${cls||''}" src="${photoSrc(id)}" alt="" loading="lazy" decoding="async" onerror="this.remove()">`:''; }
 function photoOrEmoji(id,cls){ const r=byId(id); return hasPhoto(id)?photoHtml(id,cls):`<div class="noph">${r?recipeEmoji(r):''}</div>`; }
 function kicker(r){
   const t=r.tags||[]; const parts=[];
@@ -779,12 +788,13 @@ function renderPantry(){
   $('#pantryH').hidden=!has; list.classList.toggle('hide',!has);
   if(!has)return;
   $('#pantryCount').textContent=pantry.length+' article'+(pantry.length>1?'s':'');
-  const order=pantry.map((p,i)=>({p,i})).sort((a,b)=>(b.p.at||0)-(a.p.at||0));
+  const stale_=p=>typeof isStale==='function'&&isStale(p);
+  const order=pantry.map((p,i)=>({p,i})).sort((a,b)=>(stale_(b.p)?1:0)-(stale_(a.p)?1:0)||(b.p.at||0)-(a.p.at||0));
   order.forEach(({p,i})=>{
     const wrap=document.createElement('div'); wrap.className='swrow';
     const row=document.createElement('div'); row.className='rw';
     const qtyStr=fmtPantryQty(p);
-    row.innerHTML=`<span class="tile">${pantryEmo(p.name)}</span><div class="b"><div class="t" style="font-weight:500">${p.name}</div><div class="m">${p.from==='courses'?'des courses':'ajouté'}${p.at?' · '+relDay(p.at):''}</div></div>
+    row.innerHTML=`<span class="tile">${pantryEmo(p.name)}</span><div class="b"><div class="t" style="font-weight:500">${p.name}</div><div class="m${stale_(p)?' warn':''}">${stale_(p)?'à utiliser vite · ':''}${p.from==='courses'?'des courses':'ajouté'}${p.at?' · '+relDay(p.at):''}</div></div>
       <div class="pm"><button data-m aria-label="Moins">−</button><span class="qty">${qtyStr||'1'}</span><button data-p aria-label="Plus">+</button></div>`;
     row.querySelector('[data-m]').onclick=()=>pantrySetQty(i,-1);
     row.querySelector('[data-p]').onclick=()=>pantrySetQty(i,+1);
@@ -811,13 +821,15 @@ function renderFridge(){
   $('#fridgeEmpty').hidden=has;
   $('#fridgeResultsH').hidden=!has; grid.classList.toggle('hide',!has);
   if(!has)return;
-  const ranked=allRecipes.map(r=>({r,miss:missingFor(r)}))
-    .sort((a,b)=> a.miss.length-b.miss.length || a.r.time-b.r.time)
-    .filter(x=>x.miss.length<=3).slice(0,12);
+  // on ne propose que des recettes qui utilisent le stock, ce qui doit partir vite compte double
+  const uses=r=>{ let n=0; pantry.forEach(p=>{ if(r.ingredients.some(i=>sameIngredient(baseIngredientName(i[2]),p.name))) n+=(typeof isStale==='function'&&isStale(p))?2:1; }); return n; };
+  const ranked=allRecipes.filter(r=>!isDessert(r)).map(r=>({r,miss:missingFor(r),use:uses(r)}))
+    .filter(x=>x.use>0&&x.miss.length<=6)
+    .sort((a,b)=> b.use-a.use || a.miss.length-b.miss.length || a.r.time-b.r.time).slice(0,12);
   $('#fridgeCount').textContent=ranked.length+' recette'+(ranked.length>1?'s':'');
   ranked.forEach(({r,miss})=>{
     const row=document.createElement('div'); row.className='rw thumb';
-    row.innerHTML=`${hasPhoto(r.id)?`<img class="th" src="photos/${r.id}.jpg" alt="" loading="lazy">`:`<div class="noph">${recipeEmoji(r)}</div>`}
+    row.innerHTML=`${hasPhoto(r.id)?`<img class="th" src="${photoSrc(r.id)}" alt="" loading="lazy">`:`<div class="noph">${recipeEmoji(r)}</div>`}
       <div class="b"><div class="t">${r.title}</div><div class="m ${miss.length?'warn':'ok'}">${r.time} min · ${miss.length?'il manque '+miss.join(', '):'tout est en stock'}</div></div>
       <button class="go" data-pick>${selection.has(r.id)?'✓':'+'}</button>`;
     row.querySelector('.b').onclick=()=>openRecipeDetail(r.id);
@@ -835,6 +847,7 @@ const AISLE_ICON={"Légumes & fruits":"legumes","Viandes & poissons":"viande","F
 const AISLE_CLASS={"Légumes & fruits":"ai-veg","Viandes & poissons":"ai-meat","Frais & crémerie":"ai-dairy","Œufs":"ai-egg","Pâtes, riz & féculents":"ai-carb","Conserves & épicerie":"ai-can","Autres":"ai-misc"};
 function shopKey(u,item){ return singular(baseIngredientName(item)); }
 /* map any aisle to a known one; unknown aisles fall back to "Autres" so nothing ever disappears */
+function aisleOrder(){ const a=settings.aisles; return (Array.isArray(a)&&a.length===AISLE_ORDER.length&&AISLE_ORDER.every(x=>a.includes(x)))?a:AISLE_ORDER; }
 function safeAisle(a){ return AISLE_ORDER.includes(a) ? a : 'Autres'; }
 /* unités équivalentes : évite "2 boîte + 1 boîtes" ou "1 l + 1 L" dans la liste */
 const UNIT_ALIAS={'boîtes':'boîte','boite':'boîte','boites':'boîte','gousse':'gousses','L':'l','mL':'ml','cuillère':'c. à soupe'};
@@ -943,7 +956,7 @@ function renderShop(){
     updateShopBadge(); return;
   }
   const byAisle={}; keys.forEach(k=>{(byAisle[map[k].aisle]=byAisle[map[k].aisle]||[]).push(k);});
-  AISLE_ORDER.forEach(aisle=>{
+  aisleOrder().forEach(aisle=>{
     const list=byAisle[aisle]; if(!list)return;
     list.sort((a,b)=>map[a].item.localeCompare(map[b].item));
     const done=list.filter(k=>shopChecked.has(k)).length;
@@ -1033,7 +1046,7 @@ function renderWeek(){
     const miss=pantry.length?missingFor(r):null;
     const row=document.createElement('div'); row.className='rw thumb';
     const state=pct>0?`<span style="color:var(--accT);font-weight:600">${pct} % fait</span>`:(miss?(miss.length?`<span class="warn" style="color:var(--warn)">${miss.length} article${miss.length>1?'s':''} manque${miss.length>1?'nt':''}</span>`:'<span style="color:var(--ok)">tout est en stock</span>'):mealsLabel(servingsFor(r)));
-    row.innerHTML=`${hasPhoto(id)?`<img class="th" src="photos/${id}.jpg" alt="" loading="lazy">`:`<div class="noph">${recipeEmoji(r)}</div>`}
+    row.innerHTML=`${hasPhoto(id)?`<img class="th" src="${photoSrc(id)}" alt="" loading="lazy">`:`<div class="noph">${recipeEmoji(r)}</div>`}
       <div class="b"><div class="t">${r.title}</div><div class="m">${r.time} min · ${state}</div></div>
       <button class="go" data-cook>Cuisiner</button>`;
     row.querySelector('[data-cook]').onclick=e=>{e.stopPropagation();openCook(id);};
@@ -1344,7 +1357,7 @@ function renderHistList(rows){
   const shown=histAll?rows:rows.slice(0,5);
   shown.forEach(h=>{ const [y,m,d]=h.date.split('-').map(Number); const rr=byId(h.id);
     const item=document.createElement('div'); item.className='rw thumb';
-    item.innerHTML=`${rr&&hasPhoto(h.id)?`<img class="th" src="photos/${h.id}.jpg" alt="" loading="lazy">`:`<div class="noph">${rr?recipeEmoji(rr):'🍽'}</div>`}
+    item.innerHTML=`${rr&&hasPhoto(h.id)?`<img class="th" src="${photoSrc(h.id)}" alt="" loading="lazy">`:`<div class="noph">${rr?recipeEmoji(rr):'🍽'}</div>`}
       <div class="b"><div class="t">${h.title}</div><div class="m">${d} ${MONTHS[m-1]} · ${daysSince(h.date)===0?"aujourd'hui":daysSince(h.date)===1?'hier':'il y a '+daysSince(h.date)+' jours'}${rr&&getRating(h.id)?' · '+'★'.repeat(getRating(h.id)):''}</div></div>
       ${rr?`<button class="go" data-again>Refaire</button>`:''}`;
     if(rr){ item.querySelector('[data-again]').onclick=(e)=>{ e.stopPropagation(); if(!selection.has(h.id)){toggleSelect(h.id); toast('Ajouté à la semaine');} else toast('Déjà dans la semaine'); };
@@ -1388,7 +1401,7 @@ function showDayMeals(iso,meals){
   const list=$('#dmList');
   meals.forEach(h=>{ const rr=byId(h.id);
     const item=document.createElement('div'); item.className='rw thumb';
-    item.innerHTML=`${rr&&hasPhoto(h.id)?`<img class="th" src="photos/${h.id}.jpg" alt="">`:`<div class="noph">${rr?recipeEmoji(rr):'🍽'}</div>`}
+    item.innerHTML=`${rr&&hasPhoto(h.id)?`<img class="th" src="${photoSrc(h.id)}" alt="">`:`<div class="noph">${rr?recipeEmoji(rr):'🍽'}</div>`}
       <div class="b"><div class="t">${h.title}</div><div class="m">${rr?'dans ton catalogue':'recette supprimée'}</div></div>${rr?'<span class="chev">›</span>':''}`;
     if(rr)item.onclick=()=>{ closeSheet(); openRecipeDetail(h.id); };
     list.appendChild(item);
@@ -1401,7 +1414,7 @@ $('#calToday').onclick=()=>{ const n=new Date(); calYear=n.getFullYear(); calMon
 $('#logMealBtn').onclick=openLogMealPicker;
 function openLogMealPicker(){
   const sh=$('#sheet');
-  const item=r=>`<button class="pick-recipe" data-r="${r.id}"><span class="th">${hasPhoto(r.id)?`<img src="photos/${r.id}.jpg" alt="" loading="lazy">`:recipeEmoji(r)}</span><span class="b"><span class="t">${r.title}</span><span class="m">${r.time} min · ${kicker(r)}</span></span></button>`;
+  const item=r=>`<button class="pick-recipe" data-r="${r.id}"><span class="th">${hasPhoto(r.id)?`<img src="${photoSrc(r.id)}" alt="" loading="lazy">`:recipeEmoji(r)}</span><span class="b"><span class="t">${r.title}</span><span class="m">${r.time} min · ${kicker(r)}</span></span></button>`;
   sh.innerHTML=`<div class="grab"></div>
     <div class="sh-head"><h3>Quel plat as-tu fait ?</h3><button class="sh-x" id="lpClose" aria-label="Fermer"><svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12" stroke-linecap="round"/></svg></button></div>
     <div class="sh-sub">Choisis une recette, tu indiqueras le jour ensuite.</div>
@@ -1415,10 +1428,12 @@ function openLogMealPicker(){
 
 /* ---------- ADD / EDIT ---------- */
 const AISLE_HINTS=[
+  [/poulet|boeuf|bœuf|porc|chorizo|lardon|jambon|saucisse|saumon|poisson|cabillaud|crevette|agneau|steak|viande|haché|hache|dinde|moules|filet/i,'Viandes & poissons'],
+  [/caf[ée]|(^|\s)th[ée](s|$|\s)|chocolat|biscuit|c[ée]r[ée]ales|confiture|vinaigre|moutarde|ketchup|mayonnaise/i,'Conserves & épicerie'],
   [/oignon|ail|carotte|courgette|poivron|tomate|épinard|salade|concombre|pomme de terre|brocoli|chou|champignon|citron|gingembre|basilic|menthe|persil|patate|aubergine|poireau|céleri|fruit|banane|pomme|avocat/i,'Légumes & fruits'],
   [/feta|mozzarella|parmesan|cheddar|ricotta|crème|lait|beurre|yaourt|fromage|halloumi/i,'Frais & crémerie'],
   [/œuf|oeuf/i,'Œufs'],
-  [/riz|pâtes|pate|gnocchi|couscous|lasagne|pain|semoule|quinoa|boulgour|farine|nouille/i,'Pâtes, riz & féculents'],
+  [/\briz\b|pâtes|\bpates?\b|gnocchi|couscous|lasagne|pain|semoule|quinoa|boulgour|farine|nouille/i,'Pâtes, riz & féculents'],
   [/pois chiche|lentille|haricot|maïs|mais|tomates concassées|lait de coco|bouillon|sauce soja|concentré|huile|curry|paprika|cumin|curcuma|épice|conserve|sucre/i,'Conserves & épicerie'],
 ];
 function guessAisle(item){ for(const[re,a]of AISLE_HINTS)if(re.test(item))return a; return 'Autres'; }
@@ -1520,7 +1535,7 @@ function renderSettingsSheet(){
     </div>
     <div class="sec"><span>Compte</span></div>
     <div id="acBody"></div>
-    <div class="sec" style="justify-content:center;text-transform:none"><span>Cookie Do 3.3 · <button type="button" id="pcOpen2">crédits photos</button></span></div>`;
+    <div class="sec" style="justify-content:center;text-transform:none"><span>Cookie Do 3.5 · <button type="button" id="pcOpen2">crédits photos</button></span></div>`;
   $('#acClose').onclick=closeSheet;
   $('#segTheme').querySelectorAll('button').forEach(b=>b.onclick=()=>{ settings.theme=b.dataset.v; saveSettings(); $('#segTheme').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b)); });
   const tg=(id,key,after)=>{ const t=$('#'+id); t.onclick=()=>{ settings[key]=!settings[key]; saveSettings(); t.classList.toggle('on',settings[key]); t.setAttribute('aria-checked',settings[key]); if(after)after(); }; };
@@ -1676,7 +1691,7 @@ $('#openFilters').onclick=openFilterSheet;
 $('#resetFind').onclick=()=>{ $('#search').value=''; searchTerm=''; $('#searchClr').classList.add('hide'); quickToggle('all'); };
 function shoppingListText(){
   const map=buildShopping(); const acq=acquiredSet(); let out='🛒 Ma liste de courses (Cookie Do)\n';
-  AISLE_ORDER.forEach(a=>{const ks=Object.keys(map).filter(k=>map[k].aisle===a&&!acq.has(k)&&!removedShopItems.has(k));if(!ks.length)return;out+='\n'+a+'\n';ks.forEach(k=>{const e=map[k];const q=e.mixed?e.mixed+' ':(e.hasQty?fmtQty(e.qty)+(e.unit?' '+unitLabel(e.unit,e.qty):'')+' ':'');out+='• '+q+e.item+'\n';});});
+  aisleOrder().forEach(a=>{const ks=Object.keys(map).filter(k=>map[k].aisle===a&&!acq.has(k)&&!removedShopItems.has(k));if(!ks.length)return;out+='\n'+a+'\n';ks.forEach(k=>{const e=map[k];const q=e.mixed?e.mixed+' ':(e.hasQty?fmtQty(e.qty)+(e.unit?' '+unitLabel(e.unit,e.qty):'')+' ':'');out+='• '+q+e.item+'\n';});});
   return out;
 }
 $('#shareShop').onclick=async()=>{
