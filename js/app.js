@@ -1144,8 +1144,12 @@ function openPriceSheet(id){
 }
 function ensureCookState(id){ const r=byId(id); if(!cookState[id])cookState[id]={servings:r.portions,steps:{}}; const cs=cookState[id]; if(cs.servings==null)cs.servings=cs.portions||r.portions; delete cs.portions; return cs; }
 function extractMinutes(t){ let m=t.match(/(\d+)\s*(?:à|-)\s*(\d+)\s*min/); if(m)return(+m[2])*60; m=t.match(/(\d+)\s*min/); if(m)return(+m[1])*60; m=t.match(/(\d+)\s*h/); if(m)return(+m[1])*3600; return null; }
-function openCook(id){ currentCook=id; ensureCookState(id); $('#cookTitle').textContent=byId(id).title; renderCookBody(); $('#cookModal').classList.add('open'); document.body.style.overflow='hidden'; $('#cookModal .modal-body').scrollTop=0; }
-function closeCook(){ $('#cookModal').classList.remove('open'); document.body.style.overflow=''; currentCook=null; window._splitMode=false; }
+/* l'écran reste allumé pendant qu'on cuisine (iOS 16.4+, Android) */
+let wakeLock=null;
+async function keepAwake(on){ try{ if(on&&'wakeLock' in navigator){ wakeLock=await navigator.wakeLock.request('screen'); } else if(!on&&wakeLock){ await wakeLock.release(); wakeLock=null; } }catch(e){} }
+document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='visible'&&currentCook) keepAwake(true); });
+function openCook(id){ keepAwake(true); currentCook=id; ensureCookState(id); $('#cookTitle').textContent=byId(id).title; renderCookBody(); $('#cookModal').classList.add('open'); document.body.style.overflow='hidden'; $('#cookModal .modal-body').scrollTop=0; }
+function closeCook(){ keepAwake(false); $('#cookModal').classList.remove('open'); document.body.style.overflow=''; currentCook=null; window._splitMode=false; }
 function renderCookBody(){
   const r=byId(currentCook),cs=cookState[currentCook],factor=cs.servings/r.portions;
   $('#cookMeta').textContent=r.time+' min · '+cs.servings+' portions · '+mealsLabel(cs.servings);
