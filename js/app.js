@@ -526,7 +526,7 @@ function openPhotoCredits(){
   }).join('');
   sh.innerHTML=`<div class="grab"></div>
     <div class="sh-head"><h3>Crédits photos</h3><button class="sh-x" id="pcClose" aria-label="Fermer">${xSvg()}</button></div>
-    <div class="sh-sub" style="margin-bottom:14px">Les photos des plats viennent de Wikimedia Commons et d'Openverse. Elles sont publiées sous licence libre (CC0, CC BY ou CC BY-SA) et réutilisables, chacune est créditée ci-dessous.</div>
+    <div class="sh-sub" style="margin-bottom:14px">Les photos viennent de Pixabay (licence Pixabay, utilisation libre) et de Wikimedia Commons (licences libres CC0, CC BY ou CC BY-SA). Chacune est créditée ci-dessous. Tes propres photos remplacent celles du catalogue.</div>
     <div class="sh-body" style="font-size:13px;color:var(--mut);display:flex;flex-direction:column;gap:10px">${rows||'<div>Aucune photo.</div>'}</div>`;
   $('#pcClose').onclick=closeSheet; openSheet();
 }
@@ -1535,7 +1535,7 @@ function renderSettingsSheet(){
     </div>
     <div class="sec"><span>Compte</span></div>
     <div id="acBody"></div>
-    <div class="sec" style="justify-content:center;text-transform:none"><span>Cookie Do 3.6 · <button type="button" id="pcOpen2">crédits photos</button></span></div>`;
+    <div class="sec" style="justify-content:center;text-transform:none"><span>Cookie Do 3.7 · <button type="button" id="pcOpen2">crédits photos</button></span></div>`;
   $('#acClose').onclick=closeSheet;
   $('#segTheme').querySelectorAll('button').forEach(b=>b.onclick=()=>{ settings.theme=b.dataset.v; saveSettings(); $('#segTheme').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b)); });
   const tg=(id,key,after)=>{ const t=$('#'+id); t.onclick=()=>{ settings[key]=!settings[key]; saveSettings(); t.classList.toggle('on',settings[key]); t.setAttribute('aria-checked',settings[key]); if(after)after(); }; };
