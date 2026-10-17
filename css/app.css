@@ -418,8 +418,8 @@ html[data-theme="dark"]{ --shC:0 1px 2px rgba(0,0,0,.5); }
 
 /* segment Plats / Desserts / Sauces */
 .seg-course{display:flex;gap:4px;margin:10px 16px 0;padding:3px;border-radius:11px;background:var(--sur3)}
-.seg-course button{flex:1;height:34px;border-radius:9px;font-size:14px;font-weight:600;color:var(--fg2);display:flex;align-items:center;justify-content:center;gap:6px;transition:background .15s}
-.seg-course button span{font-size:11px;font-weight:600;color:var(--mut)}
+.seg-course button{flex:1;min-width:0;height:34px;border-radius:9px;font-size:13.5px;font-weight:600;color:var(--fg2);display:flex;align-items:center;justify-content:center;gap:6px;transition:background .15s}
+.seg-course button span{font-size:10.5px;font-weight:600;color:var(--mut)}
 .seg-course button.on{background:var(--sur);color:var(--fg);box-shadow:0 1px 3px rgba(0,0,0,.12)}
 .sec-acts{display:flex;align-items:center;gap:10px}
 .sec .vt{width:30px;height:26px;display:inline-flex;align-items:center;justify-content:center;color:var(--accT)}
@@ -473,3 +473,5 @@ html[data-theme="dark"]{ --shC:0 1px 2px rgba(0,0,0,.5); }
 .pair-c .pa.on{background:var(--acc);color:#fff}
 /* quantités recalculées dans les étapes */
 .sq{font-weight:600;color:var(--accT)}
+
+@media (max-width:380px){ .seg-course button span{display:none} }
