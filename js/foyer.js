@@ -13,7 +13,7 @@ let foyerBusy=false, foyerTimer=null, foyerPoll=null, foyerErr='';
 
 /* ---- les champs partagés et leur forme ---- */
 function foyerLocal(){
-  return JSON.parse(JSON.stringify({selection:[...selection], shopChecked:[...shopChecked], removedShop:[...removedShopItems], freeShop:freeItems, pantry, plan, acquired:acquiredItems, history}));
+  return JSON.parse(JSON.stringify({selection:[...selection], shopChecked:[...shopChecked], removedShop:[...removedShopItems], freeShop:freeItems, pantry, plan, acquired:acquiredItems, history, removedFrom, acquiredFrom}));
 }
 function foyerApplyLocal(d){
   d=JSON.parse(JSON.stringify(d)); // jamais le même objet que la base commune
@@ -25,8 +25,10 @@ function foyerApplyLocal(d){
   if(d.plan&&typeof d.plan==='object') plan=d.plan;
   if(d.acquired&&typeof d.acquired==='object') acquiredItems=d.acquired;
   if(Array.isArray(d.history)) history=d.history;
+  if(d.removedFrom&&typeof d.removedFrom==='object') removedFrom=d.removedFrom;
+  if(d.acquiredFrom&&typeof d.acquiredFrom==='object') acquiredFrom=d.acquiredFrom;
   save(LS.selection,[...selection]); save(LS.shopChecked,[...shopChecked]); save(LS.removedShop,[...removedShopItems]);
-  save(LS.freeShop,freeItems); save(LS.pantry,pantry); save('cd_plan',plan); save('mm_acquired',acquiredItems); save(LS.history,history);
+  save(LS.freeShop,freeItems); save(LS.pantry,pantry); save('cd_plan',plan); save('mm_acquired',acquiredItems); save(LS.history,history); saveShopMarks();
 }
 const keyOf={freeShop:x=>norm(x.name), pantry:x=>norm(x.name)+'|'+(x.unit||''), history:x=>x.id+'|'+x.date};
 /* fusion d'un ensemble : remote + (ajouts locaux) - (retraits locaux) */
@@ -52,7 +54,9 @@ function foyerMerge(base,loc,rem){
     pantry:mergeList(base.pantry,loc.pantry,rem.pantry,keyOf.pantry),
     history:mergeList(base.history,loc.history,rem.history,keyOf.history),
     plan:mergeObj(base.plan,loc.plan,rem.plan),
-    acquired:mergeObj(base.acquired,loc.acquired,rem.acquired)
+    acquired:mergeObj(base.acquired,loc.acquired,rem.acquired),
+    removedFrom:mergeObj(base.removedFrom,loc.removedFrom,rem.removedFrom),
+    acquiredFrom:mergeObj(base.acquiredFrom,loc.acquiredFrom,rem.acquiredFrom)
   };
 }
 

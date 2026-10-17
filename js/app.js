@@ -146,6 +146,17 @@ function migrateAcquired(raw){
 }
 function isAcquired(k){ return Object.prototype.hasOwnProperty.call(acquiredItems,k); }
 function acquiredKeys(){ return Object.keys(acquiredItems); }
+/* recettes qui demandaient l'article au moment où on l'a retiré ou acheté :
+   l'article revient dans la liste seulement si une AUTRE recette en a besoin.
+   Avant, un article retiré restait caché pour toujours, et un achat était
+   oublié dès qu'on ajoutait n'importe quelle recette. */
+let removedFrom = load('cd_removedFrom', {});
+let acquiredFrom = load('cd_acquiredFrom', {});
+function coveredBy(list,e){ if(!list) return true; const ids=e&&e.ids?[...e.ids]:[]; return ids.every(id=>list.includes(id)); }
+function isRemoved(k,e){ return removedShopItems.has(k) && coveredBy(removedFrom[k],e); }
+function isAcq(k,e){ return isAcquired(k) && coveredBy(acquiredFrom[k],e); }
+function shopVisible(k,e){ return !isRemoved(k,e) && !isAcq(k,e); }
+function saveShopMarks(){ save(LS.removedShop,[...removedShopItems]); save('cd_removedFrom',removedFrom); save('mm_acquired',acquiredItems); save('cd_acquiredFrom',acquiredFrom); }
 let freeItems = load(LS.freeShop, []);
 let notes = load(LS.notes, {}); // clés d'articles retirés manuellement de la liste
 /* pantry = inventaire : [{name, qty, unit, from:'manuel'|'courses', at}] */
@@ -187,7 +198,7 @@ const $$=s=>[...document.querySelectorAll(s)];
 /* ---- cloud snapshot: gather + apply ---- */
 function snapshot(){
   return {v:4, custom:customRecipes, selection:[...selection], shopChecked:[...shopChecked],
-    history, cookState, pantry, favorites:[...favorites], ratings, prices, removedShop:[...removedShopItems], acquired:acquiredItems, freeShop:freeItems, notes, plan, userPhotos, prefs:{persons:settings.persons,aisles:settings.aisles,staples:settings.staples,vegTarget:settings.vegTarget,fishTarget:settings.fishTarget,nz:settings.nz,hidePantry:settings.hidePantry}, savedAt:Date.now()};
+    history, cookState, pantry, favorites:[...favorites], ratings, prices, removedShop:[...removedShopItems], removedFrom, acquired:acquiredItems, acquiredFrom, freeShop:freeItems, notes, plan, userPhotos, prefs:{persons:settings.persons,aisles:settings.aisles,staples:settings.staples,vegTarget:settings.vegTarget,fishTarget:settings.fishTarget,nz:settings.nz,hidePantry:settings.hidePantry}, savedAt:Date.now()};
 }
 function applySnapshot(s){
   if(!s||typeof s!=='object') return;
@@ -203,6 +214,8 @@ function applySnapshot(s){
   if(s.prices&&typeof s.prices==='object') prices=s.prices;
   if(Array.isArray(s.removedShop)) removedShopItems=new Set(s.removedShop);
   if(s.acquired) acquiredItems=migrateAcquired(s.acquired);
+  if(s.removedFrom&&typeof s.removedFrom==='object') removedFrom=s.removedFrom;
+  if(s.acquiredFrom&&typeof s.acquiredFrom==='object') acquiredFrom=s.acquiredFrom;
   if(Array.isArray(s.freeShop)) freeItems=s.freeShop;
   if(s.notes&&typeof s.notes==='object') notes=s.notes;
   if(s.plan&&typeof s.plan==='object') plan=s.plan;
@@ -211,7 +224,7 @@ function applySnapshot(s){
   save('cd_plan',plan); try{localStorage.setItem('cd_userPhotos',JSON.stringify(userPhotos));}catch(e){}
   save(LS.custom,customRecipes); save(LS.selection,[...selection]); save(LS.shopChecked,[...shopChecked]);
   save(LS.history,history); save(LS.cookState,cookState); save(LS.pantry,pantry);
-  save(LS.favorites,[...favorites]); save(LS.ratings,ratings); save(LS.prices,prices); save(LS.removedShop,[...removedShopItems]); save('mm_acquired',acquiredItems); save(LS.freeShop,freeItems); save(LS.notes,notes);
+  save(LS.favorites,[...favorites]); save(LS.ratings,ratings); save(LS.prices,prices); saveShopMarks(); save(LS.freeShop,freeItems); save(LS.notes,notes);
   rebuild();
 }
 /* called after any local mutation -> persist + schedule cloud push */
@@ -326,12 +339,25 @@ function fmtQty(n){
   const frac={0.25:'¼',0.33:'⅓',0.5:'½',0.66:'⅔',0.75:'¾'};
   const whole=Math.floor(r),rem=Math.round((r-whole)*100)/100;
   for(const[k,v]of Object.entries(frac)){if(Math.abs(rem-Number(k))<0.04)return(whole?whole:'')+v;}
-  return String(r);
+  return String(Math.round(r*10)/10).replace('.',',');
 }
 function norm(s){ return s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim(); }
 
 /* ---- servings scaling + cost ---- */
 /* effective servings for a recipe (user override or its base) */
+/* « Rincer 160 g de riz » : les quantités écrites dans les étapes suivent le nombre de portions.
+   On ne touche qu'aux mesures (g, ml, cuillères...), jamais aux minutes, degrés ou centimètres,
+   ni aux dosages « par litre ». */
+const STEP_QTY=/(\d+(?:[,.]\d+)?)(\s?)(kg|g|ml|cl|l|c\. à soupe|c\. à café)(?![\p{L}])(?!\s*(?:par|pour chaque|de plus))/gu;
+function scaleStepText(text,factor){
+  if(!factor||Math.abs(factor-1)<0.01) return text;
+  return text.replace(STEP_QTY,(m,n,sp,u)=>{ const v=parseFloat(n.replace(',','.'))*factor; let q=v;
+    if(u==='g'||u==='ml') q=v>=100?Math.round(v/10)*10:Math.round(v/5)*5||Math.round(v);
+    return `<b class="sq">${fmtQty(q)}${sp}${u}</b>`; });
+}
+function stepsHtml(r,factor){
+  return r.steps.map((s,i)=>{ const secs=extractMinutes(s); return `<div class="stp"><b class="mono">${String(i+1).padStart(2,'0')}</b><div>${scaleStepText(s,factor)}${secs?`<div><button class="tm" data-timer="${secs}" data-label="Étape ${i+1}"><svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2M9 2h6" stroke-linecap="round"/></svg>${Math.round(secs/60)} min</button></div>`:''}</div></div>`; }).join('');
+}
 function servingsFor(r){ const cs=cookState[r.id]; return (cs&&cs.servings)||r.portions; }
 function scaleFactor(r){ return servingsFor(r)/r.portions; }
 /* scaled quantity of an ingredient for current servings */
@@ -408,21 +434,26 @@ function recipeCat(r){
 }
 /* Les \b de JavaScript ne connaissent pas les lettres accentuées : « mozzarella râpée »
    donnait « mozzarella e ». On délimite donc les mots à la main (début/fin ou non-lettre). */
-const DESCRIPTORS=/(^|[^\p{L}])(égouttés?|égouttées?|râpés?|râpées?|frais|fraîches?|moyens?|moyennes?|surgelés?|surgelées?|coupés?|coupées?|entiers?|entières?|petits?|petites?|grands?|grandes?|gros|grosses?|bio)(?=$|[^\p{L}])/giu;
+const DESCRIPTORS=/(^|[^\p{L}])(très|bien|égouttés?|égouttées?|râpés?|râpées?|frais|fraîches?|moyens?|moyennes?|surgelés?|surgelées?|coupés?|coupées?|entiers?|entières?|petits?|petites?|grands?|grandes?|gros|grosses?|bio)(?=$|[^\p{L}])/giu;
 /* produits dont le « descripteur » fait partie du nom */
 const KEEP_WHOLE=/^(fromage frais|oignons? frais|petits? pois|gros sel|crème fraîche|haricots? verts?)$/i;
+/* expressions dont un mot ressemble à un descripteur : « petits pois surgelés » doit
+   rester « petits pois », pas devenir « pois » */
+const PROTECT=/petits? pois|fromage frais|fromage râpé|oignons? frais|crème fraîche|gros sel|haricots? verts?|petits? suisses?|grosses? crevettes?/gi;
 function baseIngredientName(item){
   const s=item.replace(/\(.*?\)/g,'').replace(/\s+/g,' ').trim();
   if(KEEP_WHOLE.test(s)) return s;
-  return s.replace(DESCRIPTORS,'$1').replace(/\s+/g,' ').replace(/^[\s,]+|[\s,]+$/g,'').trim();
+  const kept=[]; const masked=s.replace(PROTECT,m=>{ kept.push(m); return '\u0001'+(kept.length-1)+'\u0001'; });
+  return masked.replace(DESCRIPTORS,'$1').replace(/\s+/g,' ').replace(/^[\s,]+|[\s,]+$/g,'').trim()
+    .replace(/\u0001(\d+)\u0001/g,(m,i)=>kept[+i]);
 }
 /* Singulier d'un nom d'ingrédient normalisé (sans accents), mot par mot, pour que
    « 2 carottes » et « 1 carotte » tombent dans la même ligne de courses. */
-const SINGULAR_KEEP=new Set(['frais','gros','bruxelles','sous','pois','radis','cassis','anis','mais','ananas','jus','brebis','couscous','bras','pas','fois','tasse','epices','herbes','lentilles','pates','nouilles','gnocchis','epinards','cereales','flocons','pepites','dattes','noix','choux','oeufs']);
+const SINGULAR_KEEP=new Set(['bois','paris','gras','frais','gros','bruxelles','sous','pois','radis','cassis','anis','mais','ananas','jus','brebis','couscous','bras','pas','fois','tasse','epices','herbes','lentilles','pates','nouilles','gnocchis','epinards','cereales','flocons','pepites','dattes','noix','choux','oeufs']);
 function singularWord(w){
   if(w.length<4||SINGULAR_KEEP.has(w)) return w;
-  if(/aux$/.test(w)) return w.slice(0,-3)+'al';
   if(/(eaux|eux|oux)$/.test(w)) return w.slice(0,-1);
+  if(/aux$/.test(w)) return w.slice(0,-3)+'al';
   if(/ss$/.test(w)) return w;
   if(/s$/.test(w)) return w.slice(0,-1);
   return w;
@@ -434,28 +465,30 @@ function splitIngredient(item){
   return item.split(',').map(s=>s.trim()).filter(Boolean);
 }
 /* unités au pluriel dans la liste : « 2 boîtes », pas « 2 boîte » */
-const UNIT_PLURAL={'boîte':'boîtes','feuille':'feuilles','tranche':'tranches','poignée':'poignées','sachet':'sachets','paquet':'paquets','verre':'verres','tasse':'tasses','gousse':'gousses','morceau':'morceaux','boule':'boules','branche':'branches','brin':'brins','cube':'cubes','pot':'pots','bouquet':'bouquets'};
+const UNIT_PLURAL={'cube':'cubes','pot':'pots','bouquet':'bouquets','botte':'bottes','pavé':'pavés','filet':'filets','bâton':'bâtons','carré':'carrés','rouleau':'rouleaux','pâte':'pâtes','boîte':'boîtes','feuille':'feuilles','tranche':'tranches','poignée':'poignées','sachet':'sachets','paquet':'paquets','verre':'verres','tasse':'tasses','gousse':'gousses','morceau':'morceaux','boule':'boules','branche':'branches','brin':'brins','cube':'cubes','pot':'pots','bouquet':'bouquets'};
 /* pluriel d'affichage d'un nom : les mots avant « de / à / au » prennent un s,
    ceux d'après restent (« pommes de terre », « citrons verts ») */
-const NO_PLURAL=new Set(['basilic','persil','menthe','coriandre','aneth','ciboulette','sauge','thym','romarin','roquette','estragon','laurier','ail','pain','riz','sel','poivre','huile','beurre','lait','sucre','farine','miel','moutarde','vinaigre','passata','parmesan','cheddar','gruyere','maïs','cumin','curry','paprika','curcuma','chapelure','houmous','pesto','miso']);
+const NO_PLURAL=new Set(['basilic','persil','menthe','coriandre','aneth','ciboulette','sauge','thym','romarin','roquette','estragon','laurier','ail','riz','sel','poivre','huile','beurre','lait','sucre','farine','miel','moutarde','vinaigre','passata','parmesan','cheddar','gruyere','maïs','cumin','curry','paprika','curcuma','chapelure','houmous','pesto','miso']);
 function pluralName(name){
   if(NO_PLURAL.has(norm(name).split(' ')[0])) return name;
+  if(/^chou(-fleur)?\b/i.test(name)) return name.replace(/^chou-fleur/i,'choux-fleurs').replace(/^chou\b(?!-)/i,'choux');
   const words=name.split(' '); const out=[]; let stop=false;
   for(const w of words){
-    if(stop||/^(de|du|des|d'|d’|à|au|aux|en|et|sans)$/i.test(w)){ stop=true; out.push(w); continue; }
-    out.push(/(s|x|z)$/i.test(w)?w:(/(eau|au|eu)$/i.test(w)?w+'x':(/al$/i.test(w)?w.slice(0,-2)+'aux':w+'s')));
+    if(stop||/^(de|du|des|d'|d’|à|au|aux|en|et|sans|ou)$/i.test(w)||/^(d|l)['’]/i.test(w)){ stop=true; out.push(w); continue; }
+    out.push(/^(nature|bio|maison|frais|fraîche|basilic|pita|burger)$/i.test(w)||/(s|x|z)$/i.test(w)?w:(/(eau|au|eu)$/i.test(w)?w+'x':(/al$/i.test(w)?w.slice(0,-2)+'aux':w+'s')));
   }
   return out.join(' ');
 }
-function unitLabel(u,q){ if(!u) return ''; if(q!=null&&q>1&&UNIT_PLURAL[u]) return UNIT_PLURAL[u]; return u; }
+function unitLabel(u,q){ if(!u) return ''; u=canonUnit(u); if(q!=null&&q>=2&&UNIT_PLURAL[u]) return UNIT_PLURAL[u]; return u; }
 /* Nom générique / anglais qu'on trouve en rayon à New World ou Woolworths (NZ).
    Clé = nom normalisé (sans accents, minuscule). Aide à repérer le produit en magasin. */
 function nzName(item){
   const n=norm(baseIngredientName(item));
   if(NZ_NAMES[n])return NZ_NAMES[n];
   // try partial (e.g. "pâte brisée bio" -> pate brisee)
-  for(const k in NZ_NAMES){ if(n.includes(k))return NZ_NAMES[k]; }
-  return '';
+  // la clé la plus longue gagne : « vinaigre de vin blanc » avant « vinaigre de vin »
+  let best=''; for(const k in NZ_NAMES){ if(k.length>best.length&&(' '+n+' ').includes(' '+k+' ')) best=k; }
+  return best?NZ_NAMES[best]:'';
 }
 
 /* ---------- ingredient / tag universe ---------- */
@@ -526,7 +559,7 @@ function openPhotoCredits(){
   }).join('');
   sh.innerHTML=`<div class="grab"></div>
     <div class="sh-head"><h3>Crédits photos</h3><button class="sh-x" id="pcClose" aria-label="Fermer">${xSvg()}</button></div>
-    <div class="sh-sub" style="margin-bottom:14px">Les photos viennent de Pixabay (licence Pixabay, utilisation libre) et de Wikimedia Commons (licences libres CC0, CC BY ou CC BY-SA). Chacune est créditée ci-dessous. Tes propres photos remplacent celles du catalogue.</div>
+    <div class="sh-sub" style="margin-bottom:14px">Les photos viennent de Pixabay (licence Pixabay, utilisation libre), de Wikimedia Commons et de Flickr via Openverse (licences libres CC0, CC BY ou CC BY-SA). Chacune est créditée ci-dessous. Tes propres photos remplacent celles du catalogue.</div>
     <div class="sh-body" style="font-size:13px;color:var(--mut);display:flex;flex-direction:column;gap:10px">${rows||'<div>Aucune photo.</div>'}</div>`;
   $('#pcClose').onclick=closeSheet; openSheet();
 }
@@ -650,7 +683,6 @@ function toggleSelect(id){
   // la sélection change => c'est une nouvelle liste de courses : on ne garde
   // pas les "déjà rangé" d'une session précédente, sinon des ingrédients
   // manquent silencieusement (c'est ce qui faisait disparaître la crème).
-  if(acquiredKeys().length) clearAcquired();
   save(LS.selection,[...selection]); touch(); refreshSelUI(); renderRecipes(); renderFridge();
 }
 function refreshSelUI(){
@@ -845,24 +877,90 @@ $('#clearPantry').onclick=()=>{ if(pantry.length&&confirm('Vider tout le stock ?
 const AISLE_ORDER=["Légumes & fruits","Viandes & poissons","Frais & crémerie","Œufs","Pâtes, riz & féculents","Conserves & épicerie","Autres"];
 const AISLE_ICON={"Légumes & fruits":"legumes","Viandes & poissons":"viande","Frais & crémerie":"frais","Œufs":"oeufs","Pâtes, riz & féculents":"feculents","Conserves & épicerie":"conserves","Autres":"autres"};
 const AISLE_CLASS={"Légumes & fruits":"ai-veg","Viandes & poissons":"ai-meat","Frais & crémerie":"ai-dairy","Œufs":"ai-egg","Pâtes, riz & féculents":"ai-carb","Conserves & épicerie":"ai-can","Autres":"ai-misc"};
-function shopKey(u,item){ return singular(baseIngredientName(item)); }
+/* même produit sous deux noms : une seule ligne de courses */
+const SHOP_ALIAS={
+  'champignon de paris':'champignon','oignon nouveau':'oignon vert','cebette':'oignon vert',
+  'zeste de citron':'citron','jus de citron':'citron','zeste et jus de citron':'citron',
+  'jus de citron vert':'citron vert','zeste de citron vert':'citron vert',
+  'beurre mou':'beurre','beurre doux':'beurre','creme liquide':'creme','creme entiere':'creme','tofu ferme':'tofu',
+  'coeur de laitue romaine':'salade romaine','cœur de laitue romaine':'salade romaine','laitue romaine':'salade romaine',
+  'feuille de salade':'salade','laitue':'salade','gousse d\'ail':'ail','tete d\'ail':'ail',
+  'blanc de poulet':'blanc de poulet','escalope de poulet':'blanc de poulet','filet de poulet':'blanc de poulet',
+  'jaune d\'oeuf':'oeuf','jaune d\'œuf':'oeuf','blanc d\'oeuf':'oeuf','blanc d\'œuf':'oeuf','œuf':'oeuf',
+  'tomate concassee':'tomate concassee','pulpe de tomate':'tomate concassee',
+  'bouillon de legume':'bouillon de legume','cube de bouillon de legume':'bouillon de legume',
+  'bouillon de volaille':'bouillon de volaille','cube de bouillon de volaille':'bouillon de volaille',
+  'piment rouge':'piment','piment frais':'piment',
+  'muscade':'noix de muscade','cumin moulu':'cumin','fecule de mais':'maizena','sucre en poudre':'sucre','sucre semoule':'sucre',
+  'cacao en poudre':'cacao','origan seche':'origan','thym seche':'thym','vin blanc sec':'vin blanc','poivre concasse':'poivre noir concasse',
+  'asperge verte':'asperge','thon au naturel':'thon','riz a risotto':'riz arborio','riz rond a paella':'riz a paella','moule verte':'moule',
+  'tortilla de ble':'tortilla','extrait de vanille':'vanille','chou blanc':'chou','salade verte':'salade',
+  'haut de cuisse de poulet desosse':'cuisse de poulet desossee','haut de cuisse de poulet':'cuisse de poulet','haut de cuisse de poulet avec peau':'cuisse de poulet'
+};
+function shopKey(u,item){ const k=singular(baseIngredientName(item)).replace(/œ/g,'oe'); return SHOP_ALIAS[k]||k; }
+/* équivalences pour additionner « 2 oignons » et « 300 g d'oignons » :
+   poids d'une pièce (g), contenance d'une boîte, volume couvert par un cube */
+const PIECE_G={'chou':1000,'filet de poisson blanc':150,'oignon':150,'oignon rouge':150,'echalote':30,'pomme de terre':170,'carotte':120,'courgette':250,'tomate':130,
+  'pomme':180,'poire':180,'patate douce':300,'aubergine':300,'poivron':180,'poivron rouge':180,'poivron vert':180,'poivron jaune':180,
+  'citron':120,'citron vert':70,'banane':120,'avocat':180,'concombre':300,'poireau':200,'brocoli':400,'chou-fleur':800,
+  'courge butternut':1000,'potiron':1500,'mangue':300,'navet':150,'betterave':150,'panais':150,'fenouil':250,
+  'oeuf':55,'yaourt nature':125,'yaourt':125,'mozzarella':125,'feta':200,'halloumi':200,'tofu':300,'pave de saumon':130,
+  'dos de cabillaud':150,'steak hache':125,'saucisse':80,'blanc de poulet':150,'cuisse de poulet':250};
+const BOX_G={'tomate concassee':400,'pois chiche':400,'haricot rouge':400,'haricot noir':400,'haricot blanc':400,'lentille':400,
+  'mais':300,'thon':140,'sardine a l\'huile':120,'ananas':450};
+const BOX_ML={'lait de coco':400,'creme de coco':400};
+const CUBE_ML={'bouillon de legume':500,'bouillon de volaille':500,'bouillon de boeuf':500,'bouillon de bœuf':500};
+/* jus de citron : une cuillère à soupe = 3 c. à café ; un citron donne ≈ 3 c. à soupe, un citron vert ≈ 2 */
+const PREFER_WEIGHT=new Set(['filet de poisson blanc','blanc de poulet','cuisse de poulet','pave de saumon','dos de cabillaud','steak hache','saucisse','tofu','feta','mozzarella','halloumi']);
+const JUICE_CC={'citron':9,'citron vert':6};
+/* fond commun pour une même ligne : on passe tout en pièces (ou boîtes, cubes) quand c'est ce qu'on achète */
+function unifyUnits(k,fams){
+  const out=Object.assign({},fams); let pieces=out['u:']||0, has=('u:' in out);
+  const w=PIECE_G[k];
+  if(w&&out.poids!=null&&has){
+    // viande et poisson s'achètent au poids : on convertit les pièces en grammes
+    if(PREFER_WEIGHT.has(k)){ out.poids+=pieces*w; delete out['u:']; has=false; pieces=0; }
+    else { pieces+=out.poids/w; delete out.poids; }
+  }
+  if(JUICE_CC[k]&&out['cuillère']!=null){ pieces+=out['cuillère']/JUICE_CC[k]; delete out['cuillère']; has=true; }
+  if(has) out['u:']=pieces;
+  const bg=BOX_G[k]; if(bg&&out['u:boîte']!=null&&out.poids!=null){ out['u:boîte']+=out.poids/bg; delete out.poids; }
+  const bm=BOX_ML[k]; if(bm&&out['u:boîte']!=null&&out.volume!=null){ out['u:boîte']+=out.volume/bm; delete out.volume; }
+  const cm=CUBE_ML[k]; if(cm&&(out['u:cube']!=null||out['u:']!=null)){ const c=(out['u:cube']||0)+(out['u:']||0)+(out.volume?out.volume/cm:0); delete out['u:']; delete out.volume; out['u:cube']=c; }
+  return out;
+}
+/* arrondi « liste de courses » : on n'achète pas 1⅓ oignon ni 487 g de pâtes */
+function shopRound(q,u){
+  if(q==null) return q;
+  if(!u||['boîte','cube','pot','sachet','paquet','bouquet','botte','pavé','filet','tranche','pâte','rouleau','gousse','feuille','boule','morceau','brin','branche','bâton','carré','verre','tasse','poignée'].includes(u)) return q<=0?0:Math.max(1,Math.ceil(q-0.05));
+  if(u==='g') return q<100?Math.ceil(q/5)*5:(q<1000?Math.ceil(q/10)*10:q);
+  if(u==='kg') return Math.round(q*10)/10;
+  if(u==='ml') return Math.ceil(q/5)*5;
+  if(u==='cl') return Math.ceil(q);
+  if(u==='l') return Math.round(q*10)/10;
+  if(u==='c. à soupe'||u==='c. à café') return Math.ceil(q*2)/2;
+  return q;
+}
+const HERB_RE=/^(basilic|persil|coriandre|menthe|ciboulette|aneth|estragon|cerfeuil|thym frais|romarin frais)$/;
 /* map any aisle to a known one; unknown aisles fall back to "Autres" so nothing ever disappears */
 function aisleOrder(){ const a=settings.aisles; return (Array.isArray(a)&&a.length===AISLE_ORDER.length&&AISLE_ORDER.every(x=>a.includes(x)))?a:AISLE_ORDER; }
 function safeAisle(a){ return AISLE_ORDER.includes(a) ? a : 'Autres'; }
 /* unités équivalentes : évite "2 boîte + 1 boîtes" ou "1 l + 1 L" dans la liste */
-const UNIT_ALIAS={'boîtes':'boîte','boite':'boîte','boites':'boîte','gousse':'gousses','L':'l','mL':'ml','cuillère':'c. à soupe'};
-function canonUnit(u){ return UNIT_ALIAS[u]||u||''; }
+const UNIT_ALIAS={'boite':'boîte','boites':'boîte','L':'l','mL':'ml','cuillère':'c. à soupe','cuillères':'c. à soupe','cs':'c. à soupe','cc':'c. à café','c. à s.':'c. à soupe','c. à c.':'c. à café','pincées':'pincée'};
+/* « 2 gousses » et « 1 gousse » : une seule unité, au singulier ; le pluriel se fait à l'affichage */
+const UNIT_SING=(()=>{ const m={}; Object.entries({'boîte':'boîtes','feuille':'feuilles','tranche':'tranches','poignée':'poignées','sachet':'sachets','paquet':'paquets','verre':'verres','tasse':'tasses','gousse':'gousses','morceau':'morceaux','boule':'boules','branche':'branches','brin':'brins','cube':'cubes','pot':'pots','bouquet':'bouquets','botte':'bottes','pavé':'pavés','filet':'filets','bâton':'bâtons','carré':'carrés','rouleau':'rouleaux'}).forEach(([a,b])=>{ m[b]=a; }); return m; })();
+function canonUnit(u){ u=UNIT_ALIAS[u]||u||''; return UNIT_SING[u]||u; }
 /* familles d'unités convertibles : 3 c. à café = 1 c. à soupe, 1 kg = 1000 g, etc.
    Sans ça, une même épice comptée en cuillère à café dans une recette et en cuillère
    à soupe dans une autre s'affichait "4 c. à café + 4 c. à soupe" dans les courses. */
 const UNIT_FAMILY={
   'g':['poids',1], 'kg':['poids',1000],
   'ml':['volume',1], 'cl':['volume',10], 'l':['volume',1000],
-  'c. à café':['cuillère',1], 'c. à soupe':['cuillère',3], 'pincée':['cuillère',0.25]
+  'c. à café':['cuillère',1], 'c. à soupe':['cuillère',3]
 };
 function unitFamily(u){ const f=UNIT_FAMILY[canonUnit(u)]; return f?f[0]:('u:'+canonUnit(u)); }
 /* unités « à la louche », qui s'effacent devant une pesée ou un nombre de pièces */
-const VAGUE_FAMILIES=new Set(['u:feuilles','u:feuille','u:poignées','u:poignée','u:brins','u:brin','u:branches','u:branche','cuillère']);
+const VAGUE_FAMILIES=new Set(['u:feuille','u:poignée','u:brin','u:branche','u:pincée','cuillère']);
 function toBaseUnit(q,u){ const f=UNIT_FAMILY[canonUnit(u)]; return f?q*f[1]:q; }
 function fromBaseUnit(v,fam){
   if(fam==='poids')    return v>=1000 ? [v/1000,'kg'] : [v,'g'];
@@ -879,57 +977,65 @@ function buildShopping(){
     r.ingredients.forEach(([q,u,item0,aisle])=>{
       splitIngredient(item0).forEach((item,idx)=>{
         if(isNotPurchasable(item)) return;
-        u=canonUnit(u);
-        const k=shopKey(u,item);
-        const base=baseIngredientName(item)||item;
-        if(!map[k])map[k]={qty:0,hasQty:false,unit:u,item:base,names:{},aisle:safeAisle(aisle),units:{},from:new Set()};
-        // on retient chaque forme vue (carotte / carottes) pour choisir l'affichage à la fin
-        map[k].names[base]=(map[k].names[base]||0)+1;
+        let uu=canonUnit(u);
+        const k=shopKey(uu,item);
+        let base=baseIngredientName(item)||item;
+        if(SHOP_ALIAS[singular(base).replace(/œ/g,'oe')]) base=null;   // le nom affiché viendra de la forme canonique
+        if(!uu && HERB_RE.test(k)) uu='bouquet';                         // « 1 basilic » = un bouquet
+        if(!uu && /^bouillon/.test(k)) uu='cube';
+        if(!map[k])map[k]={qty:0,hasQty:false,unit:uu,item:base||k,names:{},aisle:safeAisle(aisle),units:{},from:new Set(),ids:new Set()};
+        if(base) map[k].names[base]=(map[k].names[base]||0)+1;
         // « sel, poivre » : la quantité ne vaut que pour le premier morceau
         if(q!=null && idx===0){
-          const uu=u||'';
-          map[k].units[uu]=(map[k].units[uu]||0)+q*f;
+          map[k].units[uu]=(map[k].units[uu]||0)+Number(q)*f;
           map[k].hasQty=true;
         }
-        map[k].from.add(r.title);
+        map[k].from.add(r.title); map[k].ids.add(r.id);
       });
     });
   });
   freeItems.forEach(f=>{
     const k='libre|'+norm(f.name);
-    if(!map[k])map[k]={qty:0,hasQty:false,unit:'',item:f.name,aisle:guessAisle(f.name),units:{},from:new Set(['Ajout manuel'])};
+    if(!map[k])map[k]={qty:0,hasQty:false,unit:'',item:f.name,aisle:guessAisle(f.name),units:{},from:new Set(['Ajout manuel']),ids:new Set()};
   });
-  // resolve display qty/unit: if a single unit, show summed qty; if mixed units, show them combined
-  Object.values(map).forEach(e=>{
-    // on regroupe d'abord par famille (poids, volume, cuillères...), puis on convertit
-    const fams={};
+  Object.entries(map).forEach(([k,e])=>{
+    // on regroupe d'abord par famille (poids, volume, cuillères, pièces...), puis on convertit
+    let fams={};
     Object.keys(e.units).forEach(u=>{ const f=unitFamily(u); fams[f]=(fams[f]||0)+toBaseUnit(e.units[u],u); });
+    fams=unifyUnits(k,fams);
     // « 4 feuilles + 1 basilic », « 2 poignées + 500 g épinards » : quand une mesure
     // précise existe, les mesures vagues ne changent rien à ce qu'on achète
+    if(Object.keys(fams).length>1) delete fams['u:pincée'];   // une pincée ne change rien à l'achat
     const famKeys=Object.keys(fams);
     if(famKeys.length>1){
       const precise=famKeys.filter(f=>!VAGUE_FAMILIES.has(f));
       if(precise.length) famKeys.filter(f=>VAGUE_FAMILIES.has(f)).forEach(f=>{ delete fams[f]; });
     }
-    const parts=Object.keys(fams).map(f=>fromBaseUnit(fams[f],f));
+    const parts=Object.keys(fams).map(f=>{ const [q,u]=fromBaseUnit(fams[f],f); return [shopRound(q,u),u]; });
     if(parts.length===1){ e.qty=parts[0][0]; e.unit=parts[0][1]; }
-    else if(parts.length>1){ e.qty=null; e.unit=''; e.mixed=parts.map(([q,u])=>fmtQty(q)+(u?' '+unitLabel(u,q):'')).join(' + '); }
-    // nom affiché : la forme au pluriel si on en achète plusieurs, sinon la plus fréquente
-    if(e.names){
-      const forms=Object.keys(e.names);
-      if(forms.length>1){
-        const plural=forms.find(n=>/s$/i.test(n)), sing=forms.find(n=>!/s$/i.test(n));
-        const many=e.hasQty && e.qty!=null && e.qty>1 && !e.unit;
-        e.item=(many?(plural||sing):(sing||plural))||e.item;
-      } else if(e.hasQty && e.qty!=null && e.qty>1 && !e.unit){
-        e.item=pluralName(e.item);   // « 5 oignon » -> « 5 oignons »
-      }
-    }
+    else if(parts.length>1){ e.qty=null; e.unit=''; e.mixed=parts.map(([q,u])=>fmtShopQty(q,u)+(u?' '+unitLabel(u,q):'')).join(' + '); }
+    // nom affiché : forme canonique pour les synonymes, pluriel si on en achète plusieurs
+    const forms=Object.keys(e.names||{});
+    if(!forms.length && !k.startsWith('libre|')) e.item=CANON_NAME[k]||e.item;
+    else if(forms.length){ e.item=forms.sort((a,b)=>e.names[b]-e.names[a])[0]; }
+    if(e.hasQty && e.qty!=null && e.qty>=2 && !e.unit && !k.startsWith('libre|')) e.item=pluralName(singularDisplay(e.item));
+    else if(e.hasQty && e.qty!=null && e.qty<2 && !e.unit && forms.length>1) e.item=singularDisplay(e.item);
   });
   return map;
 }
+/* noms affichés des produits regroupés par SHOP_ALIAS */
+const CANON_NAME={'noix de muscade':'noix de muscade','cumin':'cumin','maizena':'maïzena','sucre':'sucre','cacao':'cacao','origan':'origan','thym':'thym','vin blanc':'vin blanc','poivre noir concasse':'poivre noir concassé','asperge':'asperges','thon':'thon','riz arborio':'riz à risotto (arborio)','riz a paella':'riz à paella','moule':'moules','tortilla':'tortillas','vanille':'vanille','chou':'chou','cuisse de poulet desossee':'cuisses de poulet désossées','cuisse de poulet':'cuisses de poulet','champignon':'champignons','oignon vert':'oignon vert','citron':'citron','citron vert':'citron vert','beurre':'beurre','creme':'crème liquide','tofu':'tofu','salade romaine':'salade romaine','salade':'salade','ail':'ail','blanc de poulet':'blanc de poulet','jambon':'jambon','oeuf':'œuf','tomate concassee':'tomates concassées','bouillon de legume':'bouillon de légumes','bouillon de volaille':'bouillon de volaille','piment':'piment'};
+/* « carottes » -> « carotte » pour pouvoir remettre le bon pluriel ensuite */
+function singularDisplay(name){
+  if(NO_PLURAL.has(norm(name).split(' ')[0])) return name;
+  const words=name.split(' '); let stop=false;
+  return words.map(w=>{ if(stop||/^(de|du|des|d'|d’|à|au|aux|en|et|sans|ou)$/i.test(w)||/^(d|l)['’]/i.test(w)){ stop=true; return w; }
+    if(w.length<4||SINGULAR_KEEP.has(norm(w))) return w; if(/eaux$/i.test(w)) return w.slice(0,-1); if(/s$/i.test(w)&&!/ss$/i.test(w)) return w.slice(0,-1); return w; }).join(' ');
+}
+/* kg et litres en décimales (« 1,2 kg »), le reste comme dans les recettes */
+function fmtShopQty(q,u){ if(q==null) return ''; if(u==='kg'||u==='l') return String(Math.round(q*10)/10).replace('.',','); return fmtQty(q); }
 function acquiredSet(){ return new Set(acquiredKeys()); }
-function clearAcquired(){ acquiredItems={}; save('mm_acquired',{}); }
+function clearAcquired(){ acquiredItems={}; acquiredFrom={}; removedShopItems=new Set(); removedFrom={}; saveShopMarks(); }
 function syncHidePantryBtn(hidden){}
 function inPantryByName(itemName){
   return !!matchInPantry(baseIngredientName(itemName)||itemName);
@@ -937,15 +1043,15 @@ function inPantryByName(itemName){
 function renderShop(){
   const cont=$('#shopList'); cont.innerHTML='';
   const map=buildShopping();
-  let keys=Object.keys(map).filter(k=>!removedShopItems.has(k)&&!isAcquired(k));
+  let keys=Object.keys(map).filter(k=>shopVisible(k,map[k]));
   let hiddenByPantry=0;
   if(settings.hidePantry){ const before=keys.length; keys=keys.filter(k=>!inPantryByName(map[k].item)); hiddenByPantry=before-keys.length; }
   syncHidePantryBtn(hiddenByPantry);
-  const acquiredInMap=Object.keys(map).filter(k=>isAcquired(k));
+  const acquiredInMap=Object.keys(map).filter(k=>isAcq(k,map[k]));
   const has=keys.length>0;
   const nRec=[...selection].filter(id=>byId(id)).length;
   const sub=$('#shopSub');
-  const inStock=Object.keys(map).filter(k=>!removedShopItems.has(k)&&!isAcquired(k)&&inPantryByName(map[k].item)).length;
+  const inStock=Object.keys(map).filter(k=>shopVisible(k,map[k])&&inPantryByName(map[k].item)).length;
   sub.innerHTML=has||hiddenByPantry?`${nRec} recette${nRec>1?'s':''} · ${keys.length+hiddenByPantry} article${keys.length+hiddenByPantry>1?'s':''}${inStock?` · <span style="color:var(--ok);font-weight:600">${inStock} déjà en stock${settings.hidePantry?' (masqués)':''}</span>`:''}`:'Rayon par rayon, avec le nom anglais pour New World.';
   $('#shopEmpty').hidden=has||hiddenByPantry;
   $('#freeAdd').classList.remove('hide');
@@ -964,7 +1070,7 @@ function renderShop(){
     const sec=document.createElement('div'); sec.className='grp';
     list.forEach(k=>{
       const e=map[k],isDone=shopChecked.has(k);
-      const qtyStr=e.mixed?e.mixed:(e.hasQty?fmtQty(e.qty)+(e.unit?' '+unitLabel(e.unit,e.qty):''):'');
+      const qtyStr=e.mixed?e.mixed:(e.hasQty?fmtShopQty(e.qty,e.unit)+(e.unit?' '+unitLabel(e.unit,e.qty):''):'');
       const fromArr=[...e.from];
       const nz=settings.nz?nzName(e.item):'';
       const stock=!settings.hidePantry&&inPantryByName(e.item);
@@ -976,18 +1082,18 @@ function renderShop(){
       const tog=()=>{ if(shopChecked.has(k))shopChecked.delete(k);else shopChecked.add(k); save(LS.shopChecked,[...shopChecked]); touch(); renderShop(); };
       row.onclick=tog;
       const del=document.createElement('button'); del.className='del'; del.textContent='Retirer';
-      del.onclick=(ev)=>{ ev.stopPropagation(); if(k.startsWith('libre|')){ freeItems=freeItems.filter(f=>'libre|'+norm(f.name)!==k); save(LS.freeShop,freeItems); } else { removedShopItems.add(k); save(LS.removedShop,[...removedShopItems]); } touch(); toast('Retiré de la liste'); renderShop(); };
+      del.onclick=(ev)=>{ ev.stopPropagation(); if(k.startsWith('libre|')){ freeItems=freeItems.filter(f=>'libre|'+norm(f.name)!==k); save(LS.freeShop,freeItems); } else { removedShopItems.add(k); removedFrom[k]=[...e.ids]; saveShopMarks(); } touch(); toast('Retiré de la liste'); renderShop(); };
       wrap.appendChild(del); wrap.appendChild(row); bindSwipe(wrap);
       sec.appendChild(wrap);
     });
     cont.appendChild(sec);
   });
   if(acquiredInMap.length) cont.appendChild(acquiredNote(acquiredInMap));
-  const removedInMap=Object.keys(map).filter(k=>removedShopItems.has(k));
+  const removedInMap=Object.keys(map).filter(k=>isRemoved(k,map[k]));
   if(removedInMap.length){
     const rn=document.createElement('div'); rn.className='sec'; rn.style.justifyContent='center';
     rn.innerHTML=`<button type="button">Réafficher ${removedInMap.length} article${removedInMap.length>1?'s':''} retiré${removedInMap.length>1?'s':''}</button>`;
-    rn.querySelector('button').onclick=()=>{ removedInMap.forEach(k=>removedShopItems.delete(k)); save(LS.removedShop,[...removedShopItems]); touch(); renderShop(); };
+    rn.querySelector('button').onclick=()=>{ removedInMap.forEach(k=>{ removedShopItems.delete(k); delete removedFrom[k]; }); saveShopMarks(); touch(); renderShop(); };
     cont.appendChild(rn);
   }
   const checkedCount=keys.filter(k=>shopChecked.has(k)).length;
@@ -999,19 +1105,19 @@ function renderShop(){
 function acquiredNote(keys){
   const wrap=document.createElement('div'); wrap.className='sec'; wrap.style.justifyContent='center'; wrap.style.textTransform='none';
   wrap.innerHTML=`<span>${keys.length} article${keys.length>1?'s':''} déjà rangé${keys.length>1?'s':''} au stock · <button type="button">remettre dans la liste</button></span>`;
-  wrap.querySelector('button').onclick=()=>{ keys.forEach(k=>{ delete acquiredItems[k]; }); save('mm_acquired',acquiredItems); touch(); renderShop(); toast('Articles remis dans la liste'); };
+  wrap.querySelector('button').onclick=()=>{ keys.forEach(k=>{ delete acquiredItems[k]; delete acquiredFrom[k]; }); saveShopMarks(); touch(); renderShop(); toast('Articles remis dans la liste'); };
   return wrap;
 }
 function updateShopBadge(){
   const map=buildShopping();
-  const todo=Object.keys(map).filter(k=>!removedShopItems.has(k)&&!isAcquired(k));
+  const todo=Object.keys(map).filter(k=>shopVisible(k,map[k]));
   const remaining=todo.filter(k=>!shopChecked.has(k)).length;
   const b=$('#shopBadge'); b.classList.toggle('hide',!todo.length||!remaining); b.textContent=remaining;
 }
 /* validate shopping -> checked items go into pantry, then clear them from the list */
 function validateShopping(){
   const map=buildShopping();
-  const checkedKeys=Object.keys(map).filter(k=>shopChecked.has(k));
+  const checkedKeys=Object.keys(map).filter(k=>shopChecked.has(k)&&shopVisible(k,map[k]));
   if(!checkedKeys.length){ toast('Coche d\u2019abord les articles achetés'); return; }
   let n=0;
   checkedKeys.forEach(k=>{ const e=map[k]; if(k.startsWith('libre|')){ freeItems=freeItems.filter(f=>'libre|'+norm(f.name)!==k); n++; return; } pantryAdd(e.item.toLowerCase(), e.hasQty?e.qty:1, e.unit||'', 'courses'); n++; });
@@ -1020,8 +1126,8 @@ function validateShopping(){
   // une fois rangés, ils sortent de la liste à acheter (sinon ils réapparaissaient
   // à chaque rendu, puisque la liste est reconstruite depuis les recettes choisies)
   const now=Date.now();
-  checkedKeys.forEach(k=>{ shopChecked.delete(k); if(!k.startsWith('libre|')) acquiredItems[k]=now; });
-  save(LS.shopChecked,[...shopChecked]); save('mm_acquired',acquiredItems);
+  checkedKeys.forEach(k=>{ shopChecked.delete(k); if(!k.startsWith('libre|')){ acquiredItems[k]=now; acquiredFrom[k]=[...map[k].ids]; } });
+  save(LS.shopChecked,[...shopChecked]); saveShopMarks();
   touch();
   toast(n+' article'+(n>1?'s':'')+' rangé'+(n>1?'s':'')+' au stock');
   renderShop(); renderFridge();
@@ -1064,7 +1170,7 @@ function openRecipeDetail(id){
   const r=byId(id); if(!r)return;
   const inWeek=selection.has(id), made=lastMade(id);
   const sh=$('#sheet');
-  const stepRows=r.steps.map((s,i)=>{ const secs=extractMinutes(s); return `<div class="stp"><b class="mono">${String(i+1).padStart(2,'0')}</b><div>${s}${secs?`<div><button class="tm" data-timer="${secs}" data-label="Étape ${i+1}"><svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2M9 2h6" stroke-linecap="round"/></svg>${Math.round(secs/60)} min</button></div>`:''}</div></div>`; }).join('');
+  const stepRows=stepsHtml(r,scaleFactor(r));
   sh.innerHTML=`<div class="rd-hero">${photoOrEmoji(id)}<div class="ov"></div><span class="grab hero"></span>
       <button class="cb l" id="rdClose" aria-label="Fermer"><svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12" stroke-linecap="round"/></svg></button>
       <button class="cb r ${isFav(id)?'on':''}" id="rdFav" aria-label="Favori">${heartSvg()}</button>
@@ -1079,7 +1185,7 @@ function openRecipeDetail(id){
       <div class="grp" id="rdIngList"></div>
       <div id="rdCost" style="font-size:13px;color:var(--mut);padding:8px 2px 0"></div>
       <div class="sec" style="padding-left:0;padding-right:0"><span>Préparation</span><span>${r.steps.length} étapes</span></div>
-      <div class="grp" style="padding:2px 12px">${stepRows}</div>
+      <div class="grp" id="rdSteps" style="padding:2px 12px">${stepRows}</div>
       <div id="rdProt" style="margin-top:12px"></div>
       ${r.tip?`<div class="note tip" style="margin-top:10px"><div><b>Astuce</b>${r.tip}</div></div>`:''}
       ${r.light?`<div class="note light" style="margin-top:10px"><div><b>Version légère</b>${r.light}</div></div>`:''}
@@ -1094,6 +1200,7 @@ function openRecipeDetail(id){
     const miss=missingFor(r); const missSet=new Set(miss.map(m=>singular(m)));
     const rows=r.ingredients.map(([q,u,item])=>{ const sq=scaledQty(r,q); const qs=sq!=null?fmtQty(sq)+(u?' '+unitLabel(u,sq):''):(u||''); const base=baseIngredientName(item); const st=base&&!isStaple(base)?(missSet.has(singular(base))?'<span class="miss">manque</span>':(pantry.length?'<span class="have">en stock</span>':'')):''; const nz=settings.nz?nzName(item):''; return `<div class="ing-row"><span class="tile">${pantryEmo(item)}</span><span class="n">${qs?`<b class="q">${qs}</b> `:''}${item}${nz?`<small>${nz}</small>`:''}</span>${st}</div>`; }).join('');
     $('#rdIngList').innerHTML=rows;
+    const stp=$('#rdSteps'); if(stp){ stp.innerHTML=stepsHtml(r,scaleFactor(r)); stp.querySelectorAll('.tm').forEach(b=>b.onclick=()=>startTimer(+b.dataset.timer,b.dataset.label)); }
     $('#rdServ').textContent=servingsFor(r)+' portion'+(servingsFor(r)>1?'s':'');
     $('#rdMeals').textContent=mealsLabel(servingsFor(r))+' pour '+settings.persons+' pers.';
     $('#rdMiss').textContent=pantry.length?(miss.length?miss.length+' manque'+(miss.length>1?'nt':''):'tout est en stock'):'';
@@ -1182,7 +1289,7 @@ function renderCookBody(){
     const st=cs.steps[i]||{},secs=extractMinutes(s);
     const badge=st.assign?`<span class="mine ${st.assign==='b'?'b':''}">${st.assign==='a'?'Moi':'L’autre'}</span>`:'';
     html+=`<div class="step ${st.done?'done':''}" data-step="${i}"><div class="num">${i+1}</div>
-      <div class="step-body"><div class="step-txt">${s}</div>${badge}
+      <div class="step-body"><div class="step-txt">${scaleStepText(s,factor)}</div>${badge}
       ${secs?`<div><button class="tm" style="display:inline-flex;align-items:center;gap:4px;font-size:12px;color:var(--accT);font-weight:600;background:var(--accW);padding:4px 9px;border-radius:999px;margin-top:6px" data-timer="${secs}" data-label="Étape ${i+1}"><svg viewBox="0 0 24 24" style="width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2M9 2h6" stroke-linecap="round"/></svg>${Math.round(secs/60)} min</button></div>`:''}</div>
       <div class="cbtn"><div class="chk ${st.done?'d':''}" style="${st.done?'background:var(--ok);border-color:var(--ok)':''}"><svg viewBox="0 0 24 24" style="${st.done?'opacity:1':''}"><path d="M20 6 9 17l-5-5" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div></div>`;
   });
@@ -1430,23 +1537,42 @@ function openLogMealPicker(){
 const AISLE_HINTS=[
   [/poulet|boeuf|bœuf|porc|chorizo|lardon|jambon|saucisse|saumon|poisson|cabillaud|crevette|agneau|steak|viande|haché|hache|dinde|moules|filet/i,'Viandes & poissons'],
   [/caf[ée]|(^|\s)th[ée](s|$|\s)|chocolat|biscuit|c[ée]r[ée]ales|confiture|vinaigre|moutarde|ketchup|mayonnaise/i,'Conserves & épicerie'],
-  [/oignon|ail|carotte|courgette|poivron|tomate|épinard|salade|concombre|pomme de terre|brocoli|chou|champignon|citron|gingembre|basilic|menthe|persil|patate|aubergine|poireau|céleri|fruit|banane|pomme|avocat/i,'Légumes & fruits'],
+  [/oignon|(^|\s)ail(\s|$)|carotte|courgette|poivron|tomate|épinard|salade|concombre|pomme de terre|brocoli|chou|champignon|citron|gingembre|basilic|menthe|persil|patate|aubergine|poireau|céleri|fruit|banane|pomme|avocat/i,'Légumes & fruits'],
   [/feta|mozzarella|parmesan|cheddar|ricotta|crème|lait|beurre|yaourt|fromage|halloumi/i,'Frais & crémerie'],
   [/œuf|oeuf/i,'Œufs'],
   [/\briz\b|pâtes|\bpates?\b|gnocchi|couscous|lasagne|pain|semoule|quinoa|boulgour|farine|nouille/i,'Pâtes, riz & féculents'],
   [/pois chiche|lentille|haricot|maïs|mais|tomates concassées|lait de coco|bouillon|sauce soja|concentré|huile|curry|paprika|cumin|curcuma|épice|conserve|sucre/i,'Conserves & épicerie'],
 ];
-function guessAisle(item){ for(const[re,a]of AISLE_HINTS)if(re.test(item))return a; return 'Autres'; }
+/* rayon : d'abord celui qu'a le même produit dans le catalogue, sinon une devinette */
+let KNOWN_AISLE=null;
+function guessAisle(item){
+  if(!KNOWN_AISLE){ KNOWN_AISLE={}; RECIPES_SEED.forEach(r=>r.ingredients.forEach(i=>{ const k=shopKey('',i[2]); if(i[3]&&!KNOWN_AISLE[k]) KNOWN_AISLE[k]=i[3]; })); }
+  const k=shopKey('',item); if(KNOWN_AISLE[k]) return KNOWN_AISLE[k];
+  if(/lait de coco|tomates? concass|coulis|passata/i.test(item)) return 'Conserves & épicerie';
+  for(const[re,a]of AISLE_HINTS)if(re.test(item))return a; return 'Autres'; }
+/* « 1½ », « ½ », « ⅓ », « 1/2 », « 0,5 » -> nombre */
+const VULGAR={'½':.5,'¼':.25,'¾':.75,'⅓':1/3,'⅔':2/3,'⅛':.125};
+function normQtyText(line){
+  return line.replace(/^(\d+)?\s*([½¼¾⅓⅔⅛])/,(m,w,f)=>String((w?+w:0)+VULGAR[f]))
+             .replace(/^(\d+)\s*\/\s*(\d+)/,(m,a,b)=>String(+a/+b))
+             .replace(/^(un|une)\s/i,'1 ');
+}
 function parseIngLine(line){
-  line=line.trim(); if(!line)return null;
-  const units='g|kg|mg|ml|mL|cl|l|L|c\\. à café|c\\. à soupe|cuillères?|boîtes?|boite|gousses?|gousse|poignées?|poignée|morceau|boule|feuilles?|tranche|pincée|verre|sachet|tasse|paquet';
+  line=normQtyText(line.trim()); if(!line)return null;
+  const units='g|kg|mg|ml|mL|cl|l|L|c\\. à café|c\\. à soupe|cuillères? à soupe|cuillères? à café|cuillères?|boîtes?|boites?|gousses?|poignées?|morceaux?|boules?|feuilles?|tranches?|pincées?|verres?|sachets?|tasses?|paquets?|cubes?|pots?|bouquets?|bottes?|brins?|branches?|pavés?|filets?|bâtons?|carrés?|rouleaux?';
   let m=line.match(new RegExp('^(\\d+(?:[.,]\\d+)?)\\s*('+units+')\\s+(?:de\\s+|d\'|d\u2019)?(.+)$','i'));
-  if(m)return[parseFloat(m[1].replace(',','.')),m[2].replace('boite','boîte'),m[3].trim(),guessAisle(m[3])];
+  // « 2 feuilles de nori », « 4 pavés de saumon », « 1 bouquet garni » : ces mots ne sont une unité
+  // que suivis de « de », sinon ils font partie du nom du produit
+  if(m && /^(feuilles?|tranches?|pavés?|filets?|branches?|bâtons?|bouquets?|boules?|carrés?|rouleaux?|pots?)$/i.test(m[2]) && !/^(\d+(?:[.,]\d+)?)\s*\S+\s+(de\s|d'|d’)/i.test(line)) m=null;
+  if(m)return[parseFloat(m[1].replace(',','.')),canonUnit(m[2].replace(/^boites?$/,'boîte').replace(/^cuillères? à soupe$/,'c. à soupe').replace(/^cuillères? à café$/,'c. à café')),m[3].trim(),guessAisle(m[3])];
   m=line.match(/^(\d+(?:[.,]\d+)?)\s+(.+)$/);
   if(m)return[parseFloat(m[1].replace(',','.')),'',m[2].trim(),guessAisle(m[2])];
   return[null,'',line,guessAisle(line)];
 }
-function fmtIngLine([q,u,item]){ const qs=q!=null?(fmtQty(q)+(u?' '+u:'')+' '):(u?u+' ':''); return (qs+item).trim(); }
+function fmtIngLine([q,u,item]){
+  // « 4 feuilles de basilic », « 2 c. à soupe d'huile » : le « de » rend la ligne relisible et réanalysable
+  const de=u&&!/^(g|kg|mg|ml|cl|l)$/i.test(u)?(/^[aeiouyhâàéèêîïôœ]/i.test(item)?"d'":'de '):'';
+  const qs=q!=null?(fmtQty(q)+(u?' '+unitLabel(u,q):'')+' '):(u?u+' ':''); return (qs+de+item).trim(); }
 function openRecipeForm(existing){
   const e=existing||{},sh=$('#sheet');
   sh.innerHTML=`<div class="grab"></div>
@@ -1468,6 +1594,8 @@ function saveRecipeForm(existing){
   const portions=Math.max(1,parseInt($('#rfPortions').value)||4),time=Math.max(1,parseInt($('#rfTime').value)||30);
   const tags=$('#rfTags').value.split(',').map(s=>s.trim()).filter(Boolean);
   const ingredients=$('#rfIng').value.split('\n').map(parseIngLine).filter(Boolean);
+  // le rayon deviné se trompe parfois (« lait de coco » en crémerie) : on garde celui d'origine
+  if(existing&&existing.ingredients) ingredients.forEach(ing=>{ const o=existing.ingredients.find(x=>norm(x[2])===norm(ing[2])); if(o&&o[3]) ing[3]=o[3]; });
   const steps=$('#rfSteps').value.split('\n').map(s=>s.trim()).filter(Boolean);
   const tip=$('#rfTip').value.trim();
   if(!ingredients.length||!steps.length){toast('Ajoute au moins un ingrédient et une étape');return;}
@@ -1535,7 +1663,7 @@ function renderSettingsSheet(){
     </div>
     <div class="sec"><span>Compte</span></div>
     <div id="acBody"></div>
-    <div class="sec" style="justify-content:center;text-transform:none"><span>Cookie Do 3.7 · <button type="button" id="pcOpen2">crédits photos</button></span></div>`;
+    <div class="sec" style="justify-content:center;text-transform:none"><span>Cookie Do 4.0 · <button type="button" id="pcOpen2">crédits photos</button></span></div>`;
   $('#acClose').onclick=closeSheet;
   $('#segTheme').querySelectorAll('button').forEach(b=>b.onclick=()=>{ settings.theme=b.dataset.v; saveSettings(); $('#segTheme').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b)); });
   const tg=(id,key,after)=>{ const t=$('#'+id); t.onclick=()=>{ settings[key]=!settings[key]; saveSettings(); t.classList.toggle('on',settings[key]); t.setAttribute('aria-checked',settings[key]); if(after)after(); }; };
@@ -1691,7 +1819,7 @@ $('#openFilters').onclick=openFilterSheet;
 $('#resetFind').onclick=()=>{ $('#search').value=''; searchTerm=''; $('#searchClr').classList.add('hide'); quickToggle('all'); };
 function shoppingListText(){
   const map=buildShopping(); const acq=acquiredSet(); let out='🛒 Ma liste de courses (Cookie Do)\n';
-  aisleOrder().forEach(a=>{const ks=Object.keys(map).filter(k=>map[k].aisle===a&&!acq.has(k)&&!removedShopItems.has(k));if(!ks.length)return;out+='\n'+a+'\n';ks.forEach(k=>{const e=map[k];const q=e.mixed?e.mixed+' ':(e.hasQty?fmtQty(e.qty)+(e.unit?' '+unitLabel(e.unit,e.qty):'')+' ':'');out+='• '+q+e.item+'\n';});});
+  aisleOrder().forEach(a=>{const ks=Object.keys(map).filter(k=>map[k].aisle===a&&shopVisible(k,map[k]));if(!ks.length)return;out+='\n'+a+'\n';ks.forEach(k=>{const e=map[k];const q=e.mixed?e.mixed+' ':(e.hasQty?fmtShopQty(e.qty,e.unit)+(e.unit?' '+unitLabel(e.unit,e.qty):'')+' ':'');out+='• '+q+e.item+'\n';});});
   return out;
 }
 $('#shareShop').onclick=async()=>{
@@ -1705,8 +1833,8 @@ function addFreeItemFromInput(){ const inp=$('#freeItemInput'); const v=(inp.val
 $('#freeItemInput').addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); addFreeItemFromInput(); } });
 $('#freeItemInput').addEventListener('blur',()=>{ if($('#freeItemInput').value.trim()) addFreeItemFromInput(); });
 $('#shopMore').onclick=()=>{
-  const map=buildShopping(),acq=acquiredSet();
-  const keys=Object.keys(map).filter(k=>!acq.has(k)&&!removedShopItems.has(k));
+  const map=buildShopping();
+  const keys=Object.keys(map).filter(k=>shopVisible(k,map[k]));
   const allChecked=keys.length && keys.every(k=>shopChecked.has(k));
   const sh=$('#sheet');
   sh.innerHTML=`<div class="grab"></div>

@@ -406,3 +406,70 @@ html[data-theme="dark"] .timer-pop .tp-row button,html[data-theme="system"] .tim
 .rd-hero .cb.photo2{left:auto;right:12px;top:50px;width:auto;padding:0 10px;border-radius:999px;font-size:12px;font-weight:600}
 #weekFoot{padding-top:8px}
 #weekBalance{color:var(--mut);font-size:12.5px}
+
+/* ================= Cookie Do 4 ================= */
+:root{ --serif:ui-serif,"New York","Iowan Old Style",Georgia,"Times New Roman",serif; --rC:14px; --shC:0 1px 2px rgba(0,0,0,.05),0 4px 14px rgba(0,0,0,.06); }
+html[data-theme="dark"]{ --shC:0 1px 2px rgba(0,0,0,.5); }
+@media (prefers-color-scheme: dark){ html[data-theme="system"]{ --shC:0 1px 2px rgba(0,0,0,.5); } }
+/* grands titres et titre de fiche : une touche éditoriale, police native de l'iPhone */
+.hdr h1,.rd h2,.sh-head h3{font-family:var(--serif);font-weight:700;letter-spacing:-.01em}
+.hdr h1{font-size:36px}
+.rd h2{font-size:28px;line-height:1.1}
+
+/* segment Plats / Desserts / Sauces */
+.seg-course{display:flex;gap:4px;margin:10px 16px 0;padding:3px;border-radius:11px;background:var(--sur3)}
+.seg-course button{flex:1;height:34px;border-radius:9px;font-size:14px;font-weight:600;color:var(--fg2);display:flex;align-items:center;justify-content:center;gap:6px;transition:background .15s}
+.seg-course button span{font-size:11px;font-weight:600;color:var(--mut)}
+.seg-course button.on{background:var(--sur);color:var(--fg);box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.sec-acts{display:flex;align-items:center;gap:10px}
+.sec .vt{width:30px;height:26px;display:inline-flex;align-items:center;justify-content:center;color:var(--accT)}
+.sec .vt svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:1.8}
+
+/* rangées à découvrir */
+#rails{padding-top:4px}
+.rail-h{padding:16px 16px 8px;font-family:var(--serif);font-size:20px;font-weight:700;letter-spacing:-.01em;color:var(--fg)}
+.rail-s{display:flex;gap:10px;overflow-x:auto;padding:0 16px 6px;scroll-snap-type:x mandatory;scroll-padding:0 16px;scrollbar-width:none}
+.rail-s::-webkit-scrollbar{display:none}
+.rail-s .gcard{flex:0 0 152px;scroll-snap-align:start}
+
+/* grille du catalogue : photo en haut, titre lisible en dessous */
+.ggrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px 10px;padding:0 16px}
+@media (min-width:600px){ .ggrid{grid-template-columns:repeat(3,minmax(0,1fr))} }
+.gcard{position:relative;cursor:pointer;min-width:0}
+.gcard .ph-wrap{position:relative;aspect-ratio:4/3;border-radius:var(--rC);overflow:hidden;background:var(--sur3);box-shadow:var(--shC);isolation:isolate}
+.gcard .ph-wrap img{width:100%;height:100%;object-fit:cover;transition:transform .3s}
+.gcard:active .ph-wrap img{transform:scale(1.03)}
+.gcard .noph{width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:var(--accT);background:linear-gradient(135deg,var(--accW),var(--sur3))}
+.gcard .noph svg{width:44px;height:44px}
+.gcard .gb{padding:7px 2px 0}
+.gcard .gt{font-size:14.5px;font-weight:600;line-height:1.22;color:var(--fg);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.gcard .gm{font-size:12px;color:var(--mut);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gcard.sm .gt{font-size:13.5px}
+.gcard .tgs{position:absolute;left:7px;top:7px;display:flex;gap:4px;flex-wrap:wrap;right:40px}
+.gcard .tg{font-size:10px;font-weight:700;letter-spacing:.02em;padding:3px 6px;border-radius:6px;background:rgba(255,255,255,.94);color:#2E7A4F;line-height:1.1}
+.gcard .tg.warn{color:#9A6400}
+.gcard .tg.new{background:var(--acc);color:#fff}
+.gcard .tg.sea{color:#2F6FD6}
+.gcard .fav{position:absolute;top:4px;right:4px;width:34px;height:34px;display:flex;align-items:center;justify-content:center;color:#fff}
+.gcard .fav svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:2;filter:drop-shadow(0 1px 2px rgba(0,0,0,.45))}
+.gcard .fav.on svg{fill:#FF4F73;stroke:#FF4F73}
+.gcard .pick{position:absolute;right:7px;bottom:7px;width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,.94);color:var(--accT);display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(0,0,0,.18)}
+.gcard .pick svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2.4}
+.gcard.picked .pick{background:var(--acc);color:#fff}
+.gcard.picked .ph-wrap{outline:2.5px solid var(--acc);outline-offset:-2.5px}
+
+/* fiche : sauces et accords */
+.pair-s{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
+.pair-s::-webkit-scrollbar{display:none}
+.pair-c{flex:0 0 auto;display:flex;align-items:center;gap:9px;background:var(--sur);border-radius:12px;padding:6px 8px 6px 6px;box-shadow:var(--sh);max-width:250px;cursor:pointer}
+.pair-c img,.pair-c .noph{width:44px;height:44px;border-radius:9px;object-fit:cover;flex:none}
+.pair-c .noph{display:flex;align-items:center;justify-content:center;background:var(--accW);color:var(--accT)}
+.pair-c .noph svg{width:24px;height:24px}
+.pair-c .pb{min-width:0}
+.pair-c .pb b{display:block;font-size:13.5px;font-weight:600;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:150px}
+.pair-c .pb small{font-size:11.5px;color:var(--mut)}
+.pair-c .pa{width:30px;height:30px;border-radius:50%;background:var(--accW);color:var(--accT);display:flex;align-items:center;justify-content:center;flex:none}
+.pair-c .pa svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2.4}
+.pair-c .pa.on{background:var(--acc);color:#fff}
+/* quantités recalculées dans les étapes */
+.sq{font-weight:600;color:var(--accT)}

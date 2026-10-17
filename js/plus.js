@@ -125,7 +125,7 @@ renderFridge=function(){
 function dietOf(r){ const t=r.tags||[]; if(t.includes('végé')) return 'vege'; if(t.includes('poisson')) return 'poisson'; return 'viande'; }
 randomWeek=function(){
   const N=6;
-  const weight=r=>{ let w=Math.min(daysSince(lastMade(r.id)),60)/60; w=Math.pow(w,1.5)+0.03; const rt=getRating(r.id); if(rt) w*=(1+rt*0.25); if(isFav(r.id)) w*=1.4; if(isSeasonal(r)) w*=1.5; return w; };
+  const weight=r=>{ let w=Math.min(daysSince(lastMade(r.id)),60)/60; w=Math.pow(w,1.5)+0.03; const rt=getRating(r.id); if(rt) w*=(1+rt*0.25); if(isFav(r.id)) w*=1.4; if(isSeasonal(r)) w*=1.5; if(!lastMade(r.id)) w*=1.6; /* jamais faite : on la propose plus souvent, pour sortir des habitudes */ return w; };
   const pool=allRecipes.filter(r=>!isDessert(r));
   const pick=(cands,n,chosen)=>{ const avail=cands.filter(r=>!chosen.has(r.id)).map(r=>({id:r.id,w:weight(r)}));
     while(n>0&&avail.length){ const tot=avail.reduce((s,p)=>s+p.w,0); let x=Math.random()*tot,i=0; for(;i<avail.length;i++){ x-=avail[i].w; if(x<=0) break; } i=Math.min(i,avail.length-1); chosen.add(avail[i].id); avail.splice(i,1); n--; } };
