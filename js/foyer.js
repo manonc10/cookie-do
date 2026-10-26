@@ -150,15 +150,15 @@ function drawFoyerBox(){
   if(!logged) inner=`<div class="rw"><span class="ico" style="background:#FF6B6B"><svg viewBox="0 0 24 24"><path d="M3 11l9-7 9 7v9H3z" stroke-linejoin="round"/></svg></span><div class="b"><div class="t" style="font-weight:500">Foyer partagé</div><div class="m">Connecte-toi à ton compte (plus bas) pour partager le menu, les courses et le stock avec quelqu’un.</div></div></div>`;
   else if(!foyer) inner=`<div class="rw"><span class="ico" style="background:#FF6B6B"><svg viewBox="0 0 24 24"><path d="M3 11l9-7 9 7v9H3z" stroke-linejoin="round"/></svg></span><div class="b"><div class="t" style="font-weight:500">Foyer partagé</div><div class="m">Le même menu, les mêmes courses et le même stock sur deux téléphones, cochés en direct.</div></div></div>
       <div class="rw" id="fyCreate" style="color:var(--accT);font-weight:600;cursor:pointer">Créer un foyer</div>
-      <div class="rw" style="gap:8px"><input id="fyCode" placeholder="Code reçu (6 lettres)" maxlength="7" autocapitalize="characters" autocomplete="off" style="flex:1;border:1px solid var(--ln);border-radius:9px;padding:8px 10px;background:var(--sur2);font-size:16px;text-transform:uppercase;min-width:0"><button class="go" id="fyJoin">Rejoindre</button></div>`;
+      <div class="rw" style="gap:8px"><input id="fyCode" placeholder="Code reçu (6 lettres)" maxlength="7" autocapitalize="characters" autocomplete="off" style="flex:1;border:1px solid var(--ln);border-radius:9px;padding:8px 10px;background:var(--sur2);font-size:1rem;text-transform:uppercase;min-width:0"><button class="go" id="fyJoin">Rejoindre</button></div>`;
   else inner=`<div class="rw"><span class="ico" style="background:#FF6B6B"><svg viewBox="0 0 24 24"><path d="M3 11l9-7 9 7v9H3z" stroke-linejoin="round"/></svg></span><div class="b"><div class="t" style="font-weight:500">Foyer partagé</div><div class="m ${foyerErr?'warn':'ok'}">${foyerErr?escapeHtml(foyerErr):'Menu, courses et stock partagés'}</div></div></div>
-      <div class="rw"><div class="b"><div class="m">Code à donner à l’autre personne</div><div class="t mono" style="font-size:22px;letter-spacing:.18em">${foyer.code}</div></div><button class="go" id="fyCopy">Copier</button></div>
+      <div class="rw"><div class="b"><div class="m">Code à donner à l’autre personne</div><div class="t mono" style="font-size:1.375rem;letter-spacing:.18em">${foyer.code}</div></div><button class="go" id="fyCopy">Copier</button></div>
       <div class="rw" id="fyLeave" style="color:var(--red);cursor:pointer">Quitter le foyer</div>`;
   g.innerHTML=`<div class="sec"><span>Foyer</span></div><div class="grp" style="margin:0 16px">${inner}</div>`;
   const c=$('#fyCreate'); if(c) c.onclick=async()=>{ c.textContent='Création…'; try{ const code=await foyerCreate(); toast('Foyer créé, code '+code); }catch(e){ toast(e.message); } drawFoyerBox(); };
   const j=$('#fyJoin'); if(j) j.onclick=async()=>{ j.textContent='…'; try{ await foyerJoin($('#fyCode').value); toast('Foyer rejoint'); }catch(e){ toast(e.message); } drawFoyerBox(); };
   const cp=$('#fyCopy'); if(cp) cp.onclick=()=>{ copy('Rejoins mon foyer sur Cookie Do (Réglages, Foyer) avec le code '+foyer.code+' : https://cookie-do.netlify.app'); toast('Code copié'); };
-  const l=$('#fyLeave'); if(l) l.onclick=()=>{ if(confirm('Quitter le foyer ? Le menu et la liste ne seront plus partagés.')){ foyerLeave(); drawFoyerBox(); } };
+  const l=$('#fyLeave'); if(l) l.onclick=()=>confirmSheet('Quitter le foyer ?','Le menu et la liste ne seront plus partagés avec les autres membres. Tes données restent sur ce téléphone.','Quitter le foyer',()=>{ foyerLeave(); openAccountSheet(); });
 }
 /* courses : rappeler que la liste est partagée */
 const _renderShop2=renderShop;

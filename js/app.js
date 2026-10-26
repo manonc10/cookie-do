@@ -292,7 +292,15 @@ const byId=id=>allRecipes.find(r=>r.id===id);
 function localDay(d=new Date()){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
 function daysSince(iso){ if(!iso)return 9999; const [y,m,dd]=iso.split('-').map(Number); const then=new Date(y,m-1,dd); return Math.floor((new Date()-then)/86400000); }
 function lastMade(id){ const rows=history.filter(h=>h.id===id).map(h=>h.date).sort(); return rows.length?rows[rows.length-1]:null; }
-function toast(msg){ const t=$('#toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove('show'),2200); }
+/* toast(msg, annuler) : avec une fonction, un bouton Annuler reste 6 s (HIG : annuler plutôt que confirmer) */
+function toast(msg,undo){ const t=$('#toast'); t.textContent=msg;
+  if(undo){ const b=document.createElement('button'); b.type='button'; b.textContent='Annuler'; b.onclick=()=>{ t.classList.remove('show'); clearTimeout(t._t); undo(); }; t.appendChild(b); }
+  t.classList.add('show'); clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove('show'),undo?6000:2200); }
+/* feuille de confirmation pour ce qui ne peut pas s'annuler (remplace confirm() du navigateur) */
+function confirmSheet(title,text,okLabel,cb){ const sh=$('#sheet');
+  sh.innerHTML=`<div class="grab"></div><div class="sh-head"><h3>${title}</h3><button class="sh-x" id="cfClose" aria-label="Fermer"><svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12" stroke-linecap="round"/></svg></button></div>
+    <p class="sh-sub" style="padding:0 16px 14px;margin:0">${text}</p><div style="display:grid;gap:8px;padding:0 16px 16px"><button class="btn wide danger" id="cfOk">${okLabel}</button><button class="btn wide" id="cfCancel">Annuler</button></div>`;
+  openSheet(); $('#cfClose').onclick=closeSheet; $('#cfCancel').onclick=closeSheet; $('#cfOk').onclick=()=>{ closeSheet(); cb(); }; }
 function checkSvg(){ return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M20 6 9 17l-5-5" stroke-linecap="round" stroke-linejoin="round"/></svg>'; }
 /* icones d interface au trait, meme graphisme que les dessins de recettes */
 function UI(path,sw){ return '<svg class="uic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="'+(sw||1.5)+'" stroke-linecap="round" stroke-linejoin="round">'+path+'</svg>'; }
@@ -576,7 +584,7 @@ function openPhotoCredits(){
   sh.innerHTML=`<div class="grab"></div>
     <div class="sh-head"><h3>Crédits photos</h3><button class="sh-x" id="pcClose" aria-label="Fermer">${xSvg()}</button></div>
     <div class="sh-sub" style="margin-bottom:14px">Les photos viennent de Pixabay (licence Pixabay, utilisation libre), de Wikimedia Commons et de Flickr via Openverse (licences libres CC0, CC BY ou CC BY-SA). Chacune est créditée ci-dessous. Tes propres photos remplacent celles du catalogue.</div>
-    <div class="sh-body" style="font-size:13px;color:var(--mut);display:flex;flex-direction:column;gap:10px">${rows||'<div>Aucune photo.</div>'}</div>`;
+    <div class="sh-body" style="font-size:0.8125rem;color:var(--mut);display:flex;flex-direction:column;gap:10px">${rows||'<div>Aucune photo.</div>'}</div>`;
   $('#pcClose').onclick=closeSheet; openSheet();
 }
 function openFilterSheet(){
@@ -887,7 +895,7 @@ function renderFridge(){
 }
 $('#fridgeAdd').onclick=()=>addFridge($('#fridgeInput').value);
 $('#fridgeInput').addEventListener('keydown',e=>{ if(e.key==='Enter')addFridge($('#fridgeInput').value); });
-$('#clearPantry').onclick=()=>{ if(pantry.length&&confirm('Vider tout le stock ?')){ pantry=[]; save(LS.pantry,pantry); touch(); renderFridge(); toast('Stock vidé'); } };
+$('#clearPantry').onclick=()=>{ if(!pantry.length) return; const back=pantry; pantry=[]; save(LS.pantry,pantry); touch(); renderFridge(); toast('Stock vidé',()=>{ pantry=back; save(LS.pantry,pantry); touch(); renderFridge(); }); };
 
 /* ---------- SHOPPING ---------- */
 const AISLE_ORDER=["Légumes & fruits","Viandes & poissons","Frais & crémerie","Œufs","Pâtes, riz & féculents","Conserves & épicerie","Autres"];
@@ -1235,7 +1243,7 @@ function openRecipeDetail(id){
       <div class="btns"><button class="btn ${inWeek?'sub':'pri'}" id="rdToggle">${inWeek?'✓ Dans la semaine':'+ Dans la semaine'}</button><button class="btn" id="rdCook"><svg viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 0-7 7c0 3 2 4 2 7h10c0-3 2-4 2-7a7 7 0 0 0-7-7zM7 20h10M9 22h6" stroke-linecap="round" stroke-linejoin="round"/></svg>Cuisiner</button></div>
       <div class="sec" style="padding-left:0;padding-right:0"><span>Ingrédients</span><span id="rdMiss"></span></div>
       <div class="grp" id="rdIngList"></div>
-      <div id="rdCost" style="font-size:13px;color:var(--mut);padding:8px 2px 0"></div>
+      <div id="rdCost" style="font-size:0.8125rem;color:var(--mut);padding:8px 2px 0"></div>
       <div class="sec" style="padding-left:0;padding-right:0"><span>Préparation</span><span>${r.steps.length} étapes</span></div>
       <div class="grp" id="rdSteps" style="padding:2px 12px">${stepRows}</div>
       <div id="rdProt" style="margin-top:12px"></div>
@@ -1278,8 +1286,8 @@ function openRecipeDetail(id){
   $('#rdCook').onclick=()=>{ closeSheet(); if(!selection.has(id)){selection.add(id);save(LS.selection,[...selection]);touch();refreshSelUI();renderRecipes();} openCook(id); };
   $('#rdDidIt').onclick=()=>openDidItSheet(id);
   $('#rdEdit').onclick=()=>openRecipeForm(r);
-  const rr=$('#rdReset'); if(rr) rr.onclick=()=>{ if(confirm('Revenir à la version d’origine de cette recette ? Tes modifications seront perdues.')) resetRecipe(id); };
-  const rd=$('#rdDelete'); if(rd) rd.onclick=()=>{ if(confirm('Supprimer cette recette ?')) deleteRecipe(id); };
+  const rr=$('#rdReset'); if(rr) rr.onclick=()=>{ const back=customRecipes.find(r=>r.id===id); resetRecipe(id); toast('Recette d’origine rétablie',()=>{ if(back){ customRecipes=customRecipes.filter(r=>r.id!==id); customRecipes.push(back); save(LS.custom,customRecipes); touch(); rebuild(); } }); };
+  const rd=$('#rdDelete'); if(rd) rd.onclick=()=>{ const back=customRecipes.find(r=>r.id===id), wasSel=selection.has(id); deleteRecipe(id); toast('Recette supprimée',()=>{ if(back){ customRecipes.push(back); save(LS.custom,customRecipes); if(wasSel){ selection.add(id); save(LS.selection,[...selection]); } touch(); rebuild(); } }); };
 }
 function resetRecipe(id){
   if(RECIPES_SEED.some(s=>s.id===id)){ customRecipes=customRecipes.filter(r=>r.id!==id); save(LS.custom,customRecipes); touch(); rebuild(); closeSheet(); toast('Recette réinitialisée'); }
@@ -1293,7 +1301,7 @@ function openPriceSheet(id){
     const refQty=p.qty!=null?p.qty:(q!=null?fmtQty(q):''); const refUnit=p.unit!=null?p.unit:(u||'');
     return `<div class="rw price-row" data-key="${key}" style="flex-wrap:wrap">
       <div style="width:100%;font-weight:500">${item}</div>
-      <div style="display:flex;gap:6px;align-items:center;width:100%;font-size:14px;color:var(--mut)">$<input type="number" step="0.01" min="0" inputmode="decimal" class="pr-price" placeholder="prix" value="${p.price!=null?p.price:''}" style="width:72px;border:1px solid var(--ln);border-radius:8px;padding:6px 8px;background:var(--sur2)">pour<input type="number" step="0.1" min="0" inputmode="decimal" class="pr-qty" placeholder="qté" value="${refQty}" style="width:64px;border:1px solid var(--ln);border-radius:8px;padding:6px 8px;background:var(--sur2)"><input type="text" class="pr-unit" placeholder="unité" value="${refUnit}" style="width:70px;border:1px solid var(--ln);border-radius:8px;padding:6px 8px;background:var(--sur2)"></div>
+      <div style="display:flex;gap:6px;align-items:center;width:100%;font-size:0.875rem;color:var(--mut)">$<input type="number" step="0.01" min="0" inputmode="decimal" class="pr-price" placeholder="prix" value="${p.price!=null?p.price:''}" style="width:72px;border:1px solid var(--ln);border-radius:8px;padding:6px 8px;background:var(--sur2)">pour<input type="number" step="0.1" min="0" inputmode="decimal" class="pr-qty" placeholder="qté" value="${refQty}" style="width:64px;border:1px solid var(--ln);border-radius:8px;padding:6px 8px;background:var(--sur2)"><input type="text" class="pr-unit" placeholder="unité" value="${refUnit}" style="width:70px;border:1px solid var(--ln);border-radius:8px;padding:6px 8px;background:var(--sur2)"></div>
     </div>`;
   }).join('');
   sh.innerHTML=`<div class="grab"></div>
@@ -1342,7 +1350,7 @@ function renderCookBody(){
     const badge=st.assign?`<span class="mine ${st.assign==='b'?'b':''}">${st.assign==='a'?'Moi':'L’autre'}</span>`:'';
     html+=`<div class="step ${st.done?'done':''}" data-step="${i}"><div class="num">${i+1}</div>
       <div class="step-body"><div class="step-txt">${scaleStepText(s,factor)}</div>${badge}
-      ${secs?`<div><button class="tm" style="display:inline-flex;align-items:center;gap:4px;font-size:12px;color:var(--accT);font-weight:600;background:var(--accW);padding:4px 9px;border-radius:999px;margin-top:6px" data-timer="${secs}" data-label="Étape ${i+1}"><svg viewBox="0 0 24 24" style="width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2M9 2h6" stroke-linecap="round"/></svg>${Math.round(secs/60)} min</button></div>`:''}</div>
+      ${secs?`<div><button class="tm" style="display:inline-flex;align-items:center;gap:4px;font-size:0.75rem;color:var(--accT);font-weight:600;background:var(--accW);padding:4px 9px;border-radius:999px;margin-top:6px" data-timer="${secs}" data-label="Étape ${i+1}"><svg viewBox="0 0 24 24" style="width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2M9 2h6" stroke-linecap="round"/></svg>${Math.round(secs/60)} min</button></div>`:''}</div>
       <div class="cbtn"><div class="chk ${st.done?'d':''}" style="${st.done?'background:var(--ok);border-color:var(--ok)':''}"><svg viewBox="0 0 24 24" style="${st.done?'opacity:1':''}"><path d="M20 6 9 17l-5-5" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div></div>`;
   });
   html+=`${r.tip?`<div class="note tip" style="margin-top:10px"><div><b>Astuce</b>${r.tip}</div></div>`:''}${r.light?`<div class="note light" style="margin-top:10px"><div><b>Version légère</b>${r.light}</div></div>`:''}
@@ -1444,10 +1452,10 @@ function openRatePrompt(r, usedCount){
   const sh=$('#sheet');
   sh.innerHTML=`<div class="grab"></div>
     <div style="text-align:center;padding:18px 16px 8px">
-      <div style="font-size:44px;line-height:1;margin-bottom:8px">🎉</div>
-      <h3 style="margin:0 0 4px;font-size:22px">Bon appétit !</h3>
+      <div style="font-size:2.75rem;line-height:1;margin-bottom:8px">🎉</div>
+      <h3 style="margin:0 0 4px;font-size:1.375rem">Bon appétit !</h3>
       <div class="sh-sub" style="padding:0">« ${r.title} » est dans ton historique.${usedCount?' '+usedCount+' ingrédient'+(usedCount>1?'s retirés':' retiré')+' du stock.':''}</div>
-      <div style="font-size:13px;color:var(--mut);margin:16px 0 8px">Tu as aimé ? Note la recette</div>
+      <div style="font-size:0.8125rem;color:var(--mut);margin:16px 0 8px">Tu as aimé ? Note la recette</div>
       <div style="display:flex;justify-content:center;margin-bottom:18px">${starsHtml(r.id,{size:'lg',interactive:true})}</div>
     </div>
     <div class="stack"><button class="btn pri wide" id="rateDone">Terminer</button></div>`;
@@ -1463,7 +1471,7 @@ function openDidItSheet(id){
     <div class="sh-body">
       <div class="chips" style="padding:4px 0 12px"><button class="chip" data-q="0">Aujourd'hui</button><button class="chip" data-q="1">Hier</button><button class="chip" data-q="2">Avant-hier</button></div>
       <div class="frow"><label>Quel jour ?</label><input id="diDate" type="date" value="${today}" max="${today}"></div>
-      <div class="grp"><div class="rw"><span>Retirer aussi les ingrédients du stock</span><button class="tog" id="diConsume" role="switch" aria-checked="false"></button></div></div>
+      <div class="grp"><div class="rw"><span>Retirer aussi les ingrédients du stock</span><button class="tog" id="diConsume" role="switch" aria-label="Retirer aussi les ingrédients du stock" aria-checked="false"></button></div></div>
       <div class="stack" style="padding:12px 0 0"><button class="btn pri wide" id="diSave">Ajouter à l’historique</button></div>
     </div>`;
   openSheet();
@@ -1704,20 +1712,20 @@ function renderSettingsSheet(){
     <div class="sec"><span>Apparence</span></div>
     <div class="grp" style="margin:0 16px">
       <div class="rw"><span class="ico" style="background:#8E8E93"><svg viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 0 18V3z" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="9"/></svg></span><span>Thème</span>${segHtml('segTheme',[['system','Auto'],['light','Clair'],['dark','Sombre']],settings.theme)}</div>
-      <div class="rw"><span class="ico" style="background:#3F9B6A">Aa</span><span>Texte plus grand</span><button class="tog ${settings.bigText?'on':''}" id="togBig" role="switch" aria-checked="${!!settings.bigText}"></button></div>
+      <div class="rw"><span class="ico" style="background:#2E7A4F">Aa</span><span>Texte plus grand</span><button class="tog ${settings.bigText?'on':''}" id="togBig" role="switch" aria-label="Texte plus grand" aria-checked="${!!settings.bigText}"></button></div>
     </div>
     <div class="sec"><span>Cuisine</span></div>
     <div class="grp" style="margin:0 16px">
       <div class="rw"><span class="ico" style="background:var(--acc);color:var(--accFg)">${settings.persons}</span><span>Personnes à la maison</span><div class="stepper" style="margin-left:auto"><button id="persMinus" aria-label="Moins">−</button><span id="persVal">${settings.persons}</span><button id="persPlus" aria-label="Plus">+</button></div></div>
-      <div class="rw"><span class="ico" style="background:#FF9500">¾</span><span>Portions</span>${segHtml('segPortion',[['small','Petites'],['medium','Moyennes'],['normal','Normales']],settings.portionSize||'small')}</div>
+      <div class="rw"><span class="ico" style="background:#A86400">¾</span><span>Portions</span>${segHtml('segPortion',[['small','Petites'],['medium','Moyennes'],['normal','Normales']],settings.portionSize||'small')}</div>
       <div class="rw"><span class="sh-sub" style="padding:0">Petites : 30 % de moins que la recette d’origine, Moyennes : 15 % de moins. Ça joue sur les quantités affichées et sur les courses, sauf pour les desserts et les sauces.</span></div>
-      <div class="rw"><span class="ico" style="background:#2C6FBF">NZ</span><span>Noms anglais en rayon</span><button class="tog ${settings.nz?'on':''}" id="togNz" role="switch" aria-checked="${!!settings.nz}"></button></div>
-      <div class="rw"><span class="ico" style="background:#C77800"><svg viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M4 11h16" stroke-linecap="round"/></svg></span><span>Masquer dans les courses ce qui est en stock</span><button class="tog ${settings.hidePantry?'on':''}" id="togHide" role="switch" aria-checked="${!!settings.hidePantry}"></button></div>
+      <div class="rw"><span class="ico" style="background:#2C6FBF">NZ</span><span>Noms anglais en rayon</span><button class="tog ${settings.nz?'on':''}" id="togNz" role="switch" aria-label="Noms anglais en rayon" aria-checked="${!!settings.nz}"></button></div>
+      <div class="rw"><span class="ico" style="background:#C77800"><svg viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M4 11h16" stroke-linecap="round"/></svg></span><span>Masquer dans les courses ce qui est en stock</span><button class="tog ${settings.hidePantry?'on':''}" id="togHide" role="switch" aria-label="Masquer dans les courses ce qui est en stock" aria-checked="${!!settings.hidePantry}"></button></div>
       <div class="rw" id="rowNew" style="cursor:pointer"><span class="ico" style="background:#5856D6"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" stroke-linecap="round"/></svg></span><span>Nouvelle recette</span><span class="chev">›</span></div>
     </div>
     <div class="sec"><span>Compte</span></div>
     <div id="acBody"></div>
-    <div class="sec" style="justify-content:center;text-transform:none"><span>Cookie Do 4.2 · <button type="button" id="pcOpen2">crédits photos</button></span></div>`;
+    <div class="sec" style="justify-content:center;text-transform:none"><span>Cookie Do 4.3 · <button type="button" id="pcOpen2">crédits photos</button></span></div>`;
   $('#acClose').onclick=closeSheet;
   $('#segTheme').querySelectorAll('button').forEach(b=>b.onclick=()=>{ settings.theme=b.dataset.v; saveSettings(); $('#segTheme').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b)); });
   const tg=(id,key,after)=>{ const t=$('#'+id); t.onclick=()=>{ settings[key]=!settings[key]; saveSettings(); t.classList.toggle('on',settings[key]); t.setAttribute('aria-checked',settings[key]); if(after)after(); }; };
@@ -1854,6 +1862,7 @@ async function afterLogin(){
 /* ---------- NAV ---------- */
 let currentView='recipes';
 function switchView(v){
+  if(typeof setEditList==='function'&&editList) setEditList(false);
   currentView=v;
   $$('.view').forEach(el=>el.classList.remove('active'));
   $('#view-'+v).classList.add('active');
@@ -1866,7 +1875,10 @@ $$('.tab').forEach(t=>t.onclick=()=>{ if(currentView===t.dataset.view) window.sc
 window.addEventListener('scroll',()=>{ document.body.classList.toggle('scrolled',window.scrollY>40); },{passive:true});
 $('#accountBtn').onclick=openAccountSheet;
 $('#weekRandomBtn').onclick=randomWeek;
-$('#clearSelBtn').onclick=()=>{ if(!selection.size) return; if(!confirm('Retirer toutes les recettes de la semaine ?')) return; selection.clear();save(LS.selection,[]);shopChecked.clear();save(LS.shopChecked,[]);clearAcquired();touch();refreshSelUI();renderRecipes();renderFridge();renderShop();renderWeek();};
+$('#clearSelBtn').onclick=()=>{ if(!selection.size) return;
+  const back={sel:[...selection],chk:[...shopChecked],acq:acquiredItems,acqF:acquiredFrom,rem:[...removedShopItems],remF:removedFrom};
+  selection.clear();save(LS.selection,[]);shopChecked.clear();save(LS.shopChecked,[]);clearAcquired();touch();refreshSelUI();renderRecipes();renderFridge();renderShop();renderWeek();
+  toast('Semaine vidée',()=>{ selection=new Set(back.sel); save(LS.selection,back.sel); shopChecked=new Set(back.chk); save(LS.shopChecked,back.chk); acquiredItems=back.acq; acquiredFrom=back.acqF; removedShopItems=new Set(back.rem); removedFrom=back.remF; saveShopMarks(); touch(); refreshSelUI(); renderRecipes(); renderFridge(); renderShop(); renderWeek(); }); };
 $('#cookClose').onclick=closeCook;
 $('#search').oninput=e=>{searchTerm=e.target.value.trim();$('#searchClr').classList.toggle('hide',!searchTerm);renderRecipes();};
 $('#searchClr').onclick=()=>{ $('#search').value=''; searchTerm=''; $('#searchClr').classList.add('hide'); renderRecipes(); };
@@ -1897,16 +1909,22 @@ $('#shopMore').onclick=()=>{
     <div class="grp" style="margin:8px 16px 0">
       <div class="rw" id="smAll" style="cursor:pointer"><span>${allChecked?'Tout décocher':'Tout cocher'}</span></div>
       <div class="rw" id="smUncheck" style="cursor:pointer"><span>Décocher sans ranger</span></div>
-      <div class="rw"><span>Masquer ce qui est en stock</span><button class="tog ${settings.hidePantry?'on':''}" id="smHide" role="switch" aria-checked="${!!settings.hidePantry}"></button></div>
+      <div class="rw"><span>Masquer ce qui est en stock</span><button class="tog ${settings.hidePantry?'on':''}" id="smHide" role="switch" aria-label="Masquer ce qui est en stock" aria-checked="${!!settings.hidePantry}"></button></div>
       <div class="rw" id="smCopy" style="cursor:pointer"><span>Copier la liste en texte</span></div>
+      <div class="rw" id="smEdit" style="cursor:pointer"><span>${editList?'Terminer la modification':'Modifier la liste (retirer des articles)'}</span></div>
     </div>`;
   openSheet(); $('#smClose').onclick=closeSheet;
   $('#smAll').onclick=()=>{ if(allChecked) keys.forEach(k=>shopChecked.delete(k)); else keys.forEach(k=>shopChecked.add(k)); save(LS.shopChecked,[...shopChecked]); touch(); renderShop(); closeSheet(); };
   $('#smUncheck').onclick=()=>{ keys.forEach(k=>shopChecked.delete(k)); save(LS.shopChecked,[...shopChecked]); touch(); renderShop(); closeSheet(); };
   $('#smHide').onclick=()=>{ settings.hidePantry=!settings.hidePantry; saveSettings(); $('#smHide').classList.toggle('on',settings.hidePantry); renderShop(); };
   $('#smCopy').onclick=()=>{ copy(shoppingListText()); toast('Liste copiée'); closeSheet(); };
+  $('#smEdit').onclick=()=>{ setEditList(!editList); closeSheet(); };
 };
 $('#validateShop').onclick=validateShopping;
+/* Modifier : alternative au glissement pour retirer un article (HIG : une autre voie que le geste) */
+let editList=false;
+function setEditList(on){ editList=on; document.body.classList.toggle('editlist',on); $$('#editPantry').forEach(b=>{ b.textContent=on?'Terminer':'Modifier'; b.setAttribute('aria-pressed',on); }); }
+$$('#editPantry').forEach(b=>b.onclick=()=>setEditList(!editList));
 
 /* ---------- SHARED VIEWER ---------- */
 function checkSharedView(){
@@ -1916,7 +1934,7 @@ function checkSharedView(){
 }
 function renderSharedViewer(p){
   document.body.innerHTML=`<div class="shared">
-    <div class="kic" style="font-size:12px;color:var(--mut);font-weight:600;letter-spacing:.04em;text-transform:uppercase">Cookie Do · étapes partagées</div>
+    <div class="kic" style="font-size:0.75rem;color:var(--mut);font-weight:600;letter-spacing:.04em;text-transform:uppercase">Cookie Do · étapes partagées</div>
     <h1>${p.t}</h1>
     <div class="sub">${p.p} portions</div><div id="sv-steps"></div>
     <div style="margin-top:24px"><a href="${location.href.split('#')[0]}" style="font-weight:600;text-decoration:none">← Ouvrir l’app complète</a></div></div>`;
