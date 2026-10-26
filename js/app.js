@@ -152,7 +152,7 @@ function acquiredKeys(){ return Object.keys(acquiredItems); }
    oublié dès qu'on ajoutait n'importe quelle recette. */
 let removedFrom = load('cd_removedFrom', {});
 let acquiredFrom = load('cd_acquiredFrom', {});
-function coveredBy(list,e){ if(!list) return true; const ids=e&&e.ids?[...e.ids]:[]; return ids.every(id=>list.includes(id)); }
+function coveredBy(list,e){ if(!Array.isArray(list)) return false; const ids=e&&e.ids?[...e.ids]:[]; return ids.every(id=>list.includes(id)); }
 function isRemoved(k,e){ return removedShopItems.has(k) && coveredBy(removedFrom[k],e); }
 function isAcq(k,e){ return isAcquired(k) && coveredBy(acquiredFrom[k],e); }
 function shopVisible(k,e){ return !isRemoved(k,e) && !isAcq(k,e); }
@@ -172,7 +172,7 @@ let searchTerm='', activeTag=null, showFavOnly=false, courseFilter='all', quickF
 
 /* ---- réglages (sur l'appareil) ---- */
 const SETTINGS_KEY='cd_settings';
-let settings=Object.assign({theme:'system',persons:2,nz:true,hidePantry:false,bigText:false,aisles:null,staples:[],vegTarget:3,fishTarget:1},load(SETTINGS_KEY,{}));
+let settings=Object.assign({theme:'system',persons:2,nz:true,hidePantry:false,bigText:false,aisles:null,staples:[],vegTarget:3,fishTarget:1,portionSize:'small'},load(SETTINGS_KEY,{}));
 /* menu jour par jour : {recetteId: ['2026-10-08|soir', ...]} */
 let plan=load('cd_plan',{});
 function saveSettings(){ save(SETTINGS_KEY,settings); try{localStorage.setItem('cd_theme',settings.theme);}catch(e){} applyTheme(); }
@@ -198,7 +198,7 @@ const $$=s=>[...document.querySelectorAll(s)];
 /* ---- cloud snapshot: gather + apply ---- */
 function snapshot(){
   return {v:4, custom:customRecipes, selection:[...selection], shopChecked:[...shopChecked],
-    history, cookState, pantry, favorites:[...favorites], ratings, prices, removedShop:[...removedShopItems], removedFrom, acquired:acquiredItems, acquiredFrom, freeShop:freeItems, notes, plan, userPhotos, prefs:{persons:settings.persons,aisles:settings.aisles,staples:settings.staples,vegTarget:settings.vegTarget,fishTarget:settings.fishTarget,nz:settings.nz,hidePantry:settings.hidePantry}, savedAt:Date.now()};
+    history, cookState, pantry, favorites:[...favorites], ratings, prices, removedShop:[...removedShopItems], removedFrom, acquired:acquiredItems, acquiredFrom, freeShop:freeItems, notes, plan, userPhotos, prefs:{persons:settings.persons,aisles:settings.aisles,staples:settings.staples,vegTarget:settings.vegTarget,fishTarget:settings.fishTarget,nz:settings.nz,hidePantry:settings.hidePantry,portionSize:settings.portionSize}, savedAt:Date.now()};
 }
 function applySnapshot(s){
   if(!s||typeof s!=='object') return;
@@ -351,15 +351,31 @@ function norm(s){ return s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036
 const STEP_QTY=/(\d+(?:[,.]\d+)?)(\s?)(kg|g|ml|cl|l|c\. à soupe|c\. à café)(?![\p{L}])(?!\s*(?:par|pour chaque|de plus))/gu;
 function scaleStepText(text,factor){
   if(!factor||Math.abs(factor-1)<0.01) return text;
-  return text.replace(STEP_QTY,(m,n,sp,u)=>{ const v=parseFloat(n.replace(',','.'))*factor; let q=v;
-    if(u==='g'||u==='ml') q=v>=100?Math.round(v/10)*10:Math.round(v/5)*5||Math.round(v);
+  return text.replace(STEP_QTY,(m,n,sp,u)=>{ const q=roundQty(parseFloat(n.replace(',','.'))*factor,u);
     return `<b class="sq">${fmtQty(q)}${sp}${u}</b>`; });
 }
 function stepsHtml(r,factor){
   return r.steps.map((s,i)=>{ const secs=extractMinutes(s); return `<div class="stp"><b class="mono">${String(i+1).padStart(2,'0')}</b><div>${scaleStepText(s,factor)}${secs?`<div><button class="tm" data-timer="${secs}" data-label="Étape ${i+1}"><svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2M9 2h6" stroke-linecap="round"/></svg>${Math.round(secs/60)} min</button></div>`:''}</div></div>`; }).join('');
 }
+/* quantité lisible après mise à l'échelle : grammes et ml arrondis à 5 ou 10,
+   pièces et cuillères à la demi-unité (« 1,4 courgette » devient « 1½ courgette ») */
+function roundQty(v,u){
+  if(v==null) return v; u=u||'';
+  if(u==='g'||u==='ml') return v>=100?Math.round(v/10)*10:(Math.round(v/5)*5||Math.round(v)||v);
+  if(u==='kg'||u==='l'||u==='cl') return v;
+  if(u==='pincée') return Math.max(1,Math.round(v));
+  const h=Math.round(v*2)/2; return h||(v>0?0.5:0);
+}
+/* quantité affichée : telle quelle à l'échelle d'origine, arrondie dès qu'on change d'échelle */
+function niceQty(q,u,factor){ if(q==null) return null; const v=q*factor; return Math.abs(factor-1)<0.01?v:roundQty(v,u); }
 function servingsFor(r){ const cs=cookState[r.id]; return (cs&&cs.servings)||r.portions; }
-function scaleFactor(r){ return servingsFor(r)/r.portions; }
+/* Taille des portions (réglage) : les plats d'origine laissaient trop de restes.
+   « Petites » = 30 % de moins, « Moyennes » = 15 % de moins. Les desserts et les
+   sauces ne bougent pas : un gâteau se fait pour son moule, une sauce au goût. */
+const PORTION_FACTOR={small:0.7,medium:0.85,normal:1};
+function portionFactor(r){ if(r&&(isDessert(r)||(r.tags||[]).includes('sauce'))) return 1; return PORTION_FACTOR[settings.portionSize]||1; }
+function portionLabel(){ return settings.portionSize==='small'?'petites portions':settings.portionSize==='medium'?'portions moyennes':''; }
+function scaleFactor(r){ return servingsFor(r)/r.portions*portionFactor(r); }
 /* scaled quantity of an ingredient for current servings */
 function scaledQty(r, q){ if(q==null)return null; return q*scaleFactor(r); }
 /* price reference key for an ingredient name */
@@ -970,7 +986,22 @@ function fromBaseUnit(v,fam){
 }
 /* ingrédients qu'on n'achète pas (eau du robinet, glaçons...) */
 function isNotPurchasable(item){ return /^(eau|glaçons?)\b/i.test(item.trim()); }
+/* Un article retiré ou acheté ne reste masqué que tant que les recettes qui le
+   demandaient sont encore dans la semaine. Une fois la recette cuisinée ou
+   enlevée, la marque tombe : si on la remet plus tard, ses ingrédients
+   reviennent dans la liste (le tofu du curry manquait pour cette raison). */
+function pruneShopMarks(){
+  let changed=false;
+  const keep=(lists,drop)=>{ Object.keys(lists).forEach(k=>{ const cur=Array.isArray(lists[k])?lists[k]:[]; const l=cur.filter(id=>selection.has(id));
+    if(l.length!==cur.length||!Array.isArray(lists[k])){ changed=true; if(l.length) lists[k]=l; else { delete lists[k]; drop(k); } } }); };
+  keep(removedFrom,k=>removedShopItems.delete(k));
+  keep(acquiredFrom,k=>{ delete acquiredItems[k]; });
+  [...removedShopItems].forEach(k=>{ if(!removedFrom[k]){ removedShopItems.delete(k); changed=true; } });
+  Object.keys(acquiredItems).forEach(k=>{ if(!acquiredFrom[k]){ delete acquiredItems[k]; changed=true; } });
+  if(changed) saveShopMarks();
+}
 function buildShopping(){
+  pruneShopMarks();
   const map={};
   selection.forEach(id=>{ const r=byId(id); if(!r)return;
     const f=scaleFactor(r);
@@ -1058,7 +1089,7 @@ function renderShop(){
   $('#shareShop').classList.toggle('hide',!has); $('#shopMore').classList.toggle('hide',!has&&!hiddenByPantry);
   if(!has){
     $('#validateBar').classList.add('hide');
-    if(acquiredInMap.length){ $('#shopEmpty').hidden=true; cont.appendChild(acquiredNote(acquiredInMap)); }
+    const hr0=hiddenShopRows(map); if(hr0.length){ $('#shopEmpty').hidden=true; cont.appendChild(hiddenSection(hr0)); }
     updateShopBadge(); return;
   }
   const byAisle={}; keys.forEach(k=>{(byAisle[map[k].aisle]=byAisle[map[k].aisle]||[]).push(k);});
@@ -1088,19 +1119,40 @@ function renderShop(){
     });
     cont.appendChild(sec);
   });
-  if(acquiredInMap.length) cont.appendChild(acquiredNote(acquiredInMap));
-  const removedInMap=Object.keys(map).filter(k=>isRemoved(k,map[k]));
-  if(removedInMap.length){
-    const rn=document.createElement('div'); rn.className='sec'; rn.style.justifyContent='center';
-    rn.innerHTML=`<button type="button">Réafficher ${removedInMap.length} article${removedInMap.length>1?'s':''} retiré${removedInMap.length>1?'s':''}</button>`;
-    rn.querySelector('button').onclick=()=>{ removedInMap.forEach(k=>{ removedShopItems.delete(k); delete removedFrom[k]; }); saveShopMarks(); touch(); renderShop(); };
-    cont.appendChild(rn);
-  }
+  const hr=hiddenShopRows(map); if(hr.length) cont.appendChild(hiddenSection(hr));
   const checkedCount=keys.filter(k=>shopChecked.has(k)).length;
   const vb=$('#validateBar');
   vb.classList.toggle('hide',checkedCount===0); $('#vbCount').textContent=checkedCount+' article'+(checkedCount>1?'s cochés':' coché');
   cont.style.paddingBottom=checkedCount?'84px':'';
   updateShopBadge();
+}
+/* ce qui ne s'affiche pas dans la liste, et pourquoi : plus rien ne disparaît en silence */
+function hiddenShopRows(map){
+  const rows=[];
+  Object.keys(map).forEach(k=>{ const e=map[k];
+    if(isRemoved(k,e)) rows.push({k,e,why:'retiré de la liste',undo:()=>{ removedShopItems.delete(k); delete removedFrom[k]; }});
+    else if(isAcq(k,e)) rows.push({k,e,why:'déjà acheté, rangé au stock',undo:()=>{ delete acquiredItems[k]; delete acquiredFrom[k]; }});
+    else if(settings.hidePantry&&inPantryByName(e.item)) rows.push({k,e,why:'en stock, masqué par le réglage',undo:null});
+  });
+  return rows;
+}
+function hiddenSection(rows){
+  const frag=document.createDocumentFragment();
+  const undoable=rows.filter(r=>r.undo);
+  const h=document.createElement('div'); h.className='sec';
+  h.innerHTML=`<span>${rows.length} article${rows.length>1?'s':''} masqué${rows.length>1?'s':''}</span>${undoable.length?`<button type="button" id="hidAll">Tout remettre</button>`:''}`;
+  frag.appendChild(h);
+  const g=document.createElement('div'); g.className='grp hid';
+  rows.forEach(({e,why,undo})=>{
+    const row=document.createElement('div'); row.className='rw';
+    const from=[...e.from]; 
+    row.innerHTML=`<span class="tile">${pantryEmo(e.item)}</span><div class="n">${e.item}<small>${why} · ${from.length>1?from.length+' recettes':from[0]}</small></div>${undo?'<button type="button" class="undo">Remettre</button>':''}`;
+    if(undo){ const act=()=>{ undo(); saveShopMarks(); touch(); renderShop(); toast('Remis dans la liste'); }; row.querySelector('.undo').onclick=ev=>{ ev.stopPropagation(); act(); }; row.onclick=act; }
+    g.appendChild(row);
+  });
+  frag.appendChild(g);
+  const all=h.querySelector('#hidAll'); if(all) all.onclick=()=>{ undoable.forEach(r=>r.undo()); saveShopMarks(); touch(); renderShop(); toast('Articles remis dans la liste'); };
+  return frag;
 }
 function acquiredNote(keys){
   const wrap=document.createElement('div'); wrap.className='sec'; wrap.style.justifyContent='center'; wrap.style.textTransform='none';
@@ -1198,11 +1250,11 @@ function openRecipeDetail(id){
   openSheet(); bindStars(sh);
   function renderIng(){
     const miss=missingFor(r); const missSet=new Set(miss.map(m=>singular(m)));
-    const rows=r.ingredients.map(([q,u,item])=>{ const sq=scaledQty(r,q); const qs=sq!=null?fmtQty(sq)+(u?' '+unitLabel(u,sq):''):(u||''); const base=baseIngredientName(item); const st=base&&!isStaple(base)?(missSet.has(singular(base))?'<span class="miss">manque</span>':(pantry.length?'<span class="have">en stock</span>':'')):''; const nz=settings.nz?nzName(item):''; return `<div class="ing-row"><span class="tile">${pantryEmo(item)}</span><span class="n">${qs?`<b class="q">${qs}</b> `:''}${item}${nz?`<small>${nz}</small>`:''}</span>${st}</div>`; }).join('');
+    const rows=r.ingredients.map(([q,u,item])=>{ const sq=niceQty(q,u,scaleFactor(r)); const qs=sq!=null?fmtQty(sq)+(u?' '+unitLabel(u,sq):''):(u||''); const base=baseIngredientName(item); const st=base&&!isStaple(base)?(missSet.has(singular(base))?'<span class="miss">manque</span>':(pantry.length?'<span class="have">en stock</span>':'')):''; const nz=settings.nz?nzName(item):''; return `<div class="ing-row"><span class="tile">${pantryEmo(item)}</span><span class="n">${qs?`<b class="q">${qs}</b> `:''}${item}${nz?`<small>${nz}</small>`:''}</span>${st}</div>`; }).join('');
     $('#rdIngList').innerHTML=rows;
     const stp=$('#rdSteps'); if(stp){ stp.innerHTML=stepsHtml(r,scaleFactor(r)); stp.querySelectorAll('.tm').forEach(b=>b.onclick=()=>startTimer(+b.dataset.timer,b.dataset.label)); }
     $('#rdServ').textContent=servingsFor(r)+' portion'+(servingsFor(r)>1?'s':'');
-    $('#rdMeals').textContent=mealsLabel(servingsFor(r))+' pour '+settings.persons+' pers.';
+    $('#rdMeals').textContent=mealsLabel(servingsFor(r))+' pour '+settings.persons+' pers.'+(portionFactor(r)<1?' · '+portionLabel():'');
     $('#rdMiss').textContent=pantry.length?(miss.length?miss.length+' manque'+(miss.length>1?'nt':''):'tout est en stock'):'';
     (function(){
       const box=$('#rdProt'); if(!box)return;
@@ -1271,8 +1323,8 @@ document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==
 function openCook(id){ keepAwake(true); currentCook=id; ensureCookState(id); $('#cookTitle').textContent=byId(id).title; renderCookBody(); $('#cookModal').classList.add('open'); document.body.style.overflow='hidden'; $('#cookModal .modal-body').scrollTop=0; }
 function closeCook(){ keepAwake(false); $('#cookModal').classList.remove('open'); document.body.style.overflow=''; currentCook=null; window._splitMode=false; }
 function renderCookBody(){
-  const r=byId(currentCook),cs=cookState[currentCook],factor=cs.servings/r.portions;
-  $('#cookMeta').textContent=r.time+' min · '+cs.servings+' portions · '+mealsLabel(cs.servings);
+  const r=byId(currentCook),cs=cookState[currentCook],factor=scaleFactor(r);
+  $('#cookMeta').textContent=r.time+' min · '+cs.servings+' portions · '+mealsLabel(cs.servings)+(portionFactor(r)<1?' · '+portionLabel():'');
   const anyAssigned=Object.values(cs.steps).some(s=>s&&s.assign);
   const doneCount=Object.values(cs.steps).filter(s=>s&&s.done).length,allDone=doneCount===r.steps.length;
   let html=`<div class="cook-tools">
@@ -1281,7 +1333,7 @@ function renderCookBody(){
     <button class="tbtn" id="shareBtn"><svg viewBox="0 0 24 24"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8M16 6l-4-4-4 4M12 2v13" stroke-linecap="round" stroke-linejoin="round"/></svg>Partager</button>
   </div>`;
   html+=`<div class="sec" style="padding-left:0;padding-right:0"><span>Ingrédients</span></div><div class="grp">`;
-  r.ingredients.forEach(([q,u,item])=>{ const sc=q!=null?q*factor:null; const qs=sc!=null?fmtQty(sc)+(u?' '+unitLabel(u,sc):''):(u||''); html+=`<div class="ing-row"><span class="tile">${pantryEmo(item)}</span><span class="n">${qs?`<b class="q">${qs}</b> `:''}${item}</span></div>`; });
+  r.ingredients.forEach(([q,u,item])=>{ const sc=niceQty(q,u,factor); const qs=sc!=null?fmtQty(sc)+(u?' '+unitLabel(u,sc):''):(u||''); html+=`<div class="ing-row"><span class="tile">${pantryEmo(item)}</span><span class="n">${qs?`<b class="q">${qs}</b> `:''}${item}</span></div>`; });
   html+=`</div>`;
   if(anyAssigned) html+=`<div class="legend" style="margin-top:10px"><span><span class="sw" style="background:var(--acc)"></span>Moi</span><span><span class="sw" style="background:var(--warn)"></span>L’autre</span></div>`;
   html+=`<div class="sec" style="padding-left:0;padding-right:0"><span>Préparation</span><span class="mono">${doneCount}/${r.steps.length}</span></div>`;
@@ -1350,7 +1402,7 @@ function fbCopy(t){ const a=document.createElement('textarea'); a.value=t; docum
 
 /* consume pantry items used by a recipe; returns array of consumed names */
 function consumePantryFor(r, portions){
-  const factor = portions && r.portions ? portions/r.portions : 1;
+  const factor = (portions && r.portions ? portions/r.portions : 1)*portionFactor(r);
   const used=[];
   r.ingredients.forEach(([q,u,item])=>{
     const base=baseIngredientName(item); if(!base||isStaple(base))return;
@@ -1657,19 +1709,22 @@ function renderSettingsSheet(){
     <div class="sec"><span>Cuisine</span></div>
     <div class="grp" style="margin:0 16px">
       <div class="rw"><span class="ico" style="background:var(--acc);color:var(--accFg)">${settings.persons}</span><span>Personnes à la maison</span><div class="stepper" style="margin-left:auto"><button id="persMinus" aria-label="Moins">−</button><span id="persVal">${settings.persons}</span><button id="persPlus" aria-label="Plus">+</button></div></div>
+      <div class="rw"><span class="ico" style="background:#FF9500">¾</span><span>Portions</span>${segHtml('segPortion',[['small','Petites'],['medium','Moyennes'],['normal','Normales']],settings.portionSize||'small')}</div>
+      <div class="rw"><span class="sh-sub" style="padding:0">Petites : 30 % de moins que la recette d’origine, Moyennes : 15 % de moins. Ça joue sur les quantités affichées et sur les courses, sauf pour les desserts et les sauces.</span></div>
       <div class="rw"><span class="ico" style="background:#2C6FBF">NZ</span><span>Noms anglais en rayon</span><button class="tog ${settings.nz?'on':''}" id="togNz" role="switch" aria-checked="${!!settings.nz}"></button></div>
       <div class="rw"><span class="ico" style="background:#C77800"><svg viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M4 11h16" stroke-linecap="round"/></svg></span><span>Masquer dans les courses ce qui est en stock</span><button class="tog ${settings.hidePantry?'on':''}" id="togHide" role="switch" aria-checked="${!!settings.hidePantry}"></button></div>
       <div class="rw" id="rowNew" style="cursor:pointer"><span class="ico" style="background:#5856D6"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" stroke-linecap="round"/></svg></span><span>Nouvelle recette</span><span class="chev">›</span></div>
     </div>
     <div class="sec"><span>Compte</span></div>
     <div id="acBody"></div>
-    <div class="sec" style="justify-content:center;text-transform:none"><span>Cookie Do 4.0 · <button type="button" id="pcOpen2">crédits photos</button></span></div>`;
+    <div class="sec" style="justify-content:center;text-transform:none"><span>Cookie Do 4.2 · <button type="button" id="pcOpen2">crédits photos</button></span></div>`;
   $('#acClose').onclick=closeSheet;
   $('#segTheme').querySelectorAll('button').forEach(b=>b.onclick=()=>{ settings.theme=b.dataset.v; saveSettings(); $('#segTheme').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b)); });
   const tg=(id,key,after)=>{ const t=$('#'+id); t.onclick=()=>{ settings[key]=!settings[key]; saveSettings(); t.classList.toggle('on',settings[key]); t.setAttribute('aria-checked',settings[key]); if(after)after(); }; };
   tg('togBig','bigText'); tg('togNz','nz',()=>{renderShop();}); tg('togHide','hidePantry',()=>{renderShop();});
   const pers=d=>{ settings.persons=Math.min(8,Math.max(1,(settings.persons||2)+d)); saveSettings(); $('#persVal').textContent=settings.persons; renderRecipes(); renderWeek(); };
   $('#persMinus').onclick=()=>pers(-1); $('#persPlus').onclick=()=>pers(1);
+  $('#segPortion').querySelectorAll('button').forEach(b=>b.onclick=()=>{ settings.portionSize=b.dataset.v; saveSettings(); touch(); $('#segPortion').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b)); renderRecipes(); renderWeek(); renderShop(); });
   $('#rowNew').onclick=()=>openRecipeForm(null);
   $('#pcOpen2').onclick=openPhotoCredits;
   const body=$('#acBody');
