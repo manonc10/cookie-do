@@ -53,18 +53,18 @@ function renderCourseSeg(){
 /* 330 min -> « 5 h 30 » (desserts qui passent au frais) */
 function fmtTime(m){ if(!m) return ''; if(m<60) return m+' min'; const h=Math.floor(m/60), r=m%60; return h+' h'+(r?' '+String(r).padStart(2,'0'):''); }
 function cardMeta(r,small){
+  const veg=(r.tags||[]).includes('végé')&&!isDessert(r)&&!isExtra(r)?'Végé · ':'';   // l'étiquette Végé vit dans le texte, plus sur la photo
   if(isSauce(r)) return `${fmtTime(r.time)} · ${r.yield||mealsLabel(r.portions)}`;
-  if(small) return `${fmtTime(r.time)} · ${mealsLabel(r.portions)}`;
-  return `${fmtTime(r.time)} · ${mealsLabel(r.portions)}${protOf(r.id)&&!isDessert(r)?' · '+protOf(r.id)+' g prot.':''}`;
+  if(small) return `${veg}${fmtTime(r.time)} · ${mealsLabel(r.portions)}`;
+  return `${veg}${fmtTime(r.time)} · ${mealsLabel(r.portions)}${protOf(r.id)&&!isDessert(r)?' · '+protOf(r.id)+' g prot.':''}`;
 }
+/* une seule étiquette sur la photo, la plus utile : déjà fait > nouveau > de saison */
 function cardTags(r){
   const made=lastMade(r.id), ds=daysSince(made);
-  const out=[];
-  if(made&&ds<=10) out.push(`<span class="tg warn">${ds===0?"Fait aujourd'hui":ds===1?'Fait hier':'Fait il y a '+ds+' j'}</span>`);
-  else if(isNewRecipe(r)) out.push('<span class="tg new">Nouveau</span>');
-  if((r.tags||[]).includes('végé')&&!isDessert(r)&&!isExtra(r)) out.push('<span class="tg veg">Végé</span>');
-  if(typeof isSeasonal==='function'&&isSeasonal(r)&&!isDessert(r)&&!isExtra(r)&&out.length<2) out.push('<span class="tg sea">De saison</span>');
-  return out.slice(0,2).join('');
+  if(made&&ds<=10) return `<span class="tg warn">${ds===0?"Fait aujourd'hui":ds===1?'Fait hier':'Fait il y a '+ds+' j'}</span>`;
+  if(isNewRecipe(r)) return '<span class="tg new">Nouveau</span>';
+  if(typeof isSeasonal==='function'&&isSeasonal(r)&&!isDessert(r)&&!isExtra(r)) return '<span class="tg sea">De saison</span>';
+  return '';
 }
 function plusSvg(){ return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 5v14M5 12h14" stroke-linecap="round"/></svg>'; }
 function gridCard(r,small){
@@ -74,9 +74,25 @@ function gridCard(r,small){
       <button class="pick" data-pick aria-label="${selection.has(r.id)?'Retirer de la semaine':'Ajouter à la semaine'}">${selection.has(r.id)?checkSvg():plusSvg()}</button></div>
     <div class="gb"><div class="gt">${r.title}</div><div class="gm">${cardMeta(r,small)}</div></div>`;
   el.onclick=()=>openRecipeDetail(r.id);
-  const pk=el.querySelector('[data-pick]'); if(pk) pk.onclick=e=>{ e.stopPropagation(); toggleSelect(r.id); };
+  const pk=el.querySelector('[data-pick]'); if(pk) pk.onclick=e=>{ e.stopPropagation();
+    const adding=!selection.has(r.id), img=el.querySelector('.ph-wrap img'), from=img&&img.getBoundingClientRect();
+    toggleSelect(r.id);
+    if(adding){ flyToWeek(img,from); toast('Ajouté à la semaine',()=>{ if(selection.has(r.id)) toggleSelect(r.id); }); } };
   const fv=el.querySelector('[data-fav]'); fv.onclick=e=>{ e.stopPropagation(); toggleFav(r.id); fv.classList.toggle('on',isFav(r.id)); if(showFavOnly) renderRecipes(); };
   return el;
+}
+
+/* la vignette file vers l'onglet Semaine et la pastille rebondit (instantané avec Réduire les animations) */
+function flyToWeek(img,from){
+  const b=$('#weekBadge'); if(!b) return;
+  const pop=()=>{ b.classList.remove('pop'); void b.offsetWidth; b.classList.add('pop'); };
+  const tab=b.parentElement.getBoundingClientRect();
+  if(!img||!from||!from.width||matchMedia('(prefers-reduced-motion: reduce)').matches||!document.body.animate){ pop(); return; }
+  const f=document.createElement('img'); f.src=img.currentSrc||img.src; f.alt=''; f.className='fly'; document.body.appendChild(f);
+  const sx=from.left+from.width/2-32, sy=from.top+from.height/2-24, ex=tab.left+tab.width/2-32, ey=tab.top-14;
+  f.animate([{transform:`translate(${sx}px,${sy}px) scale(1)`,opacity:1},
+    {transform:`translate(${(sx+ex)/2}px,${Math.min(sy,ey)-70}px) scale(.7)`,opacity:1,offset:.5},
+    {transform:`translate(${ex}px,${ey}px) scale(.25)`,opacity:.2}],{duration:560,easing:'cubic-bezier(.4,0,.6,1)'}).onfinish=()=>{ f.remove(); pop(); };
 }
 
 /* ================= RANGÉES « À DÉCOUVRIR » ================= */
