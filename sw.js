@@ -1,8 +1,8 @@
 /* Cookie Do hors ligne : le site, ses scripts et les photos déjà vues restent disponibles sans réseau.
    Page (index.html) : réseau d'abord, pour recevoir les mises à jour ; cache si pas de réseau.
    Fichiers versionnés (?v=N) et photos : cache d'abord, ils ne changent pas sous un même nom. */
-const CACHE='cookiedo-v8';
-const SHELL=['./','index.html','css/app.css?v=23','js/data.js?v=23','js/app.js?v=23','js/plus.js?v=23','js/foyer.js?v=23','js/v4.js?v=23','manifest.webmanifest','favicon.png','apple-touch-icon.png'];
+const CACHE='cookiedo-v9';
+const SHELL=['./','index.html','css/app.css?v=24','js/data.js?v=24','js/app.js?v=24','js/plus.js?v=24','js/foyer.js?v=24','js/v4.js?v=24','manifest.webmanifest','favicon.png','apple-touch-icon.png'];
 self.addEventListener('install',e=>{ e.waitUntil(caches.open(CACHE).then(c=>c.addAll(SHELL)).then(()=>self.skipWaiting())); });
 self.addEventListener('activate',e=>{ e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim())); });
 self.addEventListener('fetch',e=>{
