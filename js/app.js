@@ -329,9 +329,12 @@ function uiIcon(k,sw){ return UI(UI_ICONS[k]||'',sw); }
 /* photos perso (prises sur le téléphone) : id -> dataURL jpeg, prioritaires sur le catalogue */
 let userPhotos=load('cd_userPhotos',{});
 function photoSrc(id){ return userPhotos[id]||('photos/'+id+'.jpg'); }
+/* vignette WebP (360 px) pour les cartes et les lignes ; la JPEG pleine reste en secours */
+function photoThumb(id){ return userPhotos[id]||('photos-s/'+id+'.webp'); }
+function thumbFallback(id){ return userPhotos[id]?'this.remove()':`this.onerror=null;this.src='photos/${id}.jpg'`; }
 function hasPhoto(id){ return !!userPhotos[id]||PHOTOS.has(id); }
-function photoHtml(id,cls){ return hasPhoto(id)?`<img class="ph ${cls||''}" src="${photoSrc(id)}" alt="" loading="lazy" decoding="async" onerror="this.remove()">`:''; }
-function photoOrEmoji(id,cls){ const r=byId(id); return hasPhoto(id)?photoHtml(id,cls):`<div class="noph">${r?recipeEmoji(r):''}</div>`; }
+function photoHtml(id,cls,small){ return hasPhoto(id)?(small?`<img class="ph ${cls||''}" src="${photoThumb(id)}" alt="" loading="lazy" decoding="async" onerror="${thumbFallback(id)}">`:`<img class="ph ${cls||''}" src="${photoSrc(id)}" alt="" loading="lazy" decoding="async" onerror="this.remove()">`):''; }
+function photoOrEmoji(id,cls,small){ const r=byId(id); return hasPhoto(id)?photoHtml(id,cls,small):`<div class="noph">${r?recipeEmoji(r):''}</div>`; }
 function kicker(r){
   const t=r.tags||[]; const parts=[];
   if(t.includes('végé')) parts.push('Végé'); else if(t.includes('poisson')) parts.push('Poisson'); else if(t.includes('poulet')) parts.push('Poulet'); else if(t.includes('porc')) parts.push('Porc'); else if(t.includes('viande')||t.includes('boeuf')) parts.push('Viande');
@@ -655,7 +658,7 @@ function recipeCard(r){
   const t=r.tags||[];
   const tag=t.includes('végé')&&!isDessert(r)?'<span class="tag">Végé</span>':'';
   const warn=recent?`<span class="tag warn">Fait ${dsince===0?"aujourd'hui":dsince===1?'hier':'il y a '+dsince+' j'}</span>`:'';
-  card.innerHTML=`${photoOrEmoji(r.id)}<div class="ov"></div>
+  card.innerHTML=`${photoOrEmoji(r.id,'',true)}<div class="ov"></div>
     <div class="tags">${tag}${warn}</div>
     <button class="tap" data-open="${r.id}" aria-label="${r.title}"></button>
     <button class="fav ${isFav(r.id)?'on':''}" data-fav aria-label="Favori">${heartSvg()}</button>
@@ -885,7 +888,7 @@ function renderFridge(){
   $('#fridgeCount').textContent=ranked.length+' recette'+(ranked.length>1?'s':'');
   ranked.forEach(({r,miss})=>{
     const row=document.createElement('div'); row.className='rw thumb';
-    row.innerHTML=`${hasPhoto(r.id)?`<img class="th" src="${photoSrc(r.id)}" alt="" loading="lazy">`:`<div class="noph">${recipeEmoji(r)}</div>`}
+    row.innerHTML=`${hasPhoto(r.id)?`<img class="th" src="${photoThumb(r.id)}" alt="" loading="lazy" onerror="${thumbFallback(r.id)}">`:`<div class="noph">${recipeEmoji(r)}</div>`}
       <div class="b"><div class="t">${r.title}</div><div class="m ${miss.length?'warn':'ok'}">${r.time} min · ${miss.length?'il manque '+miss.join(', '):'tout est en stock'}</div></div>
       <button class="go" data-pick>${selection.has(r.id)?'✓':'+'}</button>`;
     row.querySelector('.b').onclick=()=>openRecipeDetail(r.id);
@@ -1212,7 +1215,7 @@ function renderWeek(){
     const miss=pantry.length?missingFor(r):null;
     const row=document.createElement('div'); row.className='rw thumb';
     const state=pct>0?`<span style="color:var(--accT);font-weight:600">${pct} % fait</span>`:(miss?(miss.length?`<span class="warn" style="color:var(--warn)">${miss.length} article${miss.length>1?'s':''} manque${miss.length>1?'nt':''}</span>`:'<span style="color:var(--ok)">tout est en stock</span>'):mealsLabel(servingsFor(r)));
-    row.innerHTML=`${hasPhoto(id)?`<img class="th" src="${photoSrc(id)}" alt="" loading="lazy">`:`<div class="noph">${recipeEmoji(r)}</div>`}
+    row.innerHTML=`${hasPhoto(id)?`<img class="th" src="${photoThumb(id)}" alt="" loading="lazy" onerror="${thumbFallback(id)}">`:`<div class="noph">${recipeEmoji(r)}</div>`}
       <div class="b"><div class="t">${r.title}</div><div class="m">${r.time} min · ${state}</div></div>
       <button class="go" data-cook>Cuisiner</button>`;
     row.querySelector('[data-cook]').onclick=e=>{e.stopPropagation();openCook(id);};
@@ -1524,7 +1527,7 @@ function renderHistList(rows){
   const shown=histAll?rows:rows.slice(0,5);
   shown.forEach(h=>{ const [y,m,d]=h.date.split('-').map(Number); const rr=byId(h.id);
     const item=document.createElement('div'); item.className='rw thumb';
-    item.innerHTML=`${rr&&hasPhoto(h.id)?`<img class="th" src="${photoSrc(h.id)}" alt="" loading="lazy">`:`<div class="noph">${rr?recipeEmoji(rr):'🍽'}</div>`}
+    item.innerHTML=`${rr&&hasPhoto(h.id)?`<img class="th" src="${photoThumb(h.id)}" alt="" loading="lazy" onerror="${thumbFallback(h.id)}">`:`<div class="noph">${rr?recipeEmoji(rr):'🍽'}</div>`}
       <div class="b"><div class="t">${h.title}</div><div class="m">${d} ${MONTHS[m-1]} · ${daysSince(h.date)===0?"aujourd'hui":daysSince(h.date)===1?'hier':'il y a '+daysSince(h.date)+' jours'}${rr&&getRating(h.id)?' · '+'★'.repeat(getRating(h.id)):''}</div></div>
       ${rr?`<button class="go" data-again>Refaire</button>`:''}`;
     if(rr){ item.querySelector('[data-again]').onclick=(e)=>{ e.stopPropagation(); if(!selection.has(h.id)){toggleSelect(h.id); toast('Ajouté à la semaine');} else toast('Déjà dans la semaine'); };
@@ -1568,7 +1571,7 @@ function showDayMeals(iso,meals){
   const list=$('#dmList');
   meals.forEach(h=>{ const rr=byId(h.id);
     const item=document.createElement('div'); item.className='rw thumb';
-    item.innerHTML=`${rr&&hasPhoto(h.id)?`<img class="th" src="${photoSrc(h.id)}" alt="">`:`<div class="noph">${rr?recipeEmoji(rr):'🍽'}</div>`}
+    item.innerHTML=`${rr&&hasPhoto(h.id)?`<img class="th" src="${photoThumb(h.id)}" alt="" onerror="${thumbFallback(h.id)}">`:`<div class="noph">${rr?recipeEmoji(rr):'🍽'}</div>`}
       <div class="b"><div class="t">${h.title}</div><div class="m">${rr?'dans ton catalogue':'recette supprimée'}</div></div>${rr?'<span class="chev">›</span>':''}`;
     if(rr)item.onclick=()=>{ closeSheet(); openRecipeDetail(h.id); };
     list.appendChild(item);
@@ -1581,7 +1584,7 @@ $('#calToday').onclick=()=>{ const n=new Date(); calYear=n.getFullYear(); calMon
 $('#logMealBtn').onclick=openLogMealPicker;
 function openLogMealPicker(){
   const sh=$('#sheet');
-  const item=r=>`<button class="pick-recipe" data-r="${r.id}"><span class="th">${hasPhoto(r.id)?`<img src="${photoSrc(r.id)}" alt="" loading="lazy">`:recipeEmoji(r)}</span><span class="b"><span class="t">${r.title}</span><span class="m">${r.time} min · ${kicker(r)}</span></span></button>`;
+  const item=r=>`<button class="pick-recipe" data-r="${r.id}"><span class="th">${hasPhoto(r.id)?`<img src="${photoThumb(r.id)}" alt="" loading="lazy" onerror="${thumbFallback(r.id)}">`:recipeEmoji(r)}</span><span class="b"><span class="t">${r.title}</span><span class="m">${r.time} min · ${kicker(r)}</span></span></button>`;
   sh.innerHTML=`<div class="grab"></div>
     <div class="sh-head"><h3>Quel plat as-tu fait ?</h3><button class="sh-x" id="lpClose" aria-label="Fermer"><svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12" stroke-linecap="round"/></svg></button></div>
     <div class="sh-sub">Choisis une recette, tu indiqueras le jour ensuite.</div>
@@ -1725,7 +1728,7 @@ function renderSettingsSheet(){
     </div>
     <div class="sec"><span>Compte</span></div>
     <div id="acBody"></div>
-    <div class="sec" style="justify-content:center;text-transform:none"><span>Cookie Do 4.3 · <button type="button" id="pcOpen2">crédits photos</button></span></div>`;
+    <div class="sec" style="justify-content:center;text-transform:none"><span>Cookie Do 4.4 · <button type="button" id="pcOpen2">crédits photos</button></span></div>`;
   $('#acClose').onclick=closeSheet;
   $('#segTheme').querySelectorAll('button').forEach(b=>b.onclick=()=>{ settings.theme=b.dataset.v; saveSettings(); $('#segTheme').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b)); });
   const tg=(id,key,after)=>{ const t=$('#'+id); t.onclick=()=>{ settings[key]=!settings[key]; saveSettings(); t.classList.toggle('on',settings[key]); t.setAttribute('aria-checked',settings[key]); if(after)after(); }; };

@@ -182,7 +182,7 @@ function openDaySheet(iso){
   const sh=$('#sheet');
   sh.innerHTML=`<div class="grab"></div>
     <div class="sh-head"><h3 style="text-transform:capitalize">${DAY_FULL[dt.getDay()]} ${d}</h3><button class="sh-x" id="dsClose" aria-label="Fermer">${xSvg()}</button></div>
-    ${meals.length?`<div class="grp" style="margin:8px 16px 0">${meals.map(x=>{ const r=byId(x.id); return `<div class="rw thumb" data-id="${x.id}">${hasPhoto(x.id)?`<img class="th" src="${photoSrc(x.id)}" alt="">`:`<div class="noph">${recipeEmoji(r)}</div>`}<div class="b"><div class="t">${r.title}</div><div class="m">${x.slot}${x.first?'':' · restes'}</div></div><span class="chev">›</span></div>`; }).join('')}</div>`:'<div class="sh-sub">Rien de prévu ce jour-là. Touche « Choisir les repas » sous une recette de la semaine pour la placer ici.</div>'}`;
+    ${meals.length?`<div class="grp" style="margin:8px 16px 0">${meals.map(x=>{ const r=byId(x.id); return `<div class="rw thumb" data-id="${x.id}">${hasPhoto(x.id)?`<img class="th" src="${photoThumb(x.id)}" alt="" onerror="${thumbFallback(x.id)}">`:`<div class="noph">${recipeEmoji(r)}</div>`}<div class="b"><div class="t">${r.title}</div><div class="m">${x.slot}${x.first?'':' · restes'}</div></div><span class="chev">›</span></div>`; }).join('')}</div>`:'<div class="sh-sub">Rien de prévu ce jour-là. Touche « Choisir les repas » sous une recette de la semaine pour la placer ici.</div>'}`;
   openSheet(); $('#dsClose').onclick=closeSheet;
   sh.querySelectorAll('[data-id]').forEach(el=>el.onclick=()=>{ closeSheet(); openRecipeDetail(el.dataset.id); });
 }
@@ -219,7 +219,7 @@ renderWeek=function(){
     const when=ks.length?ks.map(slotLabel).join(' · '):'Choisir les repas';
     const row=document.createElement('div'); row.className='rw thumb';
     const state=pct>0?`<span style="color:var(--accT);font-weight:600">${pct} % fait</span>`:(miss?(miss.length?`<span style="color:var(--warn)">${miss.length} manque${miss.length>1?'nt':''}</span>`:'<span style="color:var(--ok)">tout en stock</span>'):mealsLabel(servingsFor(r)));
-    row.innerHTML=`${hasPhoto(id)?`<img class="th" src="${photoSrc(id)}" alt="" loading="lazy">`:`<div class="noph">${recipeEmoji(r)}</div>`}
+    row.innerHTML=`${hasPhoto(id)?`<img class="th" src="${photoThumb(id)}" alt="" loading="lazy" onerror="${thumbFallback(id)}">`:`<div class="noph">${recipeEmoji(r)}</div>`}
       <div class="b"><div class="t">${r.title}</div><div class="m">${r.time} min · ${state}</div><button type="button" class="when${ks.length?'':' empty'}">${when}</button></div>
       <button class="go" data-cook>Cuisiner</button>`;
     row.querySelector('[data-cook]').onclick=e=>{e.stopPropagation();openCook(id);};

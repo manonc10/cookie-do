@@ -69,7 +69,7 @@ function cardTags(r){
 function plusSvg(){ return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 5v14M5 12h14" stroke-linecap="round"/></svg>'; }
 function gridCard(r,small){
   const el=document.createElement('div'); el.className='gcard'+(small?' sm':'')+(selection.has(r.id)?' picked':'');
-  el.innerHTML=`<div class="ph-wrap">${photoOrEmoji(r.id)}<div class="tgs">${cardTags(r)}</div>
+  el.innerHTML=`<div class="ph-wrap">${photoOrEmoji(r.id,'',true)}<div class="tgs">${cardTags(r)}</div>
       <button class="fav ${isFav(r.id)?'on':''}" data-fav aria-label="Favori">${heartSvg()}</button>
       <button class="pick" data-pick aria-label="${selection.has(r.id)?'Retirer de la semaine':'Ajouter à la semaine'}">${selection.has(r.id)?checkSvg():plusSvg()}</button></div>
     <div class="gb"><div class="gt">${r.title}</div><div class="gm">${cardMeta(r,small)}</div></div>`;
@@ -185,8 +185,9 @@ openRecipeDetail=function(id){
 };
 function pairChip(r,addable){
   const on=selection.has(r.id);
-  return `<div class="pair-c" data-id="${r.id}" role="button" tabindex="0">${hasPhoto(r.id)?`<img src="${photoSrc(r.id)}" alt="" loading="lazy">`:`<div class="noph">${recipeEmoji(r)}</div>`}<div class="pb"><b>${r.title}</b><small>${fmtTime(r.time)}</small></div>${addable?`<button class="pa${on?' on':''}" data-add aria-label="Ajouter à la semaine">${on?checkSvg():plusSvg()}</button>`:''}</div>`;
+  return `<div class="pair-c" data-id="${r.id}" role="button" tabindex="0">${hasPhoto(r.id)?`<img src="${photoThumb(r.id)}" alt="" loading="lazy" onerror="${thumbFallback(r.id)}">`:`<div class="noph">${recipeEmoji(r)}</div>`}<div class="pb"><b>${r.title}</b><small>${fmtTime(r.time)}</small></div>${addable?`<button class="pa${on?' on':''}" data-add aria-label="Ajouter à la semaine">${on?checkSvg():plusSvg()}</button>`:''}</div>`;
 }
 
-/* premier rendu */
+/* premier rendu : la vue Recettes n'est peinte qu'une fois le segment et les rails en place (pas de saut de page) */
 renderCourseSeg(); renderChips(); renderRecipes(); renderWeek();
+document.body.classList.remove('boot');
