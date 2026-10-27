@@ -207,3 +207,87 @@ function pairChip(r,addable){
 /* premier rendu : la vue Recettes n'est peinte qu'une fois le segment et les rails en place (pas de saut de page) */
 renderCourseSeg(); renderChips(); renderRecipes(); renderWeek();
 document.body.classList.remove('boot');
+
+/* ================= SEMAINE 4.6 : le plat du soir d'abord ================= */
+/* sous chaque jour, un point par repas prévu */
+const _renderDays46=renderDays;
+renderDays=function(){
+  _renderDays46();
+  const count={}; Object.values(plan).forEach(ks=>(ks||[]).forEach(k=>{ const iso=k.split('|')[0]; count[iso]=(count[iso]||0)+1; }));
+  $$('#days button').forEach((el,i)=>{ const d=weekDays()[i]; const n=count[localDay(d)]||0; const it=el.querySelector('i');
+    if(it){ it.innerHTML='<em></em>'.repeat(Math.min(n,4)); it.setAttribute('aria-label',n?n+' repas':'aucun repas'); } });
+};
+/* le plat à cuisiner maintenant : ce midi avant 14 h, sinon ce soir, sinon le prochain prévu */
+function nextDish(ids){
+  const t=localDay(), h=new Date().getHours();
+  const want=h<14?[t+'|midi',t+'|soir']:[t+'|soir'];
+  const mains=ids.filter(id=>!isExtra(byId(id)));
+  for(const k of want){ const id=mains.find(x=>(plan[x]||[]).includes(k)); if(id) return {id,k}; }
+  const first=mains.map(id=>({id,k:(plan[id]||[]).slice().sort()[0]})).filter(x=>x.k).sort((a,b)=>a.k.localeCompare(b.k))[0];
+  return first||(mains[0]?{id:mains[0],k:null}:null);
+}
+const _renderWeek46=renderWeek;
+renderWeek=function(){
+  _renderWeek46();
+  const ids=[...selection].filter(id=>byId(id));
+  let hero=$('#weekTonight'); if(!hero){ hero=document.createElement('div'); hero.id='weekTonight'; $('#weekH').before(hero); }
+  hero.innerHTML=''; hero.hidden=true;
+  const nx=ids.length?nextDish(ids):null;
+  $('#weekH span').textContent=nx?'Ensuite':'À cuisiner';
+  if(nx){
+    const r=byId(nx.id), t=localDay();
+    const kick=nx.k===t+'|soir'?'Ce soir':nx.k===t+'|midi'?'Ce midi':nx.k?'Prochain plat · '+slotLabel(nx.k):'À cuisiner';
+    const rest=(plan[nx.id]||[]).filter(k=>k!==nx.k).map(slotLabel);
+    hero.innerHTML=`<div class="tn-ph">${photoOrEmoji(nx.id,'',false)}</div><div class="tn-b"><div class="tn-k">${kick}</div><div class="tn-t">${r.title}</div>
+      <div class="tn-m">${fmtTime(r.time)}${rest.length?' · aussi '+rest.join(', '):''}</div></div>
+      <button class="btn wide pri tn-go" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M4 10h16v6a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4z"/><path d="M2.5 10h19M9 6.5c0-1 .8-1.5.8-2.5M13 6.5c0-1 .8-1.5.8-2.5"/></svg>Cuisiner</button>`;
+    hero.hidden=false;
+    hero.querySelector('.tn-go').onclick=()=>openCook(nx.id);
+    hero.querySelector('.tn-ph').onclick=hero.querySelector('.tn-t').onclick=()=>openRecipeDetail(nx.id);
+    // la ligne du plat mis en avant quitte la liste ; les autres s'ouvrent d'un geste, sans bouton Cuisiner
+    $$('#weekList .rw').forEach(row=>{ const tt=row.querySelector('.t'); if(tt&&tt.textContent===r.title) row.remove(); });
+  }
+  $$('#weekList .rw').forEach(row=>{ const go=row.querySelector('.go'); if(!go) return; go.remove();
+    row.insertAdjacentHTML('beforeend','<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true"><path d="M9 5.5l6.5 6.5L9 18.5"/></svg>');
+    const b=row.querySelector('.b'); if(b) b.onclick=e=>{ if(e.target.closest('.when')) return; row.querySelector('.t').click(); }; });
+  const left=$$('#weekList .rw').length; $('#weekH').hidden=!left; $('#weekH').style.display=left?'':'none'; $('#weekList').classList.toggle('hide',!left);
+  const cb=$('#clearSelBtn'); if(cb) cb.hidden=true; const pb=$('#planBtn'); if(pb) pb.hidden=true;
+  const mb=$('#weekMoreBtn'); if(mb) mb.hidden=!ids.length;
+  renderWeekEmpty(ids);
+};
+/* menu ⋯ de la semaine : répartir, noter un plat déjà fait, tout retirer */
+function openWeekMenu(){
+  const sh=$('#sheet'); const ids=[...selection].filter(id=>byId(id)); const unplanned=ids.filter(id=>!(plan[id]||[]).length).length;
+  sh.innerHTML=`<div class="grab"></div><div class="sh-head"><h3>Semaine</h3><button class="sh-x" id="wmClose" aria-label="Fermer"><svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button></div>
+    <div style="display:grid;gap:8px;padding:0 16px 16px">
+      <button class="btn wide" id="wmPlan">${unplanned?'Répartir sur la semaine':'Répartir à nouveau'}</button>
+      <button class="btn wide" id="wmLog">Noter un plat déjà fait</button>
+      <button class="btn wide danger" id="wmClear">Tout retirer</button></div>`;
+  openSheet(); $('#wmClose').onclick=closeSheet;
+  $('#wmPlan').onclick=()=>{ closeSheet(); $('#planBtn').click(); };
+  $('#wmLog').onclick=()=>{ closeSheet(); openLogMealPicker(); };
+  $('#wmClear').onclick=()=>{ closeSheet(); $('#clearSelBtn').click(); };
+}
+{ const lb=$('#logMealBtn'); if(lb){ lb.id='weekMoreBtn'; lb.setAttribute('aria-label','Plus d’actions'); lb.title='Plus d’actions';
+    lb.innerHTML='<svg viewBox="0 0 24 24"><circle cx="6" cy="12" r="1.3" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.3" fill="currentColor" stroke="none"/><circle cx="18" cy="12" r="1.3" fill="currentColor" stroke="none"/></svg>';
+    lb.onclick=openWeekMenu; }
+  const rb=$('#weekRandomBtn'); if(rb){ rb.classList.add('ic'); rb.setAttribute('aria-label','Composer la semaine au hasard'); rb.title='Au hasard'; rb.lastChild.textContent=''; } }
+/* semaine vide : trois plats qui vont bien ensemble (un végé, un poisson, un autre), un geste pour tout ajouter */
+function weekSuggestions(){
+  const made=new Set(history.map(h=>h.id));
+  const pool=dayShuffle(allRecipes.filter(r=>!isDessert(r)&&!isExtra(r)&&hasPhoto(r.id)&&r.time<=60),'vide');
+  const pick=[]; for(const d of ['vege','poisson','viande']){ const r=pool.find(x=>dietOf(x)===d&&!pick.includes(x)&&!made.has(x.id))||pool.find(x=>dietOf(x)===d&&!pick.includes(x)); if(r) pick.push(r); }
+  for(const r of pool){ if(pick.length>=3) break; if(!pick.includes(r)) pick.push(r); }
+  return pick.slice(0,3);
+}
+function renderWeekEmpty(ids){
+  const box=$('#weekEmpty'); if(!box||ids.length) return;
+  const sug=weekSuggestions();
+  box.innerHTML=`<div class="ill"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/></svg></div>
+    <h3>Ta semaine est vide</h3><p>Trois plats suffisent pour la semaine. En voici trois qui vont bien ensemble, ou touche <strong>+</strong> dans le catalogue.</p>
+    <div class="sugg">${sug.map(r=>`<button type="button" data-id="${r.id}"><img src="${photoThumb(r.id)}" alt="" onerror="${thumbFallback(r.id)}"><span>${r.title}</span></button>`).join('')}</div>
+    <button class="btn wide pri" id="sugAll" type="button">Ajouter les trois</button>`;
+  box.querySelectorAll('[data-id]').forEach(b=>b.onclick=()=>openRecipeDetail(b.dataset.id));
+  $('#sugAll').onclick=()=>{ const add=sug.filter(r=>!selection.has(r.id)); add.forEach(r=>toggleSelect(r.id)); renderWeek();
+    toast(add.length+' plats ajoutés',()=>{ add.forEach(r=>{ if(selection.has(r.id)) toggleSelect(r.id); }); renderWeek(); }); };
+}

@@ -507,3 +507,25 @@ body.boot #courseSeg,body.boot #quickChips,body.boot #rails,body.boot #view-reci
 .seg-course::-webkit-scrollbar{display:none}
 .seg-course button{flex:1 0 auto;padding:0 10px}
 .gcard .pick::after{content:"";position:absolute;inset:-6px}
+/* Semaine 4.6 : plat du soir en tête, lignes simples, points de repas, semaine vide avec suggestions */
+#weekTonight{margin:10px 16px 6px;background:var(--sur);border-radius:var(--r);overflow:hidden;box-shadow:var(--shC)}
+#weekTonight .tn-ph{height:150px;overflow:hidden;cursor:pointer;background:var(--sur3)}
+#weekTonight .tn-ph img,#weekTonight .tn-ph .noph{width:100%;height:100%;object-fit:cover;display:flex;align-items:center;justify-content:center;font-size:3rem}
+#weekTonight .tn-b{padding:12px 14px 4px}
+#weekTonight .tn-k{font-size:0.6875rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--accT)}
+#weekTonight .tn-t{font-family:var(--serif);font-size:1.25rem;font-weight:700;line-height:1.2;margin:3px 0;cursor:pointer;text-wrap:balance}
+#weekTonight .tn-m{font-size:0.8125rem;color:var(--mut)}
+#weekTonight .tn-go{margin:10px 14px 14px;width:calc(100% - 28px)}
+#weekList .rw .when{background:none;color:var(--mut);font-weight:500;padding:0;margin-top:3px;font-size:0.8125rem}
+#weekList .rw .when.empty{color:var(--accT);border:0;padding:0;font-weight:600}
+#weekList .rw .b{cursor:pointer}
+#weekList .rw .chev{width:18px;height:18px;flex:0 0 auto;color:var(--mut);opacity:.6;margin-left:auto}
+.days button i{display:flex;gap:3px;justify-content:center;align-items:center;height:12px}
+.days button i em{width:5px;height:5px;border-radius:50%;background:var(--accT)}
+.days button.today i em{background:var(--accFg)}
+#weekEmpty .sugg{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:4px 0 14px;text-align:left}
+#weekEmpty .sugg{align-items:start}
+#weekEmpty .sugg button{display:block;min-width:0;padding:0;margin:0;border:0;background:none;text-align:center}
+#weekEmpty .sugg img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:10px;display:block;background:var(--sur3)}
+#weekEmpty .sugg span{display:block;font-size:0.75rem;line-height:1.25;margin-top:4px;color:var(--fg)}
+#weekEmpty .btn{max-width:340px}
