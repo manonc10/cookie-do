@@ -31,19 +31,7 @@ function foyerApplyLocal(d){
   save(LS.freeShop,freeItems); save(LS.pantry,pantry); save('cd_plan',plan); save('mm_acquired',acquiredItems); save(LS.history,history); saveShopMarks();
 }
 const keyOf={freeShop:x=>norm(x.name), pantry:x=>norm(x.name)+'|'+(x.unit||''), history:x=>x.id+'|'+x.date};
-/* fusion d'un ensemble : remote + (ajouts locaux) - (retraits locaux) */
-function mergeSet(base,loc,rem){ const B=new Set(base||[]),L=new Set(loc||[]),out=new Set(rem||[]);
-  L.forEach(x=>{ if(!B.has(x)) out.add(x); }); B.forEach(x=>{ if(!L.has(x)) out.delete(x); }); return [...out]; }
-/* fusion d'une liste d'objets identifiés par une clé : l'objet modifié localement gagne */
-function mergeList(base,loc,rem,kf){ const m=a=>{ const o=new Map(); (a||[]).forEach(x=>o.set(kf(x),x)); return o; };
-  const B=m(base),L=m(loc),R=m(rem);
-  L.forEach((v,k)=>{ if(!B.has(k)||JSON.stringify(B.get(k))!==JSON.stringify(v)) R.set(k,v); });
-  B.forEach((v,k)=>{ if(!L.has(k)) R.delete(k); });
-  return [...R.values()]; }
-function mergeObj(base,loc,rem){ base=base||{}; loc=loc||{}; const out=Object.assign({},rem||{});
-  new Set([...Object.keys(base),...Object.keys(loc)]).forEach(k=>{ const b=JSON.stringify(base[k]),l=JSON.stringify(loc[k]);
-    if(b!==l){ if(loc[k]===undefined) delete out[k]; else out[k]=loc[k]; } });
-  return out; }
+/* mergeSet, mergeList, mergeObj : dans app.js (communs avec la synchro du compte) */
 function foyerMerge(base,loc,rem){
   base=base||{}; rem=rem||{};
   return {

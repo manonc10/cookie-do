@@ -7,6 +7,7 @@ const Sync = (()=> {
   let pushTimer = null;
   let lastError=null, lastStatus=0;
   let lastServerUpdated = load('mm_serverUpdated', 0);
+  let rev = null;                            // updated_at de la ligne lue en dernier (null = pas de ligne)
 
   function setStatus(s){ status=s; onChange(status, session&&session.user); }
   function headers(auth){
@@ -60,10 +61,12 @@ const Sync = (()=> {
     if(r.ok){
       setStatus('on'); lastError=null;
       if(Array.isArray(r.body) && r.body.length){
-        lastServerUpdated=new Date(r.body[0].updated_at).getTime();
+        rev=r.body[0].updated_at;
+        lastServerUpdated=new Date(rev).getTime();
         save('mm_serverUpdated',lastServerUpdated);
         return r.body[0].data;
       }
+      rev=null;
       return null;
     }
     // error
@@ -87,6 +90,29 @@ const Sync = (()=> {
     else { lastError = describeError(r); lastStatus = r.status; }
     return r.ok;
   }
+  /* écriture conditionnelle : ne passe que si la ligne n'a pas bougé depuis pull().
+     Avant, chaque appareil écrasait tout avec sa copie : un onglet resté ouvert sur
+     l'ancienne semaine la remettait en ligne au premier article coché.
+     Rend true, false (erreur) ou 'conflict' (quelqu'un a écrit entre-temps : relire). */
+  async function pushIf(data){
+    if(!enabled||!session) return false;
+    if(!(await refreshIfNeeded())) return false;
+    setStatus('syncing');
+    const now=new Date().toISOString(); let r;
+    if(rev){
+      r=await api('/rest/v1/app_state?user_id=eq.'+session.user.id+'&updated_at=eq.'+encodeURIComponent(rev),{
+        method:'PATCH', headers:{...headers(true),'Prefer':'return=representation'}, body:JSON.stringify({data,updated_at:now})});
+      if(r.ok && Array.isArray(r.body) && !r.body.length){ setStatus('on'); return 'conflict'; }
+    } else {
+      r=await api('/rest/v1/app_state',{
+        method:'POST', headers:{...headers(true),'Prefer':'return=representation'}, body:JSON.stringify({user_id:session.user.id,data,updated_at:now})});
+      if(r.status===409){ setStatus('on'); return 'conflict'; }
+    }
+    setStatus(r.ok?'on':'err');
+    if(r.ok){ rev=(Array.isArray(r.body)&&r.body[0]&&r.body[0].updated_at)||now; lastServerUpdated=Date.now(); save('mm_serverUpdated',lastServerUpdated); lastError=null; lastStatus=200; }
+    else { lastError = describeError(r); lastStatus = r.status; }
+    return r.ok;
+  }
   function describeError(r){
     const b=r.body||{};
     const parts=[];
@@ -107,7 +133,7 @@ const Sync = (()=> {
     get enabled(){return enabled}, get status(){return status}, get session(){return session},
     get user(){return session&&session.user},
     set onChange(fn){onChange=fn}, setStatus, get lastError(){return lastError}, get lastStatus(){return lastStatus},
-    signUp,signIn,signOut,resetPassword,pull,push,schedulePush,refreshIfNeeded
+    signUp,signIn,signOut,resetPassword,pull,push,pushIf,schedulePush,refreshIfNeeded
   };
 })();
 
@@ -227,8 +253,84 @@ function applySnapshot(s){
   save(LS.favorites,[...favorites]); save(LS.ratings,ratings); save(LS.prices,prices); saveShopMarks(); save(LS.freeShop,freeItems); save(LS.notes,notes);
   rebuild();
 }
+/* ---- fusion à trois voies (compte et foyer) ----
+   base = dernier état commun, loc = ce téléphone, rem = la copie en ligne.
+   Ce que ce téléphone a changé depuis la base s'applique par-dessus la copie en ligne. */
+/* ensemble : remote + (ajouts locaux) - (retraits locaux) */
+function mergeSet(base,loc,rem){ const B=new Set(base||[]),L=new Set(loc||[]),out=new Set(rem||[]);
+  L.forEach(x=>{ if(!B.has(x)) out.add(x); }); B.forEach(x=>{ if(!L.has(x)) out.delete(x); }); return [...out]; }
+/* liste d'objets identifiés par une clé : l'objet modifié localement gagne */
+function mergeList(base,loc,rem,kf){ const m=a=>{ const o=new Map(); (a||[]).forEach(x=>o.set(kf(x),x)); return o; };
+  const B=m(base),L=m(loc),R=m(rem);
+  L.forEach((v,k)=>{ if(!B.has(k)||JSON.stringify(B.get(k))!==JSON.stringify(v)) R.set(k,v); });
+  B.forEach((v,k)=>{ if(!L.has(k)) R.delete(k); });
+  return [...R.values()]; }
+function mergeObj(base,loc,rem){ base=base||{}; loc=loc||{}; const out=Object.assign({},rem||{});
+  new Set([...Object.keys(base),...Object.keys(loc)]).forEach(k=>{ const b=JSON.stringify(base[k]),l=JSON.stringify(loc[k]);
+    if(b!==l){ if(loc[k]===undefined) delete out[k]; else out[k]=loc[k]; } });
+  return out; }
+
+/* ---- synchro du compte ----
+   Sans base (premier passage après la mise à jour, ou nouvel appareil), la fusion garde
+   ce qui est des deux côtés : rien ne disparaît. */
+const SYNC_BASE='cd_syncBase';
+let syncBase=load(SYNC_BASE,null);
+const SYNC_SETS=['selection','shopChecked','removedShop','favorites'];
+const SYNC_LISTS={custom:x=>x.id, pantry:x=>norm(x.name)+'|'+(x.unit||''), history:x=>x.id+'|'+x.date, freeShop:x=>norm(x.name)};
+const SYNC_OBJS=['cookState','ratings','prices','notes','plan','acquired','removedFrom','acquiredFrom'];
+function syncData(s){ const o=Object.assign({},s); delete o.savedAt; delete o.userPhotos; return JSON.parse(JSON.stringify(o)); }
+function mergeSnap(base,loc,rem){
+  const b=base||{}, out={v:4};
+  SYNC_SETS.forEach(k=>out[k]=mergeSet(b[k],loc[k],rem[k]));
+  Object.keys(SYNC_LISTS).forEach(k=>out[k]=mergeList(b[k],loc[k],rem[k],SYNC_LISTS[k]));
+  SYNC_OBJS.forEach(k=>out[k]=mergeObj(b[k],loc[k],rem[k]));
+  out.prefs=base?mergeObj(b.prefs,loc.prefs,rem.prefs):Object.assign({},loc.prefs,rem.prefs);
+  out.userPhotos=Object.assign({},rem.userPhotos,loc.userPhotos);
+  out.savedAt=Date.now();
+  return out;
+}
+/* lire, fusionner, écrire : une synchro à la fois, une de plus si on a touché à quelque chose pendant */
+let syncRun=null, syncAgain=false, syncTimer=null;
+function syncNow(){
+  clearTimeout(syncTimer); syncTimer=null;
+  if(!Sync.enabled||!Sync.session) return Promise.resolve();
+  if(syncRun){ syncAgain=true; return syncRun; }
+  syncRun=(async()=>{
+    try{
+      for(let i=0;i<4;i++){
+        const remote=await Sync.pull(); if(Sync.status==='err') return;
+        const loc=snapshot();
+        const merged=remote?mergeSnap(syncBase,loc,remote):loc;
+        if(JSON.stringify(syncData(merged))!==JSON.stringify(syncData(loc))){
+          const lost=loc.selection.filter(id=>!merged.selection.includes(id));
+          applySnapshot(merged);
+          if(typeof foyerSchedule==='function') foyerSchedule();
+          if(lost.length) toast(lost.length+(lost.length>1?' recettes retirées':' recette retirée')+' depuis un autre appareil',()=>{
+            lost.forEach(id=>selection.add(id)); save(LS.selection,[...selection]); touch(); refreshSelUI(); renderRecipes(); renderWeek(); renderShop(); });
+        }
+        if(!remote||JSON.stringify(syncData(merged))!==JSON.stringify(syncData(remote))){
+          const ok=await Sync.pushIf(merged);
+          if(ok==='conflict') continue;
+          if(!ok) return;
+        }
+        syncBase=syncData(merged); save(SYNC_BASE,syncBase); return;
+      }
+    }catch(e){ Sync.setStatus('err'); }
+    finally{ syncRun=null; updateSyncDot(); if(syncAgain){ syncAgain=false; scheduleSync(); } }
+  })();
+  return syncRun;
+}
+function scheduleSync(){ clearTimeout(syncTimer); syncTimer=setTimeout(syncNow,1200); }
+/* l'iPhone peut fermer l'app dès qu'on passe à une autre : envoyer tout de suite ce qui attend,
+   et relire en revenant (un autre appareil a pu changer la semaine) */
+document.addEventListener('visibilitychange',()=>{
+  if(!Sync.enabled||!Sync.session) return;
+  if(document.visibilityState==='hidden'){ if(syncTimer) syncNow(); }
+  else syncNow();
+});
+window.addEventListener('pagehide',()=>{ if(syncTimer) syncNow(); });
 /* called after any local mutation -> persist + schedule cloud push */
-function touch(){ if(Sync.enabled && Sync.session) Sync.schedulePush(snapshot); updateSyncDot(); }
+function touch(){ if(Sync.enabled && Sync.session) scheduleSync(); updateSyncDot(); }
 /* favorites + ratings helpers */
 function isFav(id){ return favorites.has(id); }
 function toggleFav(id){ if(favorites.has(id))favorites.delete(id); else favorites.add(id); save(LS.favorites,[...favorites]); touch(); }
@@ -752,7 +854,7 @@ const PANTRY_EMO=[
   [/epinard|salade|roquette|mache|basilic|menthe|persil|herbe|coriandre/,'🥬'],
   [/citron|lime/,'🍋'], [/avocat/,'🥑'], [/banane/,'🍌'], [/\bpomme\b/,'🍎'],
   [/gingembre/,'🫚'], [/mais/,'🌽'],
-  [/oeuf|œuf/,'🥚'],
+  [/(^|[^b])(oeuf|œuf)/,'🥚'],   // pas « bœuf »
   [/\blait\b|creme|yaourt|beurre/,'🥛'],
   [/feta|mozzarella|parmesan|cheddar|ricotta|fromage|halloumi|gruyere/,'🧀'],
   [/pates|spaghetti|penne|nouille|lasagne|gnocchi/,'🍝'],
@@ -1075,7 +1177,7 @@ function singularDisplay(name){
     if(w.length<4||SINGULAR_KEEP.has(norm(w))) return w; if(/eaux$/i.test(w)) return w.slice(0,-1); if(/s$/i.test(w)&&!/ss$/i.test(w)) return w.slice(0,-1); return w; }).join(' ');
 }
 /* kg et litres en décimales (« 1,2 kg »), le reste comme dans les recettes */
-function fmtShopQty(q,u){ if(q==null) return ''; if(u==='kg'||u==='l') return String(Math.round(q*10)/10).replace('.',','); return fmtQty(q); }
+function fmtShopQty(q,u){ if(q==null) return ''; if(u==='pincée') return fmtQty(Math.max(1,Math.round(q))); if(u==='kg'||u==='l') return String(Math.round(q*10)/10).replace('.',','); return fmtQty(q); }
 function acquiredSet(){ return new Set(acquiredKeys()); }
 function clearAcquired(){ acquiredItems={}; acquiredFrom={}; removedShopItems=new Set(); removedFrom={}; saveShopMarks(); }
 function syncHidePantryBtn(hidden){}
@@ -1728,7 +1830,7 @@ function renderSettingsSheet(){
     </div>
     <div class="sec"><span>Compte</span></div>
     <div id="acBody"></div>
-    <div class="sec" style="justify-content:center;text-transform:none"><span>Cookie Do 4.8 · <button type="button" id="pcOpen2">crédits photos</button></span></div>`;
+    <div class="sec" style="justify-content:center;text-transform:none"><span>Cookie Do 4.9 · <button type="button" id="pcOpen2">crédits photos</button></span></div>`;
   $('#acClose').onclick=closeSheet;
   $('#segTheme').querySelectorAll('button').forEach(b=>b.onclick=()=>{ settings.theme=b.dataset.v; saveSettings(); $('#segTheme').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b)); });
   const tg=(id,key,after)=>{ const t=$('#'+id); t.onclick=()=>{ settings[key]=!settings[key]; saveSettings(); t.classList.toggle('on',settings[key]); t.setAttribute('aria-checked',settings[key]); if(after)after(); }; };
@@ -1769,8 +1871,9 @@ function renderAccountLoggedIn(){
 }
 async function doSignOut(){
   // best-effort final push so nothing unsynced is lost, then wipe device + sign out
-  try{ if(Sync.status!=='err') await Sync.push(snapshot()); }catch(e){}
+  try{ if(Sync.status!=='err') await syncNow(); }catch(e){}
   Sync.signOut();
+  syncBase=null; try{ localStorage.removeItem(SYNC_BASE); }catch(e){}
   wipeLocalData();
   closeSheet(); toast('Déconnecté, appareil vidé'); updateSyncDot();
 }
@@ -1834,17 +1937,7 @@ async function autoSync(isRetry){
   if(!Sync.enabled || !Sync.session || autoSyncing) return;
   autoSyncing=true; updateSyncDot();
   try{
-    const remote=await Sync.pull();
-    if(remote){
-      const localHist=history.slice();
-      applySnapshot(remote);
-      const seen=new Set(history.map(h=>h.id+'|'+h.date));
-      localHist.forEach(h=>{ if(!seen.has(h.id+'|'+h.date)){history.push(h);seen.add(h.id+'|'+h.date);} });
-      save(LS.history,history); renderHistory();
-      await Sync.push(snapshot());
-    } else {
-      await Sync.push(snapshot());
-    }
+    await syncNow();
     // schema-cache lag: table exists but PostgREST hasn't reloaded -> auto-retry once after a short wait
     if(Sync.status==='err' && !isRetry && /schema cache|pgrst205|could not find the table/i.test(Sync.lastError||'')){
       autoSyncing=false;
