@@ -154,7 +154,6 @@ randomWeek=function(){
   const all=allRecipes; allRecipes=all.filter(r=>!isExtra(r));          // le tirage ne pioche que des plats
   try{ _randomWeekV4(); } finally { allRecipes=all; }
   refreshSelUI(); renderRecipes(); renderWeek(); };
-{ const src=randomWeek; $('#weekRandomBtn').onclick=src; }
 const _autoPlanV4=autoPlan;
 autoPlan=function(all){ const saved={}; [...selection].forEach(id=>{ if(isExtra(byId(id))){ saved[id]=1; selection.delete(id); } });
   _autoPlanV4(all); Object.keys(saved).forEach(id=>{ selection.add(id); delete plan[id]; }); save('cd_plan',plan); };
@@ -271,23 +270,10 @@ function openWeekMenu(){
 { const lb=$('#logMealBtn'); if(lb){ lb.id='weekMoreBtn'; lb.setAttribute('aria-label','Plus d’actions'); lb.title='Plus d’actions';
     lb.innerHTML='<svg viewBox="0 0 24 24"><circle cx="6" cy="12" r="1.3" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.3" fill="currentColor" stroke="none"/><circle cx="18" cy="12" r="1.3" fill="currentColor" stroke="none"/></svg>';
     lb.onclick=openWeekMenu; }
-  const rb=$('#weekRandomBtn'); if(rb){ rb.classList.add('ic'); rb.setAttribute('aria-label','Composer la semaine au hasard'); rb.title='Au hasard'; rb.lastChild.textContent=''; } }
-/* semaine vide : trois plats qui vont bien ensemble (un végé, un poisson, un autre), un geste pour tout ajouter */
-function weekSuggestions(){
-  const made=new Set(history.map(h=>h.id));
-  const pool=dayShuffle(allRecipes.filter(r=>!isDessert(r)&&!isExtra(r)&&hasPhoto(r.id)&&r.time<=60),'vide');
-  const pick=[]; for(const d of ['vege','poisson','viande']){ const r=pool.find(x=>dietOf(x)===d&&!pick.includes(x)&&!made.has(x.id))||pool.find(x=>dietOf(x)===d&&!pick.includes(x)); if(r) pick.push(r); }
-  for(const r of pool){ if(pick.length>=3) break; if(!pick.includes(r)) pick.push(r); }
-  return pick.slice(0,3);
 }
+/* semaine vide : un message, pas de plats tirés au sort */
 function renderWeekEmpty(ids){
   const box=$('#weekEmpty'); if(!box||ids.length) return;
-  const sug=weekSuggestions();
   box.innerHTML=`<div class="ill"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/></svg></div>
-    <h3>Ta semaine est vide</h3><p>Trois plats suffisent pour la semaine. En voici trois qui vont bien ensemble, ou touche <strong>+</strong> dans le catalogue.</p>
-    <div class="sugg">${sug.map(r=>`<button type="button" data-id="${r.id}"><img src="${photoThumb(r.id)}" alt="" onerror="${thumbFallback(r.id)}"><span>${r.title}</span></button>`).join('')}</div>
-    <button class="btn wide pri" id="sugAll" type="button">Ajouter les trois</button>`;
-  box.querySelectorAll('[data-id]').forEach(b=>b.onclick=()=>openRecipeDetail(b.dataset.id));
-  $('#sugAll').onclick=()=>{ const add=sug.filter(r=>!selection.has(r.id)); add.forEach(r=>toggleSelect(r.id)); renderWeek();
-    toast(add.length+' plats ajoutés',()=>{ add.forEach(r=>{ if(selection.has(r.id)) toggleSelect(r.id); }); renderWeek(); }); };
+    <h3>Ta semaine est vide</h3><p>Ajoute des recettes avec le bouton <strong>+</strong> du catalogue.</p>`;
 }

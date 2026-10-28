@@ -244,14 +244,9 @@ renderSettingsSheet=function(){
     <div class="grp" style="margin:0 16px">
       <div class="rw" id="rowAisles" style="cursor:pointer"><span class="ico" style="background:#2F6FD6"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h10M4 18h6" stroke-linecap="round"/></svg></span><span>Ordre des rayons</span><span class="chev">›</span></div>
       <div class="rw" id="rowStaples" style="cursor:pointer"><span class="ico" style="background:#C77800"><svg viewBox="0 0 24 24"><path d="M5 12l4 4 10-10" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span>Produits de base</span><span class="val">${(settings.staples||[]).length||''} ›</span></div>
-      <div class="rw"><span class="ico" style="background:#3F9B6A">V</span><span>Tirage : végé au minimum</span><div class="stepper" style="margin-left:auto"><button id="vgM" aria-label="Moins">−</button><span id="vgV">${settings.vegTarget}</span><button id="vgP" aria-label="Plus">+</button></div></div>
-      <div class="rw"><span class="ico" style="background:#32ADE6">P</span><span>Tirage : poisson au minimum</span><div class="stepper" style="margin-left:auto"><button id="fsM" aria-label="Moins">−</button><span id="fsV">${settings.fishTarget}</span><button id="fsP" aria-label="Plus">+</button></div></div>
     </div>`;
   sec.parentNode.insertBefore(g,sec);
   $('#rowAisles').onclick=openAislesSheet; $('#rowStaples').onclick=openStaplesSheet;
-  const st=(k,el,lbl,d)=>{ settings[k]=Math.max(0,Math.min(6,(settings[k]||0)+d)); saveSettings(); touch(); $(el).textContent=settings[k]; };
-  $('#vgM').onclick=()=>st('vegTarget','#vgV','végé',-1); $('#vgP').onclick=()=>st('vegTarget','#vgV','végé',1);
-  $('#fsM').onclick=()=>st('fishTarget','#fsV','poisson',-1); $('#fsP').onclick=()=>st('fishTarget','#fsV','poisson',1);
 };
 function openAislesSheet(){
   let order=aisleOrder().slice(); const sh=$('#sheet');
@@ -366,7 +361,7 @@ if('serviceWorker' in navigator && location.protocol==='https:'){
 }
 
 /* liaisons faites par app.js avant que ces fonctions soient remplacées */
-$('#weekRandomBtn').onclick=randomWeek;
+
 const pb=$('#planBtn'); if(pb) pb.onclick=()=>{ autoPlan(true); touch(); renderWeek(); toast('Recettes réparties sur les sept prochains jours'); };
 /* premier rendu avec les nouvelles fonctions */
 (function(){ if(document.getElementById('days')){ autoPlan(false); renderChips(); renderRecipes(); renderWeek(); renderShop(); renderFridge(); } })();

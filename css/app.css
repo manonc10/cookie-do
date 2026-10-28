@@ -492,7 +492,7 @@ body.boot #courseSeg,body.boot #quickChips,body.boot #rails,body.boot #view-reci
 .rw .undo{margin-left:auto;flex:0 0 auto;font-size:0.8125rem;font-weight:600;color:var(--accT);background:none;border:0;padding:6px 0 6px 8px;font-family:inherit}
 
 /* zones tactiles de 44 pt sans changer le dessin (HIG) */
-.sec button,.rw .go,.rw .when,.search .clr,.stepper button,.rd-hero .cb,.chip,.seg-course button,.seg button{position:relative}
+.sec button,.rw .go,.rw .when,.search .clr,.stepper button,.chip,.seg-course button,.seg button{position:relative} /* pas .rd-hero .cb : déjà en absolute sur la photo */
 .sec button,.rw .go,.rw .when{z-index:1}
 .tbtn::after,.rw .go::after,.rw .when::after,.search .clr::after,.stepper button::after,.rd-hero .cb::after{content:"";position:absolute;inset:-8px}
 .sec button::after{content:"";position:absolute;inset:-13px -8px}

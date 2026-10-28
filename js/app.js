@@ -1805,6 +1805,16 @@ $('#tpStop').onclick=()=>{ clearInterval(timer.int); timer.running=false; $('#ti
 function openSheet(){ $('#sheetBg').classList.add('open'); $('#sheet').scrollTop=0; document.body.style.overflow='hidden'; $('#sheetBg').onclick=e=>{if(e.target===$('#sheetBg'))closeSheet();}; }
 function closeSheet(){ $('#sheetBg').classList.remove('open'); if(!$('#cookModal').classList.contains('open')) document.body.style.overflow=''; }
 document.addEventListener('keydown',e=>{ if(e.key==='Escape'){ if($('#sheetBg').classList.contains('open')) closeSheet(); else if($('#cookModal').classList.contains('open')) closeCook(); } });
+/* glisser la feuille vers le bas pour la fermer, quand elle est tout en haut de son défilement */
+(()=>{ const sh=$('#sheet'); let y0=null, dy=0, t0=0;
+  sh.addEventListener('touchstart',e=>{ y0=sh.scrollTop<=0?e.touches[0].clientY:null; dy=0; t0=Date.now(); },{passive:true});
+  sh.addEventListener('touchmove',e=>{ if(y0==null) return; dy=e.touches[0].clientY-y0;
+    if(dy<=0||sh.scrollTop>0){ if(dy<0) y0=null; sh.style.transform=''; return; }
+    e.preventDefault(); sh.style.transition='none'; sh.style.transform='translateY('+dy+'px)'; },{passive:false});
+  sh.addEventListener('touchend',()=>{ if(y0==null) return; y0=null; sh.style.transition='';
+    if(dy>110||(dy>40&&Date.now()-t0<250)){ closeSheet(); setTimeout(()=>{ sh.style.transform=''; },250); }
+    else sh.style.transform=''; dy=0; });
+})();
 
 /* ---------- ACCOUNT / SYNC UI ---------- */
 function updateSyncDot(){
@@ -1974,7 +1984,7 @@ function switchView(v){
 $$('.tab').forEach(t=>t.onclick=()=>{ if(currentView===t.dataset.view) window.scrollTo({top:0,behavior:'smooth'}); else switchView(t.dataset.view); });
 window.addEventListener('scroll',()=>{ document.body.classList.toggle('scrolled',window.scrollY>40); },{passive:true});
 $('#accountBtn').onclick=openAccountSheet;
-$('#weekRandomBtn').onclick=randomWeek;
+
 $('#clearSelBtn').onclick=()=>{ if(!selection.size) return;
   const back={sel:[...selection],chk:[...shopChecked],acq:acquiredItems,acqF:acquiredFrom,rem:[...removedShopItems],remF:removedFrom};
   selection.clear();save(LS.selection,[]);shopChecked.clear();save(LS.shopChecked,[]);clearAcquired();touch();refreshSelUI();renderRecipes();renderFridge();renderShop();renderWeek();
