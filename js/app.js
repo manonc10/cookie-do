@@ -139,6 +139,7 @@ const Sync = (()=> {
 
 
 /* ============ Cookie Do · app logic ============ */
+const APP_VERSION='4.11';
 const LS = {
   custom:'mm_custom', selection:'mm_selection', shopChecked:'mm_shopChecked',
   history:'mm_history', cookState:'mm_cookState', fridge:'mm_fridge', pantry:'mm_pantry',
@@ -1844,7 +1845,7 @@ function renderSettingsSheet(){
     </div>
     <div class="sec"><span>Compte</span></div>
     <div id="acBody"></div>
-    <div class="sec" style="justify-content:center;text-transform:none"><span>Cookie Do 4.10 · <button type="button" id="pcOpen2">crédits photos</button></span></div>`;
+    <div class="sec" style="justify-content:center;text-transform:none"><span>Cookie Do ${APP_VERSION} · <button type="button" id="pcOpen2">crédits photos</button></span></div>`;
   $('#acClose').onclick=closeSheet;
   $('#segTheme').querySelectorAll('button').forEach(b=>b.onclick=()=>{ settings.theme=b.dataset.v; saveSettings(); $('#segTheme').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b)); });
   const tg=(id,key,after)=>{ const t=$('#'+id); t.onclick=()=>{ settings[key]=!settings[key]; saveSettings(); t.classList.toggle('on',settings[key]); t.setAttribute('aria-checked',settings[key]); if(after)after(); }; };
