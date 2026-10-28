@@ -238,10 +238,11 @@ renderWeek=function(){
     const kick=nx.k===t+'|soir'?'Ce soir':nx.k===t+'|midi'?'Ce midi':nx.k?'Prochain plat · '+slotLabel(nx.k):'À cuisiner';
     const rest=(plan[nx.id]||[]).filter(k=>k!==nx.k).map(slotLabel);
     hero.innerHTML=`<div class="tn-ph">${photoOrEmoji(nx.id,'',false)}</div><div class="tn-b"><div class="tn-k">${kick}</div><div class="tn-t">${r.title}</div>
-      <div class="tn-m">${fmtTime(r.time)}${rest.length?' · aussi '+rest.join(', '):''}</div></div>
+      <div class="tn-m">${fmtTime(r.time)}${rest.length?' · aussi '+rest.join(', '):''}</div><button type="button" class="tn-when">${nx.k?'Changer les repas':'Choisir les repas'}</button></div>
       <button class="btn wide pri tn-go" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M4 10h16v6a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4z"/><path d="M2.5 10h19M9 6.5c0-1 .8-1.5.8-2.5M13 6.5c0-1 .8-1.5.8-2.5"/></svg>Cuisiner</button>`;
     hero.hidden=false;
     hero.querySelector('.tn-go').onclick=()=>openCook(nx.id);
+    hero.querySelector('.tn-when').onclick=()=>openDayPicker(nx.id);
     hero.querySelector('.tn-ph').onclick=hero.querySelector('.tn-t').onclick=()=>openRecipeDetail(nx.id);
     // la ligne du plat mis en avant quitte la liste ; les autres s'ouvrent d'un geste, sans bouton Cuisiner
     $$('#weekList .rw').forEach(row=>{ const tt=row.querySelector('.t'); if(tt&&tt.textContent===r.title) row.remove(); });
@@ -254,16 +255,14 @@ renderWeek=function(){
   const mb=$('#weekMoreBtn'); if(mb) mb.hidden=!ids.length;
   renderWeekEmpty(ids);
 };
-/* menu ⋯ de la semaine : répartir, noter un plat déjà fait, tout retirer */
+/* menu ⋯ de la semaine : noter un plat déjà fait, tout retirer */
 function openWeekMenu(){
   const sh=$('#sheet'); const ids=[...selection].filter(id=>byId(id)); const unplanned=ids.filter(id=>!(plan[id]||[]).length).length;
   sh.innerHTML=`<div class="grab"></div><div class="sh-head"><h3>Semaine</h3><button class="sh-x" id="wmClose" aria-label="Fermer"><svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button></div>
     <div style="display:grid;gap:8px;padding:0 16px 16px">
-      <button class="btn wide" id="wmPlan">${unplanned?'Répartir sur la semaine':'Répartir à nouveau'}</button>
       <button class="btn wide" id="wmLog">Noter un plat déjà fait</button>
       <button class="btn wide danger" id="wmClear">Tout retirer</button></div>`;
   openSheet(); $('#wmClose').onclick=closeSheet;
-  $('#wmPlan').onclick=()=>{ closeSheet(); $('#planBtn').click(); };
   $('#wmLog').onclick=()=>{ closeSheet(); openLogMealPicker(); };
   $('#wmClear').onclick=()=>{ closeSheet(); $('#clearSelBtn').click(); };
 }
@@ -277,3 +276,6 @@ function renderWeekEmpty(ids){
   box.innerHTML=`<div class="ill"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/></svg></div>
     <h3>Ta semaine est vide</h3><p>Ajoute des recettes avec le bouton <strong>+</strong> du catalogue.</p>`;
 }
+
+/* 4.12 : une fois, on efface les repas placés automatiquement par les versions d'avant */
+if(!load('cd_planManual',false)){ plan={}; save('cd_plan',plan); save('cd_planManual',true); touch(); renderWeek(); }

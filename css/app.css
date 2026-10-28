@@ -545,3 +545,5 @@ body.boot #courseSeg,body.boot #quickChips,body.boot #rails,body.boot #view-reci
 .nt-tag.ok{background:color-mix(in srgb,var(--ok) 15%,transparent);color:var(--ok)}
 .nt-tag.ask{background:color-mix(in srgb,var(--warn) 16%,transparent);color:var(--warn)}
 .nt-tag.run{background:var(--sur3);color:var(--fg)}
+.tn-when{color:var(--accT);font-weight:600;font-size:0.9375rem;padding:6px 0 0;position:relative}
+.tn-when::after{content:"";position:absolute;inset:-8px}

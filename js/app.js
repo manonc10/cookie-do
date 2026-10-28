@@ -139,7 +139,7 @@ const Sync = (()=> {
 
 
 /* ============ Cookie Do · app logic ============ */
-const APP_VERSION='4.11';
+const APP_VERSION='4.12';
 const LS = {
   custom:'mm_custom', selection:'mm_selection', shopChecked:'mm_shopChecked',
   history:'mm_history', cookState:'mm_cookState', fridge:'mm_fridge', pantry:'mm_pantry',
@@ -485,7 +485,9 @@ function roundQty(v,u){
   const h=Math.round(v*2)/2; return h||(v>0?0.5:0);
 }
 /* quantité affichée : telle quelle à l'échelle d'origine, arrondie dès qu'on change d'échelle */
-function niceQty(q,u,factor){ if(q==null) return null; const v=q*factor; return Math.abs(factor-1)<0.01?v:roundQty(v,u); }
+/* légumes et fruits comptés à la pièce : un nombre entier, arrondi au-dessus (¾ carotte = 1 carotte) */
+function niceQty(q,u,factor,aisle){ if(q==null) return null; const v=q*factor; const n=Math.abs(factor-1)<0.01?v:roundQty(v,u);
+  return !u&&aisle==='Légumes & fruits'&&n>0?Math.max(1,Math.ceil(n-0.05)):n; }
 function servingsFor(r){ const cs=cookState[r.id]; return (cs&&cs.servings)||r.portions; }
 /* Taille des portions (réglage) : les plats d'origine laissaient trop de restes.
    « Petites » = 30 % de moins, « Moyennes » = 15 % de moins. Les desserts et les
@@ -1368,7 +1370,7 @@ function openRecipeDetail(id){
   openSheet(); bindStars(sh);
   function renderIng(){
     const miss=missingFor(r); const missSet=new Set(miss.map(m=>singular(m)));
-    const rows=r.ingredients.map(([q,u,item])=>{ const sq=niceQty(q,u,scaleFactor(r)); const qs=sq!=null?fmtQty(sq)+(u?' '+unitLabel(u,sq):''):(u||''); const base=baseIngredientName(item); const st=base&&!isStaple(base)?(missSet.has(singular(base))?'<span class="miss">manque</span>':(pantry.length?'<span class="have">en stock</span>':'')):''; const nz=settings.nz?nzName(item):''; return `<div class="ing-row"><span class="tile">${pantryEmo(item)}</span><span class="n">${qs?`<b class="q">${qs}</b> `:''}${item}${nz?`<small>${nz}</small>`:''}</span>${st}</div>`; }).join('');
+    const rows=r.ingredients.map(([q,u,item,aisle])=>{ const sq=niceQty(q,u,scaleFactor(r),aisle); const qs=sq!=null?fmtQty(sq)+(u?' '+unitLabel(u,sq):''):(u||''); const base=baseIngredientName(item); const st=base&&!isStaple(base)?(missSet.has(singular(base))?'<span class="miss">manque</span>':(pantry.length?'<span class="have">en stock</span>':'')):''; const nz=settings.nz?nzName(item):''; return `<div class="ing-row"><span class="tile">${pantryEmo(item)}</span><span class="n">${qs?`<b class="q">${qs}</b> `:''}${item}${nz?`<small>${nz}</small>`:''}</span>${st}</div>`; }).join('');
     $('#rdIngList').innerHTML=rows;
     const stp=$('#rdSteps'); if(stp){ stp.innerHTML=stepsHtml(r,scaleFactor(r)); stp.querySelectorAll('.tm').forEach(b=>b.onclick=()=>startTimer(+b.dataset.timer,b.dataset.label)); }
     $('#rdServ').textContent=servingsFor(r)+' portion'+(servingsFor(r)>1?'s':'');
@@ -1451,7 +1453,7 @@ function renderCookBody(){
     <button class="tbtn" id="shareBtn"><svg viewBox="0 0 24 24"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8M16 6l-4-4-4 4M12 2v13" stroke-linecap="round" stroke-linejoin="round"/></svg>Partager</button>
   </div>`;
   html+=`<div class="sec" style="padding-left:0;padding-right:0"><span>Ingrédients</span></div><div class="grp">`;
-  r.ingredients.forEach(([q,u,item])=>{ const sc=niceQty(q,u,factor); const qs=sc!=null?fmtQty(sc)+(u?' '+unitLabel(u,sc):''):(u||''); html+=`<div class="ing-row"><span class="tile">${pantryEmo(item)}</span><span class="n">${qs?`<b class="q">${qs}</b> `:''}${item}</span></div>`; });
+  r.ingredients.forEach(([q,u,item,aisle])=>{ const sc=niceQty(q,u,factor,aisle); const qs=sc!=null?fmtQty(sc)+(u?' '+unitLabel(u,sc):''):(u||''); html+=`<div class="ing-row"><span class="tile">${pantryEmo(item)}</span><span class="n">${qs?`<b class="q">${qs}</b> `:''}${item}</span></div>`; });
   html+=`</div>`;
   if(anyAssigned) html+=`<div class="legend" style="margin-top:10px"><span><span class="sw" style="background:var(--acc)"></span>Moi</span><span><span class="sw" style="background:var(--warn)"></span>L’autre</span></div>`;
   html+=`<div class="sec" style="padding-left:0;padding-right:0"><span>Préparation</span><span class="mono">${doneCount}/${r.steps.length}</span></div>`;

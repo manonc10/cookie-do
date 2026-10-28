@@ -232,7 +232,8 @@ renderWeek=function(){
 };
 /* une recette ajoutée à la semaine prend toute seule sa place */
 const _toggleSelect=toggleSelect;
-toggleSelect=function(id){ _toggleSelect(id); if(selection.has(id)) autoPlan(false); else { delete plan[id]; save('cd_plan',plan); } };
+/* les repas, c'est Manon qui les place (Choisir les repas) : plus de répartition automatique */
+toggleSelect=function(id){ _toggleSelect(id); if(!selection.has(id)){ delete plan[id]; save('cd_plan',plan); } };
 
 /* ================= RÉGLAGES : rayons, produits de base, équilibre ================= */
 const _renderSettingsSheet=renderSettingsSheet;
@@ -364,4 +365,4 @@ if('serviceWorker' in navigator && location.protocol==='https:'){
 
 const pb=$('#planBtn'); if(pb) pb.onclick=()=>{ autoPlan(true); touch(); renderWeek(); toast('Recettes réparties sur les sept prochains jours'); };
 /* premier rendu avec les nouvelles fonctions */
-(function(){ if(document.getElementById('days')){ autoPlan(false); renderChips(); renderRecipes(); renderWeek(); renderShop(); renderFridge(); } })();
+(function(){ if(document.getElementById('days')){ renderChips(); renderRecipes(); renderWeek(); renderShop(); renderFridge(); } })();
