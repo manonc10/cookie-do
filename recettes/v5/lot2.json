@@ -1,0 +1,4989 @@
+[
+{
+"id": "lentilles-tomate",
+"portions": 4,
+"prep": 10,
+"cook": 65,
+"rest": 0,
+"difficulty": "Facile",
+"cost": "Bon marché",
+"tools": [
+"Sauteuse",
+"Casserole",
+"Louche"
+],
+"ingredients": [
+[
+200,
+"g",
+"lentilles vertes",
+"Conserves & épicerie"
+],
+[
+1,
+"",
+"oignon",
+"Légumes & fruits"
+],
+[
+1,
+"gousse",
+"ail",
+"Légumes & fruits"
+],
+[
+1,
+"c. à café",
+"curcuma",
+"Conserves & épicerie"
+],
+[
+1,
+"c. à café",
+"curry",
+"Conserves & épicerie"
+],
+[
+1,
+"boîte",
+"tomates concassées (400 g)",
+"Conserves & épicerie"
+],
+[
+2,
+"cube",
+"bouillon de légumes",
+"Conserves & épicerie"
+],
+[
+2,
+"c. à soupe",
+"huile d'olive",
+"Conserves & épicerie"
+],
+[
+1,
+"bouquet",
+"persil",
+"Légumes & fruits"
+],
+[
+null,
+"",
+"sel, poivre",
+"Autres"
+]
+],
+"steps": [
+"Éplucher et émincer l'oignon et l'ail.",
+"Préparer {=1 L} de bouillon bien chaud avec les cubes. Le garder à côté de la sauteuse.",
+"Faire chauffer {7:0.5} d'huile d'olive dans la sauteuse. Y jeter {3} de curcuma et {4} de curry, avant les légumes.",
+"Ajouter l'oignon et l'ail et les faire revenir.",
+"Ajouter {0} de lentilles non trempées et remuer pour les enrober d'huile épicée. Verser les tomates concassées.",
+"Verser une louche de bouillon chaud et laisser mijoter à feu doux. Ajouter une louche dès que la précédente est absorbée.",
+"Saler, poivrer. Ajouter le reste d'huile d'olive et parsemer de persil."
+],
+"stepMeta": [
+{
+"ing": [
+1,
+2
+]
+},
+{
+"ing": [
+6
+]
+},
+{
+"mark": "Les épices embaument.",
+"why": "Les épices s'ouvrent dans l'huile chaude, c'est la particularité de cette recette et ça change nettement le parfum.",
+"ing": [
+3,
+4,
+7
+]
+},
+{
+"timer": 300,
+"ing": [
+1,
+2
+]
+},
+{
+"ing": [
+0,
+5
+]
+},
+{
+"timer": 3600,
+"mark": "Lentilles tendres, presque tout le bouillon absorbé.",
+"why": "Comme pour un risotto : c'est cette méthode qui donne des lentilles fondantes plutôt que bouillies. Tu n'auras peut-être pas besoin de tout le bouillon, arrête-toi quand la texture te convient.",
+"ing": [
+6
+]
+},
+{
+"why": "Saler seulement en fin de cuisson : le sel en début de cuisson garde les lentilles fermes.",
+"ing": [
+7,
+8,
+9
+]
+}
+],
+"tip": "Ajouter le bouillon louche par louche plutôt que tout d'un coup demande un peu de présence mais donne une texture bien meilleure, crémeuse sans aucune crème. Les 200 g de lentilles sèches pour 4 correspondent à ce qu'on mange vraiment : c'est déjà une grosse assiette, elles triplent de volume. Se réchauffe parfaitement et se congèle.",
+"light": "Recette déjà très légère. Sers avec une salade verte plutôt qu'avec du pain, et garde le filet d'huile d'olive final : il compte peu et apporte beaucoup."
+},
+{
+"id": "pates-cremeuses",
+"portions": 4,
+"prep": 10,
+"cook": 20,
+"rest": 0,
+"difficulty": "Facile",
+"cost": "Moyen",
+"tools": [
+"Grande casserole",
+"Grande poêle",
+"Passoire",
+"Louche"
+],
+"ingredients": [
+[
+280,
+"g",
+"pâtes",
+"Pâtes, riz & féculents"
+],
+[
+300,
+"g",
+"champignons",
+"Légumes & fruits"
+],
+[
+2,
+"poignées",
+"épinards",
+"Légumes & fruits"
+],
+[
+20,
+"cl",
+"crème",
+"Frais & crémerie"
+],
+[
+1,
+"",
+"oignon",
+"Légumes & fruits"
+],
+[
+2,
+"gousses",
+"ail",
+"Légumes & fruits"
+],
+[
+50,
+"g",
+"parmesan râpé",
+"Frais & crémerie"
+],
+[
+1,
+"c. à soupe",
+"huile d'olive",
+"Conserves & épicerie"
+],
+[
+null,
+"",
+"sel, poivre",
+"Autres"
+]
+],
+"steps": [
+"Porter une grande casserole d'eau à ébullition et la saler franchement.",
+"Essuyer les champignons avec un papier humide et les couper en lamelles épaisses.",
+"Émincer l'oignon et l'ail. Rincer et essorer les épinards.",
+"Chauffer {7} d'huile d'olive dans une grande poêle à feu vif. Y jeter les champignons en une seule couche, sans y toucher.",
+"Remuer et poursuivre la cuisson des champignons à feu vif.",
+"Ajouter l'oignon et poursuivre.",
+"Ajouter l'ail. Saler, poivrer.",
+"Plonger {0} de pâtes dans l'eau bouillante, pour 1 min de moins que le temps du paquet.",
+"Ajouter les épinards dans la poêle.",
+"Baisser le feu. Verser {3} de crème et la moitié du parmesan, et laisser épaissir à frémissement.",
+"Prélever une louche d'eau de cuisson, égoutter les pâtes et les verser dans la poêle.",
+"Mélanger à feu doux en ajoutant l'eau de cuisson petit à petit.",
+"Poivrer généreusement et servir aussitôt avec le reste de parmesan."
+],
+"stepMeta": [
+{
+"why": "Compter 10 g de sel par litre d'eau.",
+"ing": [
+8
+]
+},
+{
+"why": "Pas sous l'eau : lavés, les champignons se gorgent et ne doreront plus jamais.",
+"ing": [
+1
+]
+},
+{
+"ing": [
+2,
+4,
+5
+]
+},
+{
+"timer": 180,
+"ing": [
+1,
+7
+]
+},
+{
+"timer": 300,
+"mark": "Ils rendent leur eau, la reperdent, puis dorent.",
+"why": "Attends cette troisième phase. Retirés trop tôt, ils rendront leur eau dans la sauce et la diluteront.",
+"ing": []
+},
+{
+"timer": 180,
+"ing": [
+4
+]
+},
+{
+"timer": 30,
+"ing": [
+5,
+8
+]
+},
+{
+"ing": [
+0
+]
+},
+{
+"timer": 120,
+"mark": "Ils réduisent à presque rien.",
+"ing": [
+2
+]
+},
+{
+"timer": 120,
+"why": "Sans faire bouillir.",
+"ing": [
+3,
+6
+]
+},
+{
+"ing": []
+},
+{
+"timer": 60,
+"why": "L'amidon de l'eau lie la crème aux pâtes et donne l'onctuosité. Sans elle, la sauce glisse et reste au fond de l'assiette.",
+"ing": []
+},
+{
+"ing": [
+6,
+8
+]
+}
+],
+"tip": "Les champignons doivent réellement dorer avant l'arrivée de la crème, c'est la seule chose qui fait la différence entre une sauce goûteuse et une sauce fade et liquide. Garde toujours une louche d'eau de cuisson, c'est elle qui lie la sauce. Sers immédiatement, ces pâtes n'attendent pas.",
+"light": "Remplace la moitié de la crème par du yaourt nature ajouté hors du feu (la sauce reste onctueuse). Assiette légère : moins de pâtes, plus d'épinards-champignons."
+},
+{
+"id": "tarte-citron",
+"portions": 6,
+"prep": 25,
+"cook": 45,
+"rest": 195,
+"advance": "2 h au frais minimum, après refroidissement",
+"difficulty": "Moyen",
+"cost": "Moyen",
+"tools": [
+"Moule à tarte de 24 cm",
+"Billes de cuisson",
+"Râpe fine",
+"Fouet",
+"Saladier"
+],
+"ingredients": [
+[
+1,
+"",
+"pâte sablée",
+"Pâtes, riz & féculents"
+],
+[
+3,
+"",
+"citrons",
+"Légumes & fruits"
+],
+[
+3,
+"",
+"œufs",
+"Œufs"
+],
+[
+120,
+"g",
+"sucre",
+"Conserves & épicerie"
+],
+[
+80,
+"g",
+"beurre",
+"Frais & crémerie"
+],
+[
+1,
+"",
+"zeste de citron",
+"Légumes & fruits"
+]
+],
+"steps": [
+"Préchauffer le four à 180 °C.",
+"Étaler la pâte sablée dans un moule à tarte de 24 cm, en appuyant bien dans l'angle. Piquer le fond à la fourchette et couper l'excédent au ras du bord.",
+"Placer le moule au congélateur.",
+"Couvrir la pâte de papier cuisson et la remplir de billes de cuisson, de riz ou de légumes secs. Enfourner.",
+"Retirer les billes et le papier, puis poursuivre la cuisson pour sécher le fond.",
+"Pendant ce temps, prélever le zeste d'un citron à la râpe fine, puis presser les citrons pour obtenir {=12 cl} de jus.",
+"Fouetter les œufs avec {3} de sucre.",
+"Ajouter le jus et le zeste.",
+"Faire fondre {4} de beurre, le laisser tiédir puis l'incorporer en filet en mélangeant.",
+"Baisser le four à 160 °C et verser l'appareil sur le fond de tarte encore tiède.",
+"Enfourner.",
+"Laisser refroidir complètement à température ambiante.",
+"Mettre au réfrigérateur avant de démouler et de découper."
+],
+"stepMeta": [
+{
+"ing": []
+},
+{
+"ing": [
+0
+]
+},
+{
+"timer": 900,
+"why": "Une pâte bien froide ne s'affaisse pas pendant la cuisson à blanc, et c'est le geste que tout le monde saute.",
+"ing": []
+},
+{
+"timer": 900,
+"ing": []
+},
+{
+"timer": 300,
+"mark": "Le fond est blond et mat.",
+"ing": []
+},
+{
+"ing": [
+1,
+5
+]
+},
+{
+"timer": 60,
+"why": "Ne fouette pas plus longtemps : trop d'air dans l'appareil donne une crème qui se craquelle en cuisant.",
+"ing": [
+2,
+3
+]
+},
+{
+"ing": [
+1,
+5
+]
+},
+{
+"ing": [
+4
+]
+},
+{
+"ing": []
+},
+{
+"timer": 1380,
+"mark": "Prise sur les bords, le centre tremble encore légèrement quand on secoue le moule.",
+"why": "20 à 25 min selon le four. Elle finira de figer en refroidissant.",
+"ing": []
+},
+{
+"timer": 3600,
+"ing": []
+},
+{
+"timer": 7200,
+"ing": []
+}
+],
+"tip": "Les deux étapes qui font la différence sont le passage au congélateur avant la cuisson à blanc, et la sortie du four quand le centre tremble encore. Passe la lame sous l'eau chaude et essuie-la entre chaque part. Pour une version meringuée, monte trois blancs avec 60 g de sucre et passe 3 min sous le gril."
+},
+{
+"id": "brioche",
+"portions": 8,
+"prep": 40,
+"cook": 25,
+"rest": 145,
+"advance": "2 h 15 de levées. Beurre et œufs sortis du frigo à l'avance",
+"difficulty": "Difficile",
+"cost": "Bon marché",
+"tools": [
+"Grand saladier",
+"Robot pétrin (facultatif)",
+"Moule à cake de 24 cm",
+"Pinceau",
+"Grille"
+],
+"ingredients": [
+[
+400,
+"g",
+"farine",
+"Pâtes, riz & féculents"
+],
+[
+100,
+"g",
+"beurre",
+"Frais & crémerie"
+],
+[
+10,
+"cl",
+"lait",
+"Frais & crémerie"
+],
+[
+3,
+"",
+"œufs",
+"Œufs"
+],
+[
+60,
+"g",
+"sucre",
+"Conserves & épicerie"
+],
+[
+1,
+"sachet",
+"levure boulangère",
+"Conserves & épicerie"
+],
+[
+1,
+"pincée",
+"sel",
+"Autres"
+],
+[
+1,
+"",
+"jaune d'œuf (dorure)",
+"Œufs"
+]
+],
+"steps": [
+"Sortir le beurre et les œufs à l'avance.",
+"Faire tiédir {2} de lait à 35 °C environ. Y délayer la levure et laisser reposer.",
+"Dans un grand saladier, mélanger {0} de farine, {4} de sucre et le sel, puis creuser un puits.",
+"Verser les œufs et le mélange lait et levure dans le puits. Mélanger jusqu'à ce que la pâte se rassemble.",
+"Pétrir à la main en étirant et repliant la pâte, ou au robot avec le crochet à vitesse moyenne.",
+"Ajouter {1} de beurre mou en petits morceaux, un tiers à la fois, et pétrir encore.",
+"Couvrir d'un linge et laisser lever dans un endroit tiède.",
+"Dégazer du plat de la main, puis façonner : une boule, une tresse à trois brins, ou trois boudins côte à côte dans un moule à cake de 24 cm.",
+"Laisser lever une seconde fois.",
+"Préchauffer le four à 180 °C. Battre le jaune d'œuf avec une goutte de lait et dorer au pinceau, sans appuyer.",
+"Enfourner.",
+"Démouler et laisser refroidir sur une grille."
+],
+"stepMeta": [
+{
+"why": "Une pâte à brioche travaille mal avec des ingrédients froids.",
+"ing": [
+1,
+3
+]
+},
+{
+"timer": 600,
+"mark": "Une mousse se forme en surface. Le lait est à la température du doigt.",
+"why": "Sans mousse, la levure est morte et la brioche ne lèvera pas, il faut en reprendre.",
+"ing": [
+2,
+5
+]
+},
+{
+"why": "Garde le sel à l'écart de la levure jusqu'au mélange, le contact direct l'abîme.",
+"ing": [
+0,
+4,
+6
+]
+},
+{
+"ing": [
+3
+]
+},
+{
+"timer": 600,
+"mark": "Souple, élastique, elle se décolle des parois.",
+"ing": []
+},
+{
+"timer": 600,
+"mark": "Lisse, brillante, elle se détache en un seul bloc.",
+"why": "8 à 10 min. La pâte redevient liquide et sale à chaque ajout : c'est normal, continue sans ajouter de farine, elle se resserre toujours au bout de quelques minutes. C'est l'étape où la plupart des brioches se ratent.",
+"ing": [
+1
+]
+},
+{
+"timer": 5400,
+"mark": "Elle double de volume.",
+"why": "Un four éteint avec seulement la lampe allumée est l'endroit idéal.",
+"ing": []
+},
+{
+"why": "L'appui chasse le gaz.",
+"ing": []
+},
+{
+"timer": 2700,
+"mark": "La pâte regonfle bien et remplit le moule.",
+"why": "Ne saute pas cette deuxième pousse, c'est elle qui donne la mie filante.",
+"ing": []
+},
+{
+"why": "Appuyer ferait retomber la pâte.",
+"ing": [
+2,
+7
+]
+},
+{
+"timer": 1500,
+"mark": "Bien dorée, elle sonne creux si on tape dessous.",
+"why": "Si elle colore trop vite, pose une feuille d'aluminium par-dessus.",
+"ing": []
+},
+{
+"why": "Posée sur une assiette, le dessous devient humide.",
+"ing": []
+}
+],
+"tip": "Deux points font toute la brioche : incorporer le beurre petit à petit sans jamais rattraper la pâte avec de la farine, et respecter les deux levées. Si tu as le temps, laisse la première pousse toute une nuit au réfrigérateur, la pâte sera plus parfumée et bien plus facile à façonner le lendemain."
+},
+{
+"id": "galettes-legumes",
+"portions": 4,
+"prep": 20,
+"cook": 20,
+"rest": 10,
+"difficulty": "Facile",
+"cost": "Bon marché",
+"tools": [
+"Râpe à gros trous",
+"Passoire",
+"Torchon propre",
+"Saladier",
+"Poêle antiadhésive"
+],
+"ingredients": [
+[
+3,
+"",
+"carottes",
+"Légumes & fruits"
+],
+[
+1,
+"",
+"courgette",
+"Légumes & fruits"
+],
+[
+2,
+"",
+"œufs",
+"Œufs"
+],
+[
+4,
+"c. à soupe",
+"farine",
+"Pâtes, riz & féculents"
+],
+[
+1,
+"",
+"oignon",
+"Légumes & fruits"
+],
+[
+3,
+"c. à soupe",
+"huile",
+"Conserves & épicerie"
+],
+[
+null,
+"",
+"sel, poivre",
+"Autres"
+],
+[
+4,
+"c. à soupe",
+"yaourt nature",
+"Frais & crémerie"
+]
+],
+"steps": [
+"Râper les carottes et la courgette à gros trous.",
+"Saler les légumes râpés et les laisser dégorger dans une passoire.",
+"Les transférer dans un torchon propre, refermer et presser fortement au-dessus de l'évier, en tordant.",
+"Émincer très finement l'oignon.",
+"Dans un saladier, battre les œufs. Ajouter {3} de farine, du poivre et très peu de sel.",
+"Incorporer les légumes essorés et l'oignon.",
+"Faire chauffer {5:0.33} d'huile dans une poêle antiadhésive à feu moyen.",
+"Déposer des tas de pâte et les aplatir au dos d'une cuillère sur 1 cm d'épaisseur, sans les coller.",
+"Cuire sans y toucher.",
+"Retourner d'un geste net et poursuivre.",
+"Égoutter sur du papier absorbant. Essuyer la poêle et cuire le reste avec le reste d'huile.",
+"Servir avec {7} de yaourt salé et poivré."
+],
+"stepMeta": [
+{
+"why": "Les gros trous comptent : râpés fin, les légumes rendent une purée et les galettes n'ont plus de texture.",
+"ing": [
+0,
+1
+]
+},
+{
+"timer": 600,
+"why": "Le sel fait sortir l'eau tout seul et rend l'essorage bien plus efficace.",
+"ing": [
+6
+]
+},
+{
+"mark": "Il en sort un vrai jus, plusieurs cuillerées.",
+"why": "C'est l'étape qui décide si les galettes se tiendront.",
+"ing": []
+},
+{
+"ing": [
+4
+]
+},
+{
+"why": "Très peu de sel, puisque les légumes en ont déjà pris.",
+"ing": [
+2,
+3,
+6
+]
+},
+{
+"mark": "La pâte est dense et tient en tas sur la cuillère.",
+"why": "Si elle coule, ajoute une cuillère de farine et attends une minute.",
+"ing": []
+},
+{
+"why": "Trop chaud, l'extérieur brûle avant que le centre soit cuit.",
+"ing": [
+5
+]
+},
+{
+"ing": []
+},
+{
+"timer": 210,
+"mark": "Dessous bien doré, bords pris.",
+"why": "3 à 4 min.",
+"ing": []
+},
+{
+"timer": 180,
+"ing": []
+},
+{
+"ing": [
+5
+]
+},
+{
+"why": "Relève d'un filet de citron et d'herbes si tu en as.",
+"ing": [
+6,
+7
+]
+}
+],
+"tip": "Saler puis presser dans un torchon, en deux temps, essore bien mieux que presser directement : dix minutes d'attente pour des galettes qui tiennent. Ne les retourne qu'une fois et seulement quand le dessous est doré, sinon elles se cassent. Elles se mangent chaudes ou froides et se congèlent cuites.",
+"light": "Cuis-les au four (200°C, 20 min, retournées à mi-cuisson) au lieu de la poêle : croustillantes avec bien moins d'huile."
+},
+{
+"id": "chili-patate-douce",
+"portions": 4,
+"prep": 15,
+"cook": 45,
+"rest": 0,
+"difficulty": "Facile",
+"cost": "Bon marché",
+"tools": [
+"Sauteuse avec couvercle",
+"Casserole avec couvercle"
+],
+"ingredients": [
+[
+2,
+"",
+"patates douces",
+"Légumes & fruits"
+],
+[
+1,
+"boîte",
+"haricots rouges (égouttés)",
+"Conserves & épicerie"
+],
+[
+1,
+"boîte",
+"tomates concassées (400 g)",
+"Conserves & épicerie"
+],
+[
+1,
+"",
+"oignon",
+"Légumes & fruits"
+],
+[
+2,
+"gousses",
+"ail",
+"Légumes & fruits"
+],
+[
+1,
+"",
+"poivron",
+"Légumes & fruits"
+],
+[
+1,
+"c. à soupe",
+"cumin",
+"Conserves & épicerie"
+],
+[
+1,
+"c. à café",
+"paprika",
+"Conserves & épicerie"
+],
+[
+160,
+"g",
+"riz",
+"Pâtes, riz & féculents"
+],
+[
+2,
+"c. à soupe",
+"huile d'olive",
+"Conserves & épicerie"
+],
+[
+null,
+"",
+"sel, poivre",
+"Autres"
+]
+],
+"steps": [
+"Éplucher les patates douces et les couper en dés de 2 cm bien réguliers.",
+"Émincer l'oignon, hacher l'ail, couper le poivron en dés.",
+"Faire revenir l'oignon et le poivron dans {9} d'huile d'olive à feu moyen.",
+"Ajouter l'ail.",
+"Ajouter {6} de cumin et {7} de paprika et remuer dans l'huile chaude.",
+"Ajouter les dés de patate douce et remuer pour les enrober.",
+"Verser les tomates concassées et {=150 ml} d'eau, saler, poivrer. Porter à frémissement.",
+"Couvrir et laisser mijoter à feu doux.",
+"Ajouter les haricots rouges égouttés et rincés. Poursuivre à découvert.",
+"Pendant ce temps, rincer {8} de riz et le cuire à couvert dans deux fois son volume d'eau salée.",
+"Goûter et ajuster le sel et le poivre.",
+"Servir sur le riz."
+],
+"stepMeta": [
+{
+"why": "Des morceaux inégaux donneront de la purée d'un côté et du cru de l'autre.",
+"ing": [
+0
+]
+},
+{
+"ing": [
+3,
+4,
+5
+]
+},
+{
+"timer": 330,
+"why": "5 à 6 min.",
+"ing": [
+3,
+5,
+9
+]
+},
+{
+"timer": 30,
+"ing": [
+4
+]
+},
+{
+"timer": 30,
+"why": "Torréfier les épices avant d'ajouter du liquide est ce qui leur fait rendre leur parfum.",
+"ing": [
+6,
+7
+]
+},
+{
+"ing": [
+0
+]
+},
+{
+"ing": [
+2,
+10
+]
+},
+{
+"timer": 1200,
+"mark": "La pointe d'un couteau traverse la patate douce sans forcer.",
+"ing": []
+},
+{
+"timer": 540,
+"mark": "La sauce réduit et nappe.",
+"why": "8 à 10 min.",
+"ing": [
+1
+]
+},
+{
+"timer": 660,
+"why": "10 à 12 min.",
+"ing": [
+8,
+10
+]
+},
+{
+"why": "Un peu de piment, une pincée de sucre ou un filet de jus de citron si les tomates dominent.",
+"ing": [
+10
+]
+},
+{
+"why": "Avec un peu de yaourt ou d'avocat si tu en as.",
+"ing": []
+}
+],
+"tip": "Les haricots arrivent en fin de cuisson car ils sont déjà cuits : mijotés une demi-heure, ils se défont en bouillie. La patate douce sucre naturellement le plat, un filet de citron ou de vinaigre au dernier moment rééquilibre. Encore meilleur réchauffé le lendemain.",
+"light": "Déjà très légumes. Assiette légère : la patate douce fait office de féculent, pas besoin de riz en plus."
+},
+{
+"id": "poulet-citron-four",
+"portions": 4,
+"prep": 15,
+"cook": 45,
+"rest": 5,
+"difficulty": "Facile",
+"cost": "Moyen",
+"tools": [
+"Plat à four",
+"Casserole avec couvercle",
+"Papier absorbant"
+],
+"ingredients": [
+[
+4,
+"",
+"cuisses de poulet",
+"Viandes & poissons"
+],
+[
+2,
+"",
+"citrons",
+"Légumes & fruits"
+],
+[
+4,
+"gousses",
+"ail",
+"Légumes & fruits"
+],
+[
+2,
+"c. à soupe",
+"huile d'olive",
+"Conserves & épicerie"
+],
+[
+1,
+"c. à café",
+"thym",
+"Conserves & épicerie"
+],
+[
+160,
+"g",
+"riz",
+"Pâtes, riz & féculents"
+],
+[
+null,
+"",
+"sel, poivre",
+"Autres"
+]
+],
+"steps": [
+"Éponger le poulet, surtout la peau.",
+"Presser un citron et couper l'autre en rondelles épaisses.",
+"Dans un plat, mélanger le jus de citron, {3} d'huile d'olive, l'ail écrasé, {4} de thym, du sel et du poivre.",
+"Enrober les cuisses de poulet de cette marinade en les massant.",
+"Préchauffer le four à 200 °C.",
+"Disposer les cuisses peau vers le haut dans le plat, sans qu'elles se touchent. Glisser les rondelles de citron entre les morceaux.",
+"Enfourner.",
+"Arroser avec le jus du plat et poursuivre la cuisson.",
+"Arroser une seconde fois et terminer la cuisson.",
+"Pendant ce temps, rincer {5} de riz et le cuire à couvert dans deux fois son volume d'eau salée.",
+"Laisser reposer le poulet hors du four.",
+"Servir sur le riz avec tout le jus citronné du plat."
+],
+"stepMeta": [
+{
+"why": "Humide, la peau ne croustillera jamais. Si tu y penses, sors le poulet du réfrigérateur 20 min avant.",
+"ing": [
+0
+]
+},
+{
+"ing": [
+1
+]
+},
+{
+"ing": [
+1,
+2,
+3,
+4,
+6
+]
+},
+{
+"why": "Facultatif : laisse-les 30 min à température ambiante si tu as le temps. Vingt minutes suffisent déjà à parfumer la chair ; au-delà d'une heure, l'acidité du citron commence à la rendre farineuse.",
+"ing": [
+0
+]
+},
+{
+"ing": []
+},
+{
+"why": "Peau vers le haut et à l'air libre, c'est ce qui la fait dorer.",
+"ing": [
+1
+]
+},
+{
+"timer": 1200,
+"ing": []
+},
+{
+"timer": 900,
+"ing": []
+},
+{
+"timer": 450,
+"mark": "Peau bien dorée, le jus d'une cuisse piquée au plus épais est clair, jamais rosé.",
+"why": "Compte 5 min de plus si besoin.",
+"ing": []
+},
+{
+"timer": 660,
+"why": "10 à 12 min, à feu doux.",
+"ing": [
+5,
+6
+]
+},
+{
+"timer": 300,
+"ing": []
+},
+{
+"ing": []
+}
+],
+"tip": "Le jus au fond du plat est le meilleur de la recette : arrose deux fois en cours de cuisson et verse tout dans l'assiette. Pour en faire un plat complet, ajoute des pommes de terre et des carottes en gros morceaux dès le départ, elles cuiront dans le jus.",
+"light": "Déjà léger (blanc, citron, four). Assiette légère : moins de riz, la sauce citronnée parfume sans alourdir."
+},
+{
+"id": "pates-saumon-creme",
+"portions": 4,
+"prep": 10,
+"cook": 15,
+"rest": 0,
+"difficulty": "Facile",
+"cost": "Assez cher",
+"tools": [
+"Grande casserole",
+"Grande poêle",
+"Râpe fine",
+"Passoire",
+"Louche"
+],
+"ingredients": [
+[
+280,
+"g",
+"pâtes",
+"Pâtes, riz & féculents"
+],
+[
+200,
+"g",
+"saumon fumé",
+"Viandes & poissons"
+],
+[
+20,
+"cl",
+"crème",
+"Frais & crémerie"
+],
+[
+1,
+"",
+"oignon",
+"Légumes & fruits"
+],
+[
+1,
+"",
+"citron",
+"Légumes & fruits"
+],
+[
+2,
+"c. à soupe",
+"aneth (ou persil)",
+"Légumes & fruits"
+],
+[
+1,
+"c. à soupe",
+"huile d'olive",
+"Conserves & épicerie"
+],
+[
+null,
+"",
+"sel, poivre",
+"Autres"
+]
+],
+"steps": [
+"Porter une grande casserole d'eau à ébullition et la saler modérément.",
+"Émincer finement l'oignon. Couper le saumon fumé en lanières de 1 cm.",
+"Prélever le zeste de la moitié du citron et presser l'autre moitié.",
+"Faire revenir l'oignon à feu doux dans {6} d'huile d'olive, sans colorer.",
+"Plonger {0} de pâtes dans l'eau bouillante, pour 1 min de moins que le temps du paquet.",
+"Verser {2} de crème dans la poêle et la laisser chauffer à feu doux, sans faire bouillir.",
+"Prélever une louche d'eau de cuisson, puis égoutter les pâtes.",
+"Couper le feu et ajouter le saumon fumé à la crème.",
+"Verser les pâtes dans la poêle avec un peu d'eau de cuisson et mélanger pour lier la sauce.",
+"Ajouter le zeste, un filet de jus de citron et beaucoup de poivre. Goûter avant de saler.",
+"Parsemer d'aneth ou de persil et servir aussitôt."
+],
+"stepMeta": [
+{
+"why": "Le saumon fumé est déjà très salé.",
+"ing": [
+7
+]
+},
+{
+"ing": [
+1,
+3
+]
+},
+{
+"ing": [
+4
+]
+},
+{
+"timer": 240,
+"mark": "Fondant et translucide.",
+"ing": [
+3,
+6
+]
+},
+{
+"ing": [
+0
+]
+},
+{
+"timer": 120,
+"ing": [
+2
+]
+},
+{
+"ing": []
+},
+{
+"why": "Il ne doit pas cuire : à la chaleur il durcit, blanchit et perd son goût, la chaleur résiduelle suffit largement.",
+"ing": [
+1
+]
+},
+{
+"timer": 30,
+"ing": []
+},
+{
+"ing": [
+4,
+7
+]
+},
+{
+"ing": [
+5
+]
+}
+],
+"tip": "Le saumon fumé s'ajoute hors du feu, c'est la seule règle de cette recette. Sale l'eau des pâtes à moitié et goûte avant d'ajouter du sel dans la poêle. Le zeste de citron compte autant que le jus, ne le saute pas.",
+"light": "Remplace la moitié de la crème par du yaourt hors du feu, le citron lie bien. Assiette légère : moins de pâtes, plus de saumon."
+},
+{
+"id": "crevettes-ail",
+"portions": 2,
+"prep": 10,
+"cook": 15,
+"rest": 0,
+"difficulty": "Facile",
+"cost": "Assez cher",
+"tools": [
+"Poêle",
+"Casserole avec couvercle",
+"Papier absorbant"
+],
+"ingredients": [
+[
+250,
+"g",
+"crevettes",
+"Viandes & poissons"
+],
+[
+4,
+"gousses",
+"ail",
+"Légumes & fruits"
+],
+[
+1,
+"",
+"citron",
+"Légumes & fruits"
+],
+[
+3,
+"c. à soupe",
+"huile d'olive",
+"Conserves & épicerie"
+],
+[
+2,
+"c. à soupe",
+"persil frais",
+"Légumes & fruits"
+],
+[
+80,
+"g",
+"riz",
+"Pâtes, riz & féculents"
+],
+[
+1,
+"pincée",
+"piment",
+"Conserves & épicerie"
+],
+[
+null,
+"",
+"sel, poivre",
+"Autres"
+]
+],
+"steps": [
+"Rincer {5} de riz et le cuire dans deux fois son volume d'eau salée : ébullition, couvrir, feu doux.",
+"Laisser gonfler le riz hors du feu.",
+"Décortiquer les crevettes si besoin et les éponger soigneusement dans du papier absorbant.",
+"Émincer l'ail en lamelles fines.",
+"Ciseler le persil et couper le citron en deux.",
+"Faire chauffer {3} d'huile d'olive dans une poêle à feu moyen. Ajouter l'ail et le piment et laisser infuser.",
+"Monter le feu à vif et ajouter les crevettes en une seule couche, sans les entasser, et sans y toucher.",
+"Retourner les crevettes et poursuivre.",
+"Hors du feu, presser le jus de la moitié du citron, saler, poivrer et parsemer de persil.",
+"Servir aussitôt sur le riz, en versant toute l'huile parfumée par-dessus."
+],
+"stepMeta": [
+{
+"timer": 660,
+"why": "10 à 12 min.",
+"ing": [
+5,
+7
+]
+},
+{
+"ing": []
+},
+{
+"why": "Humides, elles bouillent au lieu de saisir et restent molles.",
+"ing": [
+0
+]
+},
+{
+"why": "En lamelles plutôt que haché : haché, il brûle en quelques secondes.",
+"ing": [
+1
+]
+},
+{
+"ing": [
+2,
+4
+]
+},
+{
+"timer": 90,
+"mark": "L'ail blondit juste sur les bords et parfume l'huile.",
+"why": "1 à 2 min. Dès qu'il brunit, il devient amer et il faut tout recommencer.",
+"ing": [
+1,
+3,
+6
+]
+},
+{
+"timer": 120,
+"ing": [
+0
+]
+},
+{
+"timer": 90,
+"mark": "Roses, opaques, recourbées en C.",
+"why": "1 à 2 min. Recourbées en O, elles sont déjà trop cuites.",
+"ing": []
+},
+{
+"ing": [
+2,
+4,
+7
+]
+},
+{
+"ing": []
+}
+],
+"tip": "Deux minutes d'attention suffisent pour cette recette, mais elles ne se négocient pas : ail à feu moyen, crevettes à feu vif, et hors du feu dès qu'elles rosissent. L'huile de la poêle est la moitié du plat, ne la laisse pas dedans. Avec du pain grillé à la place du riz, ça devient une entrée.",
+"light": "Réduis l'huile à 2 c. à soupe (l'ail parfume autant). Les crevettes sont très maigres : moins de riz, plus de crevettes."
+},
+{
+"id": "sushi-geant-philadelphia",
+"portions": 4,
+"prep": 35,
+"cook": 15,
+"rest": 80,
+"advance": "1 h de presse au frais minimum",
+"difficulty": "Moyen",
+"cost": "Assez cher",
+"tools": [
+"Plat de 15 x 20 cm",
+"Film alimentaire",
+"Casserole avec couvercle",
+"Passoire",
+"Spatule",
+"Grand couteau"
+],
+"ingredients": [
+[
+160,
+"g",
+"riz à sushi",
+"Pâtes, riz & féculents"
+],
+[
+300,
+"g",
+"saumon cru qualité sashimi",
+"Viandes & poissons"
+],
+[
+150,
+"g",
+"fromage frais (Philadelphia)",
+"Frais & crémerie"
+],
+[
+2,
+"",
+"avocats",
+"Légumes & fruits"
+],
+[
+1,
+"",
+"concombre",
+"Légumes & fruits"
+],
+[
+1,
+"",
+"citron vert",
+"Légumes & fruits"
+],
+[
+2,
+"c. à soupe",
+"vinaigre de riz",
+"Conserves & épicerie"
+],
+[
+1,
+"c. à soupe",
+"sucre",
+"Conserves & épicerie"
+],
+[
+2,
+"c. à soupe",
+"sauce soja",
+"Conserves & épicerie"
+],
+[
+1,
+"c. à soupe",
+"graines de sésame",
+"Conserves & épicerie"
+],
+[
+1,
+"c. à soupe",
+"ciboulette",
+"Légumes & fruits"
+],
+[
+null,
+"",
+"sel",
+"Autres"
+]
+],
+"steps": [
+"Choisir un saumon vendu explicitement pour être mangé cru.",
+"Sortir le fromage frais du réfrigérateur dès le départ.",
+"Trancher le concombre en fines lamelles, les saler légèrement et les laisser dégorger dans une passoire.",
+"Éponger le concombre dans du papier absorbant.",
+"Rincer {0} de riz dans un saladier d'eau froide en le brassant à la main, en changeant l'eau 4 ou 5 fois.",
+"Cuire le riz dans {=30 cl} d'eau : ébullition, couvrir, feu minimum.",
+"Laisser reposer hors du feu sans soulever le couvercle.",
+"Faire tiédir {6} de vinaigre de riz avec {7} de sucre et {=0,5 c. à café} de sel jusqu'à dissolution.",
+"Verser sur le riz chaud étalé dans un grand plat. Incorporer en tranchant le riz à la spatule, sans tourner.",
+"Laisser tiédir le riz jusqu'à température ambiante.",
+"Tapisser un plat de 15 x 20 cm de film alimentaire, en le laissant largement déborder des quatre côtés.",
+"Travailler le fromage frais à la fourchette jusqu'à ce qu'il soit bien souple.",
+"Étaler la moitié du riz au fond sur 1 cm, en tassant fermement avec le dos d'une cuillère mouillée.",
+"Étaler le fromage frais sur toute la surface, en une couche régulière jusqu'aux bords.",
+"Disposer le concombre épongé et l'avocat en tranches, arrosés d'un filet de jus de citron vert. Parsemer de ciboulette ciselée.",
+"Couvrir avec le reste du riz et tasser fermement.",
+"Poser les tranches de saumon bien à plat et serrées sur toute la surface. Parsemer de graines de sésame.",
+"Rabattre le film, poser une planche dessus avec un poids et mettre au réfrigérateur.",
+"Démouler en tirant sur le film. Couper en carrés avec un grand couteau bien aiguisé, passé sous l'eau chaude et essuyé à chaque passage.",
+"Servir avec la sauce soja à côté."
+],
+"stepMeta": [
+{
+"why": "« Sashimi grade » ou « raw grade » : pose la question au poissonnier plutôt que de te fier à l'aspect. En Nouvelle-Zélande, le king salmon d'élevage (Ōra King, Regal, Aoraki) est le choix le plus simple, le saumon d'élevage présentant un risque parasitaire très faible. En cas de doute sur l'origine, congèle 7 jours à -20 °C et décongèle une nuit au frigo.",
+"ing": [
+1
+]
+},
+{
+"why": "Froid, il est impossible à étaler : il arrache le riz au lieu de le recouvrir.",
+"ing": [
+2
+]
+},
+{
+"timer": 600,
+"why": "Sans feuille de nori, plus rien ne fait barrière entre les légumes et le riz : c'est le concombre qui détremperait tout, et cette étape est ce qui remplace l'algue.",
+"ing": [
+4,
+11
+]
+},
+{
+"ing": []
+},
+{
+"mark": "L'eau est presque claire.",
+"ing": [
+0
+]
+},
+{
+"timer": 720,
+"ing": []
+},
+{
+"timer": 600,
+"ing": []
+},
+{
+"ing": [
+6,
+7,
+11
+]
+},
+{
+"ing": []
+},
+{
+"timer": 600,
+"why": "Sinon le fromage fond et l'avocat cuit.",
+"ing": []
+},
+{
+"ing": []
+},
+{
+"ing": [
+2
+]
+},
+{
+"why": "Le riz à sushi colle à tout sauf à l'eau : mouille tes mains et tes ustensiles.",
+"ing": []
+},
+{
+"why": "C'est lui qui joue le rôle de l'algue ici : il fait barrière contre l'humidité et il colle les deux couches de riz entre elles. Ne laisse pas de trou, c'est là que le pavé se fendra à la découpe.",
+"ing": [
+2
+]
+},
+{
+"why": "Le citron vert évite que l'avocat noircisse.",
+"ing": [
+3,
+4,
+5,
+10
+]
+},
+{
+"ing": []
+},
+{
+"ing": [
+1,
+9
+]
+},
+{
+"timer": 3600,
+"why": "1 h, pas 30 min. Sans le nori qui structure le milieu, c'est la presse et le froid qui tiennent le pavé : le fromage raffermi devient la colle. Deux boîtes de conserve font un bon poids, ou un second plat à la place de la planche.",
+"ing": []
+},
+{
+"why": "Le fromage frais accroche à la lame bien plus que le nori.",
+"ing": []
+},
+{
+"ing": [
+8
+]
+}
+],
+"light": "Prends du fromage frais allégé, qui s'étale d'ailleurs plus facilement, et compte 100 g au lieu de 150. Double le concombre au détriment de l'avocat. Comme dans l'autre version, c'est le riz qui pèse le plus lourd : fais des carrés plus petits et sers une grosse salade à côté.",
+"tip": "Sans algue, deux choses changent et ce sont les deux seules qui comptent : le concombre doit dégorger, et la presse passe de 30 min à 1 h minimum. Le nori faisait à la fois barrière à l'humidité et armature ; ici c'est le fromage frais qui remplit les deux rôles, à condition qu'il soit étalé partout et bien froid au moment de couper. Passe la lame sous l'eau chaude entre chaque coupe, sinon elle traîne le fromage et écrase les carrés."
+},
+{
+"id": "salade-cesar-poulet",
+"portions": 4,
+"prep": 15,
+"cook": 25,
+"rest": 5,
+"difficulty": "Facile",
+"cost": "Moyen",
+"tools": [
+"Grande poêle",
+"Fouet",
+"Saladier",
+"Essoreuse à salade"
+],
+"ingredients": [
+[
+500,
+"g",
+"blancs de poulet",
+"Viandes & poissons"
+],
+[
+2,
+"",
+"cœurs de laitue romaine",
+"Légumes & fruits"
+],
+[
+80,
+"g",
+"parmesan",
+"Frais & crémerie"
+],
+[
+4,
+"",
+"tranches de pain",
+"Pâtes, riz & féculents"
+],
+[
+4,
+"c. à soupe",
+"mayonnaise",
+"Conserves & épicerie"
+],
+[
+2,
+"",
+"filets d'anchois",
+"Conserves & épicerie"
+],
+[
+1,
+"gousse",
+"ail",
+"Légumes & fruits"
+],
+[
+1,
+"c. à café",
+"moutarde",
+"Conserves & épicerie"
+],
+[
+1,
+"",
+"citron",
+"Légumes & fruits"
+],
+[
+3,
+"c. à soupe",
+"huile d'olive",
+"Conserves & épicerie"
+],
+[
+null,
+"",
+"sel, poivre",
+"Autres"
+]
+],
+"steps": [
+"Couper le pain en cubes et les mélanger avec les deux tiers de l'huile d'olive et une pincée de sel.",
+"Faire dorer les cubes à la poêle à feu moyen en remuant. Réserver.",
+"Saler et poivrer les blancs de poulet. Les cuire dans le reste d'huile à feu moyen.",
+"Retourner les blancs et poursuivre la cuisson.",
+"Laisser reposer le poulet avant de le trancher.",
+"Pendant ce temps, écraser les filets d'anchois et l'ail en pâte avec le plat d'un couteau.",
+"Fouetter avec {4} de mayonnaise, {7} de moutarde, le jus de la moitié du citron et la moitié du parmesan râpé.",
+"Laver et essorer soigneusement la romaine, la couper en larges morceaux.",
+"Mélanger la salade avec la sauce juste avant de servir.",
+"Ajouter le poulet tranché, les croûtons et le reste du parmesan en copeaux. Poivrer généreusement."
+],
+"stepMeta": [
+{
+"ing": [
+3,
+9,
+10
+]
+},
+{
+"timer": 480,
+"mark": "Croustillants à cœur.",
+"ing": []
+},
+{
+"timer": 390,
+"why": "6 à 7 min de chaque côté. Trop fort, l'extérieur brûle avant que l'intérieur soit cuit.",
+"ing": [
+0,
+9,
+10
+]
+},
+{
+"timer": 390,
+"ing": []
+},
+{
+"timer": 300,
+"why": "Couper tout de suite fait fuir le jus dans la planche.",
+"ing": []
+},
+{
+"ing": [
+5,
+6
+]
+},
+{
+"why": "Détends avec une cuillère d'eau si c'est trop épais.",
+"ing": [
+2,
+4,
+7,
+8
+]
+},
+{
+"why": "Une salade mal essorée dilue la sauce et la rend fade.",
+"ing": [
+1
+]
+},
+{
+"mark": "Chaque feuille est enrobée.",
+"ing": []
+},
+{
+"ing": [
+2,
+10
+]
+}
+],
+"tip": "Les anchois sont ce qui distingue une vraie César d'une salade au poulet : ils ne donnent pas un goût de poisson mais la profondeur salée de la sauce. Ne les saute pas, même si ça te rebute. Assaisonne au tout dernier moment, la romaine retombe en quelques minutes une fois enrobée.",
+"light": "Remplace la moitié de la mayonnaise par du yaourt grec, réduis les croûtons à deux tranches de pain et compte 50 g de parmesan. Le poulet grillé et la romaine sont déjà très légers : c'est la sauce et les croûtons qui font le total."
+},
+{
+"id": "quesadillas-haricots-fromage",
+"portions": 4,
+"prep": 10,
+"cook": 25,
+"rest": 0,
+"difficulty": "Facile",
+"cost": "Bon marché",
+"tools": [
+"Grande poêle",
+"Fourchette",
+"Spatule"
+],
+"ingredients": [
+[
+8,
+"",
+"tortillas",
+"Pâtes, riz & féculents"
+],
+[
+1,
+"boîte",
+"haricots rouges (égouttés)",
+"Conserves & épicerie"
+],
+[
+150,
+"g",
+"cheddar râpé",
+"Frais & crémerie"
+],
+[
+1,
+"",
+"poivron",
+"Légumes & fruits"
+],
+[
+1,
+"",
+"oignon",
+"Légumes & fruits"
+],
+[
+1,
+"c. à café",
+"cumin",
+"Conserves & épicerie"
+],
+[
+1,
+"c. à café",
+"paprika fumé",
+"Conserves & épicerie"
+],
+[
+150,
+"g",
+"yaourt nature",
+"Frais & crémerie"
+],
+[
+1,
+"",
+"citron vert",
+"Légumes & fruits"
+],
+[
+1,
+"c. à soupe",
+"huile",
+"Conserves & épicerie"
+],
+[
+null,
+"",
+"sel",
+"Autres"
+]
+],
+"steps": [
+"Émincer l'oignon et le poivron. Les faire revenir dans {9} d'huile avec {5} de cumin et {6} de paprika.",
+"Ajouter les haricots et les écraser à moitié à la fourchette avec {=3 c. à soupe} d'eau. Saler et cuire.",
+"Étaler la garniture sur une tortilla, couvrir de cheddar et poser une seconde tortilla dessus.",
+"Cuire dans une poêle sèche à feu moyen, en pressant avec une spatule.",
+"Retourner et cuire l'autre face.",
+"Couper en quartiers et servir avec {7} de yaourt mélangé au jus de citron vert."
+],
+"stepMeta": [
+{
+"timer": 360,
+"ing": [
+3,
+4,
+5,
+6,
+9
+]
+},
+{
+"timer": 180,
+"ing": [
+1,
+10
+]
+},
+{
+"ing": [
+0,
+2
+]
+},
+{
+"timer": 180,
+"mark": "Le fromage fond et colle les deux tortillas.",
+"ing": []
+},
+{
+"timer": 180,
+"ing": []
+},
+{
+"ing": [
+7,
+8
+]
+}
+],
+"tip": "Fais-les tenir au chaud dans le four à 100 °C pendant que tu cuis les suivantes.",
+"light": "Une seule tortilla pliée en deux par personne, moins de fromage et plus de haricots."
+},
+{
+"id": "oeufs-cocotte-epinards",
+"portions": 4,
+"prep": 10,
+"cook": 17,
+"rest": 0,
+"difficulty": "Facile",
+"cost": "Bon marché",
+"tools": [
+"4 ramequins",
+"Poêle",
+"Plat à four"
+],
+"ingredients": [
+[
+8,
+"",
+"œufs",
+"Œufs"
+],
+[
+300,
+"g",
+"épinards",
+"Légumes & fruits"
+],
+[
+150,
+"ml",
+"crème liquide",
+"Frais & crémerie"
+],
+[
+60,
+"g",
+"fromage râpé",
+"Frais & crémerie"
+],
+[
+1,
+"gousse",
+"ail",
+"Légumes & fruits"
+],
+[
+1,
+"pincée",
+"noix de muscade",
+"Conserves & épicerie"
+],
+[
+1,
+"",
+"pain",
+"Pâtes, riz & féculents"
+],
+[
+10,
+"g",
+"beurre",
+"Frais & crémerie"
+],
+[
+null,
+"",
+"sel, poivre",
+"Autres"
+]
+],
+"steps": [
+"Préchauffer le four à 180 °C et beurrer les ramequins avec {7} de beurre.",
+"Faire tomber les épinards dans une poêle avec l'ail haché. Les presser pour retirer l'eau.",
+"Répartir les épinards au fond des ramequins, puis {2} de crème.",
+"Casser deux œufs par ramequin. Saler, poivrer, ajouter la muscade et le fromage.",
+"Poser les ramequins dans un plat et verser de l'eau chaude à mi-hauteur.",
+"Enfourner.",
+"Servir avec des mouillettes de pain grillé."
+],
+"stepMeta": [
+{
+"ing": [
+7
+]
+},
+{
+"timer": 180,
+"ing": [
+1,
+4
+]
+},
+{
+"ing": [
+2
+]
+},
+{
+"ing": [
+0,
+3,
+5,
+8
+]
+},
+{
+"why": "Ce bain-marie cuit doucement et garde le jaune coulant.",
+"ing": []
+},
+{
+"timer": 780,
+"mark": "Blanc pris, jaune encore tremblant.",
+"why": "12 à 14 min.",
+"ing": []
+},
+{
+"ing": [
+6
+]
+}
+],
+"tip": "Les épinards surgelés font très bien l'affaire, bien essorés.",
+"light": "Remplace la crème par du fromage blanc et garde un œuf par ramequin avec plus d'épinards."
+},
+{
+"id": "riz-saute-ananas",
+"portions": 4,
+"prep": 15,
+"cook": 20,
+"rest": 10,
+"advance": "Riz cuit la veille, ou refroidi 10 min",
+"difficulty": "Facile",
+"cost": "Moyen",
+"tools": [
+"Wok",
+"Casserole avec couvercle",
+"Plaque"
+],
+"ingredients": [
+[
+160,
+"g",
+"riz",
+"Pâtes, riz & féculents"
+],
+[
+3,
+"",
+"œufs",
+"Œufs"
+],
+[
+1,
+"boîte",
+"ananas (égoutté)",
+"Conserves & épicerie"
+],
+[
+1,
+"",
+"poivron rouge",
+"Légumes & fruits"
+],
+[
+150,
+"g",
+"petits pois surgelés",
+"Conserves & épicerie"
+],
+[
+3,
+"",
+"oignons verts",
+"Légumes & fruits"
+],
+[
+2,
+"gousses",
+"ail",
+"Légumes & fruits"
+],
+[
+3,
+"c. à soupe",
+"sauce soja",
+"Conserves & épicerie"
+],
+[
+1,
+"c. à café",
+"curry",
+"Conserves & épicerie"
+],
+[
+50,
+"g",
+"noix de cajou",
+"Conserves & épicerie"
+],
+[
+2,
+"c. à soupe",
+"huile",
+"Conserves & épicerie"
+]
+],
+"steps": [
+"Cuire {0} de riz à l'avance, idéalement la veille.",
+"À défaut, étaler le riz sur une plaque et le mettre au frais.",
+"Couper l'ananas en morceaux et le poivron en dés. Émincer l'ail et les oignons verts.",
+"Dans un wok très chaud, brouiller les œufs dans {10:0.5} d'huile. Réserver.",
+"Remettre le reste d'huile et saisir le poivron.",
+"Ajouter l'ail et {8} de curry.",
+"Ajouter le riz en l'écrasant avec la spatule pour séparer les grains.",
+"Ajouter {4} de petits pois, l'ananas et {7} de sauce soja. Mélanger.",
+"Ajouter les œufs, les oignons verts et {9} de noix de cajou."
+],
+"stepMeta": [
+{
+"timer": 720,
+"why": "Du riz froid et sec saute sans coller.",
+"ing": [
+0
+]
+},
+{
+"timer": 600,
+"ing": []
+},
+{
+"ing": [
+2,
+3,
+5,
+6
+]
+},
+{
+"ing": [
+1,
+10
+]
+},
+{
+"timer": 120,
+"ing": [
+3,
+10
+]
+},
+{
+"timer": 30,
+"ing": [
+6,
+8
+]
+},
+{
+"timer": 180,
+"ing": []
+},
+{
+"timer": 120,
+"ing": [
+2,
+4,
+7
+]
+},
+{
+"ing": [
+1,
+5,
+9
+]
+}
+],
+"tip": "Le riz jasmin est le meilleur pour ça. Garde un peu de jus d'ananas pour déglacer si le riz accroche.",
+"light": "Deux œufs, pas de cajous, et plus de petits pois."
+},
+{
+"id": "pizza-champignons",
+"portions": 4,
+"prep": 15,
+"cook": 12,
+"rest": 0,
+"difficulty": "Facile",
+"cost": "Moyen",
+"tools": [
+"Plaque de four"
+],
+"ingredients": [
+[
+2,
+"",
+"pâtes à pizza",
+"Frais & crémerie"
+],
+[
+200,
+"g",
+"passata (coulis de tomate)",
+"Conserves & épicerie"
+],
+[
+300,
+"g",
+"champignons",
+"Légumes & fruits"
+],
+[
+150,
+"g",
+"mozzarella râpée",
+"Frais & crémerie"
+],
+[
+1,
+"",
+"oignon rouge",
+"Légumes & fruits"
+],
+[
+1,
+"c. à café",
+"origan",
+"Conserves & épicerie"
+],
+[
+2,
+"gousses",
+"ail",
+"Légumes & fruits"
+],
+[
+1,
+"",
+"roquette",
+"Légumes & fruits"
+],
+[
+2,
+"c. à soupe",
+"huile d'olive",
+"Conserves & épicerie"
+],
+[
+null,
+"",
+"sel, poivre",
+"Autres"
+]
+],
+"steps": [
+"Préchauffer le four au maximum (250 °C) avec la plaque dedans.",
+"Émincer les champignons, couper l'oignon en fines lamelles et hacher l'ail.",
+"Partager {1} de passata entre les deux fonds, en laissant 1 cm de bord. Saler, poivrer, ajouter {5} d'origan et l'ail.",
+"Répartir la mozzarella, les champignons et l'oignon. Arroser de {8} d'huile d'olive.",
+"Faire glisser sur la plaque chaude et cuire.",
+"Parsemer de roquette au moment de servir."
+],
+"stepMeta": [
+{
+"why": "Une plaque brûlante donne un dessous croustillant.",
+"ing": []
+},
+{
+"ing": [
+2,
+4,
+6
+]
+},
+{
+"ing": [
+0,
+1,
+5,
+6,
+9
+]
+},
+{
+"ing": [
+2,
+3,
+4,
+8
+]
+},
+{
+"timer": 660,
+"mark": "Les bords sont dorés.",
+"why": "10 à 12 min. Cuis les pizzas l'une après l'autre si elles ne tiennent pas ensemble.",
+"ing": []
+},
+{
+"ing": [
+7
+]
+}
+],
+"tip": "Les champignons crus sur la pizza rendent de l'eau : coupe-les fins et n'en mets pas trop. Ou fais-les sauter 3 min avant.",
+"light": "Une pâte fine, moitié de mozzarella et beaucoup de légumes."
+},
+{
+"id": "poulet-tikka-masala",
+"portions": 4,
+"prep": 15,
+"cook": 35,
+"rest": 0,
+"difficulty": "Facile",
+"cost": "Moyen",
+"tools": [
+"Sauteuse",
+"Casserole avec couvercle",
+"Mixeur plongeant"
+],
+"ingredients": [
+[
+500,
+"g",
+"blanc de poulet",
+"Viandes & poissons"
+],
+[
+150,
+"g",
+"yaourt nature",
+"Frais & crémerie"
+],
+[
+2,
+"c. à soupe",
+"garam masala",
+"Conserves & épicerie"
+],
+[
+1,
+"c. à café",
+"curcuma",
+"Conserves & épicerie"
+],
+[
+1,
+"c. à café",
+"paprika",
+"Conserves & épicerie"
+],
+[
+1,
+"",
+"oignon",
+"Légumes & fruits"
+],
+[
+3,
+"gousses",
+"ail",
+"Légumes & fruits"
+],
+[
+1,
+"c. à soupe",
+"gingembre râpé",
+"Légumes & fruits"
+],
+[
+1,
+"boîte",
+"tomates concassées (400 g)",
+"Conserves & épicerie"
+],
+[
+150,
+"ml",
+"crème liquide",
+"Frais & crémerie"
+],
+[
+160,
+"g",
+"riz",
+"Pâtes, riz & féculents"
+],
+[
+1,
+"bouquet",
+"coriandre",
+"Légumes & fruits"
+],
+[
+2,
+"c. à soupe",
+"huile",
+"Conserves & épicerie"
+],
+[
+null,
+"",
+"sel",
+"Autres"
+]
+],
+"steps": [
+"Couper le poulet en cubes. Le mélanger avec {1} de yaourt, la moitié du garam masala, {3} de curcuma et du sel.",
+"Rincer {10} de riz et le cuire à couvert dans deux fois son volume d'eau salée.",
+"Saisir le poulet mariné à feu vif dans {12:0.5} d'huile. Réserver.",
+"Dans la même poêle, faire fondre l'oignon émincé dans le reste d'huile.",
+"Ajouter l'ail, {7} de gingembre, le reste de garam masala et {4} de paprika.",
+"Ajouter les tomates et laisser mijoter.",
+"Mixer la sauce pour la rendre lisse.",
+"Remettre le poulet, ajouter {9} de crème et laisser à feu doux. Saler.",
+"Servir sur le riz avec la coriandre."
+],
+"stepMeta": [
+{
+"why": "Laisse mariner le temps de préparer le reste, ou dès la veille.",
+"ing": [
+0,
+1,
+2,
+3,
+13
+]
+},
+{
+"timer": 660,
+"ing": [
+10,
+13
+]
+},
+{
+"timer": 300,
+"mark": "Le poulet est coloré.",
+"ing": [
+12
+]
+},
+{
+"timer": 300,
+"ing": [
+5,
+12
+]
+},
+{
+"timer": 60,
+"ing": [
+2,
+4,
+6,
+7
+]
+},
+{
+"timer": 600,
+"ing": [
+8
+]
+},
+{
+"why": "Facultatif, mais c'est ce qui donne la texture restaurant.",
+"ing": []
+},
+{
+"timer": 300,
+"ing": [
+9,
+13
+]
+},
+{
+"ing": [
+11
+]
+}
+],
+"tip": "Le garam masala est le mélange d'épices clé, il se trouve partout. Le plat est meilleur réchauffé.",
+"light": "Yaourt à la place de la crème en fin de cuisson, hors du feu pour qu'il ne tranche pas."
+},
+{
+"id": "chow-mein-poulet",
+"portions": 4,
+"prep": 15,
+"cook": 15,
+"rest": 0,
+"difficulty": "Facile",
+"cost": "Moyen",
+"tools": [
+"Wok ou grande poêle",
+"Casserole",
+"Passoire"
+],
+"ingredients": [
+[
+500,
+"g",
+"blanc de poulet",
+"Viandes & poissons"
+],
+[
+280,
+"g",
+"nouilles",
+"Pâtes, riz & féculents"
+],
+[
+2,
+"",
+"carottes",
+"Légumes & fruits"
+],
+[
+150,
+"g",
+"chou",
+"Légumes & fruits"
+],
+[
+150,
+"g",
+"pousses de soja",
+"Légumes & fruits"
+],
+[
+3,
+"",
+"oignons verts",
+"Légumes & fruits"
+],
+[
+2,
+"gousses",
+"ail",
+"Légumes & fruits"
+],
+[
+3,
+"c. à soupe",
+"sauce soja",
+"Conserves & épicerie"
+],
+[
+1,
+"c. à soupe",
+"sauce huître",
+"Conserves & épicerie"
+],
+[
+1,
+"c. à café",
+"huile de sésame",
+"Conserves & épicerie"
+],
+[
+2,
+"c. à soupe",
+"huile",
+"Conserves & épicerie"
+]
+],
+"steps": [
+"Cuire {1} de nouilles 1 min de moins que le temps du paquet. Rincer et réserver avec {10:0.25} d'huile.",
+"Couper le poulet en fines lanières, les carottes en julienne et le chou en lanières. Hacher l'ail et ciseler les oignons verts.",
+"Saisir le poulet à feu vif dans {10:0.25} d'huile. Réserver.",
+"Remettre le reste d'huile et sauter les carottes et le chou.",
+"Ajouter l'ail.",
+"Ajouter les nouilles, le poulet, {7} de sauce soja, {8} de sauce huître et {9} d'huile de sésame. Mélanger à feu vif.",
+"Ajouter les pousses de soja et les oignons verts au dernier moment."
+],
+"stepMeta": [
+{
+"ing": [
+1,
+10
+]
+},
+{
+"ing": [
+0,
+2,
+3,
+5,
+6
+]
+},
+{
+"timer": 240,
+"ing": [
+0,
+10
+]
+},
+{
+"timer": 180,
+"ing": [
+2,
+3,
+10
+]
+},
+{
+"timer": 30,
+"ing": [
+6
+]
+},
+{
+"timer": 120,
+"ing": [
+7,
+8,
+9
+]
+},
+{
+"ing": [
+4,
+5
+]
+}
+],
+"tip": "La sauce huître (rayon asiatique) donne le goût de restaurant. Sans, double la sauce soja avec une cuillère de miel.",
+"light": "Moins de nouilles, plus de chou et de pousses de soja."
+},
+{
+"id": "roti-porc-moutarde",
+"portions": 4,
+"prep": 15,
+"cook": 60,
+"rest": 10,
+"difficulty": "Facile",
+"cost": "Moyen",
+"tools": [
+"Grand plat à four",
+"Papier aluminium",
+"Pinceau ou cuillère"
+],
+"ingredients": [
+[
+500,
+"g",
+"rôti de porc",
+"Viandes & poissons"
+],
+[
+2,
+"c. à soupe",
+"moutarde",
+"Conserves & épicerie"
+],
+[
+1,
+"c. à soupe",
+"miel",
+"Conserves & épicerie"
+],
+[
+1,
+"c. à café",
+"thym",
+"Conserves & épicerie"
+],
+[
+4,
+"gousses",
+"ail",
+"Légumes & fruits"
+],
+[
+800,
+"g",
+"pommes de terre",
+"Légumes & fruits"
+],
+[
+2,
+"",
+"oignons",
+"Légumes & fruits"
+],
+[
+200,
+"ml",
+"bouillon de volaille",
+"Conserves & épicerie"
+],
+[
+2,
+"c. à soupe",
+"huile d'olive",
+"Conserves & épicerie"
+],
+[
+null,
+"",
+"sel, poivre",
+"Autres"
+]
+],
+"steps": [
+"Préchauffer le four à 200 °C. Sortir le rôti du réfrigérateur.",
+"Mélanger {1} de moutarde, {2} de miel, {3} de thym, du sel et du poivre. En badigeonner le rôti.",
+"Couper les pommes de terre en quartiers et les oignons en lamelles. Les mélanger dans un plat avec {8} d'huile d'olive et l'ail écrasé.",
+"Enfourner les légumes seuls.",
+"Poser le rôti sur les légumes, arroser avec la moitié du bouillon et poursuivre à 200 °C.",
+"Baisser à 180 °C, arroser avec le reste du bouillon et terminer la cuisson.",
+"Laisser reposer le rôti sous une feuille d'aluminium avant de trancher.",
+"Servir avec les pommes de terre et le jus du plat."
+],
+"stepMeta": [
+{
+"why": "Sors-le 30 min avant si tu y penses.",
+"ing": []
+},
+{
+"ing": [
+0,
+1,
+2,
+3,
+9
+]
+},
+{
+"ing": [
+4,
+5,
+6,
+8
+]
+},
+{
+"timer": 1200,
+"why": "Les légumes demandent plus de cuisson que le rôti : ils partent donc avant lui.",
+"ing": []
+},
+{
+"timer": 900,
+"ing": [
+0,
+7
+]
+},
+{
+"timer": 1500,
+"mark": "65 °C à cœur au thermomètre.",
+"ing": [
+7
+]
+},
+{
+"timer": 600,
+"why": "Le jus se redistribue.",
+"ing": []
+},
+{
+"ing": []
+}
+],
+"tip": "Un thermomètre dit tout : 65 °C à cœur. Les restes font d'excellents sandwichs.",
+"light": "Sers une part plus petite avec des haricots verts en plus."
+},
+{
+"id": "nouilles-crevettes-legumes",
+"portions": 4,
+"prep": 15,
+"cook": 15,
+"rest": 0,
+"difficulty": "Facile",
+"cost": "Moyen",
+"tools": [
+"Wok ou grande poêle",
+"Casserole",
+"Passoire"
+],
+"ingredients": [
+[
+400,
+"g",
+"crevettes crues décortiquées",
+"Viandes & poissons"
+],
+[
+280,
+"g",
+"nouilles",
+"Pâtes, riz & féculents"
+],
+[
+1,
+"",
+"poivron",
+"Légumes & fruits"
+],
+[
+1,
+"",
+"courgette",
+"Légumes & fruits"
+],
+[
+150,
+"g",
+"pousses de soja",
+"Légumes & fruits"
+],
+[
+3,
+"gousses",
+"ail",
+"Légumes & fruits"
+],
+[
+1,
+"c. à soupe",
+"gingembre râpé",
+"Légumes & fruits"
+],
+[
+3,
+"c. à soupe",
+"sauce soja",
+"Conserves & épicerie"
+],
+[
+1,
+"c. à soupe",
+"miel",
+"Conserves & épicerie"
+],
+[
+1,
+"",
+"citron vert",
+"Légumes & fruits"
+],
+[
+2,
+"c. à soupe",
+"huile",
+"Conserves & épicerie"
+]
+],
+"steps": [
+"Cuire {1} de nouilles selon le paquet. Rincer et réserver avec {10:0.25} d'huile.",
+"Couper le poivron en lanières et la courgette en demi-rondelles fines. Hacher l'ail.",
+"Saisir les crevettes à feu vif dans {10:0.25} d'huile. Réserver aussitôt.",
+"Sauter les légumes dans le reste d'huile.",
+"Ajouter l'ail et {6} de gingembre.",
+"Ajouter les nouilles, {7} de sauce soja, {8} de miel et les crevettes. Mélanger.",
+"Hors du feu, ajouter les pousses de soja et le jus de citron vert."
+],
+"stepMeta": [
+{
+"ing": [
+1,
+10
+]
+},
+{
+"ing": [
+2,
+3,
+5
+]
+},
+{
+"timer": 120,
+"mark": "Elles deviennent roses.",
+"why": "Elles finiront de cuire après.",
+"ing": [
+0,
+10
+]
+},
+{
+"timer": 240,
+"ing": [
+2,
+3,
+10
+]
+},
+{
+"timer": 30,
+"ing": [
+5,
+6
+]
+},
+{
+"timer": 120,
+"ing": [
+7,
+8
+]
+},
+{
+"ing": [
+4,
+9
+]
+}
+],
+"tip": "Les crevettes crues surgelées sont moins chères et meilleures que les cuites. Décongèle-les sous l'eau froide 10 min.",
+"light": "C'est déjà léger : plus de légumes, moins de nouilles si tu veux."
+},
+{
+"id": "quiche-lorraine",
+"portions": 6,
+"prep": 10,
+"cook": 45,
+"rest": 10,
+"difficulty": "Facile",
+"cost": "Moyen",
+"tools": [
+"Moule à tarte de 24 cm",
+"Poêle",
+"Saladier",
+"Fouet"
+],
+"ingredients": [
+[
+1,
+"",
+"pâte brisée",
+"Frais & crémerie"
+],
+[
+200,
+"g",
+"lardons",
+"Viandes & poissons"
+],
+[
+3,
+"",
+"œufs",
+"Œufs"
+],
+[
+200,
+"ml",
+"crème liquide",
+"Frais & crémerie"
+],
+[
+150,
+"ml",
+"lait",
+"Frais & crémerie"
+],
+[
+100,
+"g",
+"fromage râpé",
+"Frais & crémerie"
+],
+[
+1,
+"pincée",
+"noix de muscade",
+"Conserves & épicerie"
+],
+[
+null,
+"",
+"sel, poivre",
+"Autres"
+]
+],
+"steps": [
+"Préchauffer le four à 190 °C. Dérouler la pâte dans un moule de 24 cm et piquer le fond.",
+"Faire dorer {1} de lardons dans une poêle sans gras. Les égoutter sur du papier absorbant.",
+"Battre les œufs avec {3} de crème, {4} de lait, la muscade, un peu de sel et du poivre.",
+"Répartir les lardons et {5} de fromage sur la pâte. Verser l'appareil.",
+"Enfourner.",
+"Laisser reposer avant de servir."
+],
+"stepMeta": [
+{
+"ing": [
+0
+]
+},
+{
+"timer": 300,
+"ing": [
+1
+]
+},
+{
+"why": "Peu de sel : les lardons sont salés.",
+"ing": [
+2,
+3,
+4,
+6,
+7
+]
+},
+{
+"ing": [
+5
+]
+},
+{
+"timer": 2250,
+"mark": "Dorée et à peine tremblante au centre.",
+"why": "35 à 40 min.",
+"ing": []
+},
+{
+"timer": 600,
+"ing": []
+}
+],
+"tip": "Un passage de 10 min de la pâte seule au four avant de garnir évite le fond mou.",
+"light": "Lait à la place de la crème, moitié lardons et des épinards en plus."
+},
+{
+"id": "crumble-pommes-poires",
+"portions": 6,
+"prep": 15,
+"cook": 35,
+"rest": 0,
+"difficulty": "Facile",
+"cost": "Bon marché",
+"tools": [
+"Plat à four",
+"Saladier"
+],
+"ingredients": [
+[
+3,
+"",
+"pommes",
+"Légumes & fruits"
+],
+[
+3,
+"",
+"poires",
+"Légumes & fruits"
+],
+[
+120,
+"g",
+"farine",
+"Conserves & épicerie"
+],
+[
+80,
+"g",
+"sucre",
+"Conserves & épicerie"
+],
+[
+90,
+"g",
+"beurre",
+"Frais & crémerie"
+],
+[
+50,
+"g",
+"flocons d'avoine",
+"Conserves & épicerie"
+],
+[
+1,
+"c. à café",
+"cannelle",
+"Conserves & épicerie"
+]
+],
+"steps": [
+"Préchauffer le four à 190 °C.",
+"Éplucher et couper les fruits en morceaux. Les mettre dans un plat avec {6} de cannelle et {=1 c. à soupe} de sucre pris sur le total.",
+"Du bout des doigts, sabler {2} de farine, le reste du sucre, {5} de flocons et {4} de beurre froid en dés.",
+"Répartir le sable sur les fruits sans tasser.",
+"Enfourner. Servir tiède."
+],
+"stepMeta": [
+{
+"ing": []
+},
+{
+"ing": [
+0,
+1,
+3,
+6
+]
+},
+{
+"mark": "Un sable grossier avec des morceaux.",
+"ing": [
+2,
+3,
+4,
+5
+]
+},
+{
+"ing": []
+},
+{
+"timer": 1950,
+"mark": "Dessus doré, les fruits bouillonnent sur les bords.",
+"why": "30 à 35 min.",
+"ing": []
+}
+],
+"tip": "Le beurre doit rester froid, et on ne tasse jamais : c'est ce qui donne un crumble qui croustille.",
+"light": "60 g de beurre et moitié sucre : les fruits sont déjà sucrés."
+},
+{
+"id": "sauce-hollandaise",
+"portions": 4,
+"prep": 5,
+"cook": 10,
+"rest": 0,
+"difficulty": "Moyen",
+"cost": "Bon marché",
+"tools": [
+"Bol résistant à la chaleur",
+"Casserole",
+"Petite casserole",
+"Fouet"
+],
+"ingredients": [
+[
+3,
+"",
+"jaunes d'œufs",
+"Œufs"
+],
+[
+150,
+"g",
+"beurre",
+"Frais & crémerie"
+],
+[
+1,
+"",
+"citron",
+"Légumes & fruits"
+],
+[
+null,
+"",
+"sel, poivre",
+"Autres"
+]
+],
+"steps": [
+"Faire fondre {1} de beurre à feu doux et le garder tiède. Presser le citron.",
+"Dans un bol résistant à la chaleur, mettre les jaunes d'œufs avec {=2 c. à soupe} d'eau froide.",
+"Poser le bol sur une casserole d'eau frémissante. Fouetter sans arrêt.",
+"Retirer du bain-marie et verser le beurre fondu en mince filet en fouettant constamment.",
+"Ajouter {=1 c. à soupe} de jus de citron, saler, poivrer. Goûter.",
+"Servir tout de suite."
+],
+"stepMeta": [
+{
+"ing": [
+1,
+2
+]
+},
+{
+"ing": [
+0
+]
+},
+{
+"timer": 210,
+"mark": "Les jaunes doublent de volume, deviennent pâles et mousseux, le fouet laisse des sillons visibles.",
+"why": "3 à 4 min. Le fond du bol ne doit pas toucher l'eau.",
+"ing": []
+},
+{
+"mark": "La sauce épaissit, lisse et brillante.",
+"why": "Si elle tourne (granuleuse ou huileuse) : dans un bol propre, 1 c. à soupe d'eau froide, puis incorporer la sauce petit à petit en fouettant vivement. Si elle est trop épaisse, 1 c. à café d'eau tiède.",
+"ing": [
+1
+]
+},
+{
+"mark": "Beurrée et acidulée.",
+"why": "1 à 2 c. à soupe de jus selon le goût.",
+"ing": [
+2,
+3
+]
+},
+{
+"why": "Elle se garde 20 à 30 min sur un bain-marie tiède, feu éteint, en fouettant de temps en temps.",
+"ing": []
+}
+],
+"tip": "C'est la même technique que la béarnaise, avec le citron à la place de la réduction vinaigre-estragon. Les jaunes ne doivent pas dépasser 65 °C, sinon ils cuisent en grains. 2 jours au frigo maximum, réchauffée très doucement au bain-marie avec une goutte d'eau.",
+"light": "Remplacer la moitié du beurre par 75 g de yaourt grec ajouté hors du feu : sauce plus légère et plus acidulée, parfaite sur les asperges."
+},
+{
+"id": "pesto-basilic",
+"portions": 4,
+"prep": 10,
+"cook": 3,
+"rest": 0,
+"difficulty": "Facile",
+"cost": "Assez cher",
+"tools": [
+"Mixeur",
+"Poêle"
+],
+"ingredients": [
+[
+2,
+"bouquet",
+"basilic",
+"Légumes & fruits"
+],
+[
+40,
+"g",
+"pignons de pin",
+"Conserves & épicerie"
+],
+[
+50,
+"g",
+"parmesan râpé",
+"Frais & crémerie"
+],
+[
+1,
+"gousse",
+"ail",
+"Légumes & fruits"
+],
+[
+10,
+"cl",
+"huile d'olive",
+"Conserves & épicerie"
+],
+[
+1,
+"",
+"citron",
+"Légumes & fruits"
+],
+[
+null,
+"",
+"sel, poivre",
+"Autres"
+]
+],
+"steps": [
+"Faire griller {1} de pignons à sec dans une poêle à feu moyen, en remuant. Laisser refroidir.",
+"Effeuiller le basilic, en gardant les feuilles et les tiges tendres. Le sécher parfaitement.",
+"Dans un mixeur, mettre les pignons, l'ail et une pincée de sel. Mixer en poudre grossière.",
+"Ajouter le basilic et la moitié de l'huile d'olive. Mixer par impulsions courtes.",
+"Ajouter {2} de parmesan et le reste d'huile. Mixer brièvement.",
+"Ajouter un trait de jus de citron, poivrer et goûter."
+],
+"stepMeta": [
+{
+"timer": 150,
+"mark": "Dorés et parfumés.",
+"why": "Surveille-les, ils brûlent en quelques secondes.",
+"ing": [
+1
+]
+},
+{
+"why": "L'eau fait noircir le pesto.",
+"ing": [
+0
+]
+},
+{
+"ing": [
+3,
+6
+]
+},
+{
+"why": "Un mixage long chauffe les feuilles et les fait noircir.",
+"ing": [
+0,
+4
+]
+},
+{
+"mark": "Une pâte granuleuse, pas une purée lisse.",
+"ing": [
+2,
+4
+]
+},
+{
+"why": "Le citron garde la couleur verte. Pour des pâtes, détends le pesto avec 2 ou 3 c. à soupe d'eau de cuisson : il nappe sans être gras.",
+"ing": [
+5,
+6
+]
+}
+],
+"tip": "Les pignons sont chers en Nouvelle-Zélande : les noix de cajou ou les amandes effilées marchent très bien. Au frigo, recouvrir le pesto d'une fine couche d'huile d'olive, il garde sa couleur 5 jours. Il se congèle 3 mois en bacs à glaçons (sans le parmesan, à ajouter au moment).",
+"light": "Remplacer la moitié de l'huile par 4 c. à soupe d'eau de cuisson ou de yaourt nature, et réduire le parmesan à 30 g."
+},
+{
+"id": "guacamole",
+"portions": 4,
+"prep": 10,
+"cook": 0,
+"rest": 5,
+"difficulty": "Facile",
+"cost": "Moyen",
+"tools": [
+"Bol",
+"Fourchette"
+],
+"ingredients": [
+[
+3,
+"",
+"avocats",
+"Légumes & fruits"
+],
+[
+1,
+"",
+"citron vert",
+"Légumes & fruits"
+],
+[
+0.5,
+"",
+"oignon rouge",
+"Légumes & fruits"
+],
+[
+1,
+"",
+"tomate",
+"Légumes & fruits"
+],
+[
+1,
+"bouquet",
+"coriandre",
+"Légumes & fruits"
+],
+[
+1,
+"",
+"piment vert",
+"Légumes & fruits"
+],
+[
+null,
+"",
+"sel, poivre",
+"Autres"
+]
+],
+"steps": [
+"Choisir des avocats mûrs.",
+"Hacher très finement l'oignon rouge et le piment épépiné. Les mettre dans un bol avec le jus du citron vert et une pincée de sel.",
+"Couper la tomate en petits dés en retirant les graines. Ciseler la coriandre.",
+"Ouvrir les avocats, retirer le noyau et récupérer la chair à la cuillère dans le bol.",
+"Écraser à la fourchette en gardant des morceaux.",
+"Ajouter la tomate et la coriandre, mélanger délicatement. Saler, poivrer et goûter."
+],
+"stepMeta": [
+{
+"mark": "Ils cèdent légèrement sous le pouce près de la queue, sans être mous.",
+"why": "Trop fermes, ils ne s'écrasent pas.",
+"ing": [
+0
+]
+},
+{
+"timer": 300,
+"why": "L'acide adoucit l'oignon.",
+"ing": [
+1,
+2,
+5,
+6
+]
+},
+{
+"why": "Sans les graines : sinon le guacamole devient aqueux.",
+"ing": [
+3,
+4
+]
+},
+{
+"ing": [
+0
+]
+},
+{
+"why": "Un guacamole se mange avec de la texture, pas en purée lisse.",
+"ing": []
+},
+{
+"why": "Rajoute du citron vert si besoin.",
+"ing": [
+3,
+4,
+6
+]
+}
+],
+"tip": "Le citron vert ralentit le brunissement. Pour le garder quelques heures, presser un film alimentaire directement au contact de la surface : c'est l'air qui le noircit. 1 jour au frigo maximum ; si la surface a bruni, gratter la fine couche, dessous il est vert.",
+"light": "Remplacer un avocat par 150 g de petits pois cuits et refroidis, écrasés avec : même couleur, moins gras."
+},
+{
+"id": "kofte-lentilles-boulgour",
+"portions": 4,
+"prep": 20,
+"cook": 20,
+"rest": 15,
+"difficulty": "Facile",
+"cost": "Bon marché",
+"tools": [
+"Casserole",
+"Poêle",
+"Grand saladier"
+],
+"ingredients": [
+[
+200,
+"g",
+"lentilles corail",
+"Conserves & épicerie"
+],
+[
+160,
+"g",
+"boulgour fin",
+"Pâtes, riz & féculents"
+],
+[
+1,
+"",
+"oignon",
+"Légumes & fruits"
+],
+[
+2,
+"c. à soupe",
+"huile d'olive",
+"Conserves & épicerie"
+],
+[
+2,
+"c. à soupe",
+"concentré de tomate",
+"Conserves & épicerie"
+],
+[
+1,
+"c. à café",
+"paprika",
+"Conserves & épicerie"
+],
+[
+1,
+"c. à café",
+"cumin moulu",
+"Conserves & épicerie"
+],
+[
+1,
+"pincée",
+"flocons de piment",
+"Conserves & épicerie"
+],
+[
+4,
+"",
+"oignons verts",
+"Légumes & fruits"
+],
+[
+1,
+"bouquet",
+"persil",
+"Légumes & fruits"
+],
+[
+1,
+"",
+"citron",
+"Légumes & fruits"
+],
+[
+1,
+"",
+"laitue romaine",
+"Légumes & fruits"
+],
+[
+200,
+"g",
+"yaourt grec",
+"Frais & crémerie"
+],
+[
+null,
+"",
+"sel, poivre",
+"Autres"
+]
+],
+"steps": [
+"Rincer {0} de lentilles corail et les cuire dans {=500 ml} d'eau à feu moyen, en remuant.",
+"Hors du feu, verser {1} de boulgour sur les lentilles chaudes. Mélanger, couvrir et laisser gonfler.",
+"Pendant ce temps, hacher l'oignon et le faire revenir dans {3} d'huile d'olive à feu moyen.",
+"Ajouter {4} de concentré de tomate, {5} de paprika, {6} de cumin et le piment. Remuer.",
+"Verser l'oignon épicé sur les lentilles et le boulgour. Ajouter les oignons verts et le persil ciselés, le jus de la moitié du citron, saler et poivrer.",
+"Pétrir à la main.",
+"Former des boudins allongés en serrant la pâte dans le poing.",
+"Servir dans des feuilles de laitue romaine avec {12} de yaourt grec et le reste du citron en quartiers."
+],
+"stepMeta": [
+{
+"timer": 810,
+"mark": "En purée, l'eau est absorbée.",
+"why": "12 à 15 min.",
+"ing": [
+0
+]
+},
+{
+"timer": 900,
+"why": "Le boulgour cuit seulement avec la chaleur et l'humidité des lentilles.",
+"ing": [
+1
+]
+},
+{
+"timer": 360,
+"mark": "L'oignon est doré.",
+"ing": [
+2,
+3
+]
+},
+{
+"timer": 60,
+"ing": [
+4,
+5,
+6,
+7
+]
+},
+{
+"ing": [
+8,
+9,
+10,
+13
+]
+},
+{
+"timer": 120,
+"mark": "La pâte tient quand on la presse.",
+"why": "Trop sèche, une cuillère d'eau ; trop collante, laisse reposer 5 min de plus.",
+"ing": []
+},
+{
+"why": "Serrer dans le poing garde la marque des doigts.",
+"ing": []
+},
+{
+"ing": [
+10,
+11,
+12
+]
+}
+],
+"tip": "C'est un plat qui se mange tiède ou froid : il se prépare la veille et se garde 3 jours au frais. Le boulgour doit être FIN, le gros ne gonfle pas assez sans cuisson.",
+"light": "Déjà léger. Remplace le yaourt grec par un yaourt nature allégé et ajoute concombre et tomates en salade."
+},
+{
+"id": "paella-legumes",
+"portions": 4,
+"prep": 15,
+"cook": 35,
+"rest": 5,
+"difficulty": "Moyen",
+"cost": "Moyen",
+"tools": [
+"Grande poêle large",
+"Râpe",
+"Torchon propre"
+],
+"ingredients": [
+[
+160,
+"g",
+"riz rond à paella",
+"Pâtes, riz & féculents"
+],
+[
+1,
+"",
+"oignon",
+"Légumes & fruits"
+],
+[
+1,
+"",
+"poivron rouge",
+"Légumes & fruits"
+],
+[
+200,
+"g",
+"haricots verts",
+"Légumes & fruits"
+],
+[
+150,
+"g",
+"petits pois surgelés",
+"Légumes & fruits"
+],
+[
+1,
+"boîte",
+"haricots blancs",
+"Conserves & épicerie"
+],
+[
+2,
+"",
+"tomates",
+"Légumes & fruits"
+],
+[
+3,
+"gousses",
+"ail",
+"Légumes & fruits"
+],
+[
+2,
+"c. à café",
+"paprika fumé",
+"Conserves & épicerie"
+],
+[
+1,
+"pincée",
+"safran ou curcuma",
+"Conserves & épicerie"
+],
+[
+1,
+"cube",
+"bouillon de légumes",
+"Conserves & épicerie"
+],
+[
+3,
+"c. à soupe",
+"huile d'olive",
+"Conserves & épicerie"
+],
+[
+1,
+"",
+"citron",
+"Légumes & fruits"
+],
+[
+1,
+"bouquet",
+"persil",
+"Légumes & fruits"
+],
+[
+null,
+"",
+"sel, poivre",
+"Autres"
+]
+],
+"steps": [
+"Dissoudre le bouillon dans {=500 ml} d'eau chaude avec le safran ou le curcuma.",
+"Dans une grande poêle large, chauffer {11} d'huile d'olive à feu moyen. Faire revenir l'oignon haché et le poivron en lanières.",
+"Ajouter {3} de haricots verts coupés en deux.",
+"Ajouter l'ail haché et les tomates râpées.",
+"Ajouter {8} de paprika fumé et {0} de riz. Remuer pour enrober chaque grain.",
+"Verser le bouillon chaud, ajouter les haricots blancs rincés, saler, poivrer et répartir le riz uniformément.",
+"Cuire à feu moyen-vif sans remuer.",
+"Baisser à feu doux et enfoncer légèrement {4} de petits pois.",
+"Monter le feu.",
+"Couvrir d'un torchon hors du feu.",
+"Servir avec le persil et le citron en quartiers."
+],
+"stepMeta": [
+{
+"ing": [
+9,
+10
+]
+},
+{
+"timer": 360,
+"ing": [
+1,
+2,
+11
+]
+},
+{
+"timer": 180,
+"ing": [
+3
+]
+},
+{
+"timer": 300,
+"mark": "L'eau s'évapore et ça forme une pâte.",
+"why": "Râpe la tomate coupée en deux, la peau reste dans la main.",
+"ing": [
+6,
+7
+]
+},
+{
+"timer": 60,
+"ing": [
+0,
+8
+]
+},
+{
+"why": "À partir de maintenant, ne plus remuer : c'est ce qui donne la croûte du fond.",
+"ing": [
+5,
+14
+]
+},
+{
+"timer": 600,
+"ing": []
+},
+{
+"timer": 480,
+"ing": [
+4
+]
+},
+{
+"timer": 90,
+"mark": "Le liquide a disparu et ça crépite : c'est la croûte qui se forme. Arrêter dès que ça sent le grillé.",
+"why": "1 à 2 min.",
+"ing": []
+},
+{
+"timer": 300,
+"ing": []
+},
+{
+"ing": [
+12,
+13
+]
+}
+],
+"light": "Garde 120 g de riz seulement et ajoute une courgette et plus de haricots verts.",
+"tip": "Une paella ne se remue pas, contrairement au risotto : le riz rond absorbe le bouillon sans relâcher d'amidon et la croûte du fond est la partie qu'on se dispute. Un riz à risotto marche aussi s'il n'y a pas de riz à paella."
+},
+{
+"id": "aloo-gobi",
+"portions": 4,
+"prep": 15,
+"cook": 30,
+"rest": 0,
+"difficulty": "Facile",
+"cost": "Bon marché",
+"tools": [
+"Grande poêle avec couvercle"
+],
+"ingredients": [
+[
+1,
+"",
+"chou-fleur",
+"Légumes & fruits"
+],
+[
+500,
+"g",
+"pommes de terre",
+"Légumes & fruits"
+],
+[
+1,
+"",
+"oignon",
+"Légumes & fruits"
+],
+[
+3,
+"gousses",
+"ail",
+"Légumes & fruits"
+],
+[
+1,
+"c. à soupe",
+"gingembre râpé",
+"Légumes & fruits"
+],
+[
+1,
+"c. à café",
+"graines de cumin",
+"Conserves & épicerie"
+],
+[
+1,
+"c. à café",
+"curcuma",
+"Conserves & épicerie"
+],
+[
+2,
+"c. à café",
+"garam masala",
+"Conserves & épicerie"
+],
+[
+1,
+"pincée",
+"flocons de piment",
+"Conserves & épicerie"
+],
+[
+2,
+"",
+"tomates",
+"Légumes & fruits"
+],
+[
+2,
+"c. à soupe",
+"huile",
+"Conserves & épicerie"
+],
+[
+1,
+"boîte",
+"pois chiches",
+"Conserves & épicerie"
+],
+[
+150,
+"g",
+"yaourt nature",
+"Frais & crémerie"
+],
+[
+1,
+"bouquet",
+"coriandre",
+"Légumes & fruits"
+],
+[
+1,
+"",
+"citron",
+"Légumes & fruits"
+],
+[
+null,
+"",
+"sel, poivre",
+"Autres"
+]
+],
+"steps": [
+"Couper le chou-fleur en petits bouquets et {1} de pommes de terre en cubes de 2 cm.",
+"Chauffer {10} d'huile dans une grande poêle à feu moyen. Ajouter {5} de graines de cumin.",
+"Ajouter l'oignon émincé et cuire.",
+"Ajouter l'ail, {4} de gingembre, {6} de curcuma et le piment.",
+"Ajouter les pommes de terre et le chou-fleur, saler, poivrer et bien enrober d'épices. Faire dorer à feu moyen-vif en remuant de temps en temps.",
+"Ajouter les tomates en dés, les pois chiches rincés et {=4 c. à soupe} d'eau. Couvrir et cuire à feu doux.",
+"Retirer le couvercle, ajouter {7} de garam masala et cuire à découvert.",
+"Arroser de jus de citron, parsemer de coriandre et servir avec {12} de yaourt."
+],
+"stepMeta": [
+{
+"why": "Garde-les de taille égale pour qu'ils cuisent ensemble.",
+"ing": [
+0,
+1
+]
+},
+{
+"timer": 30,
+"mark": "Elles grésillent.",
+"ing": [
+5,
+10
+]
+},
+{
+"timer": 300,
+"ing": [
+2
+]
+},
+{
+"timer": 60,
+"ing": [
+3,
+4,
+6,
+8
+]
+},
+{
+"timer": 300,
+"ing": [
+15
+]
+},
+{
+"timer": 900,
+"mark": "Les pommes de terre sont tendres à la pointe du couteau.",
+"ing": [
+9,
+11
+]
+},
+{
+"timer": 180,
+"why": "Pour sécher et légèrement griller les légumes.",
+"ing": [
+7
+]
+},
+{
+"ing": [
+12,
+13,
+14
+]
+}
+],
+"tip": "C'est un plat sec, pas une sauce : peu d'eau et un couvercle, puis quelques minutes sans couvercle pour que les légumes accrochent un peu. Le garam masala va à la fin, il perd son parfum s'il cuit longtemps.",
+"light": "Remplace la moitié des pommes de terre par plus de chou-fleur, c'est déjà un plat léger."
+},
+{
+"id": "poulet-general-tao",
+"portions": 4,
+"prep": 15,
+"cook": 20,
+"rest": 0,
+"difficulty": "Moyen",
+"cost": "Moyen",
+"tools": [
+"Grande poêle",
+"Casserole avec couvercle",
+"Petite casserole",
+"Bol"
+],
+"ingredients": [
+[
+500,
+"g",
+"hauts de cuisse de poulet désossés",
+"Viandes & poissons"
+],
+[
+4,
+"c. à soupe",
+"fécule de maïs",
+"Conserves & épicerie"
+],
+[
+2,
+"c. à soupe",
+"huile",
+"Conserves & épicerie"
+],
+[
+3,
+"gousses",
+"ail",
+"Légumes & fruits"
+],
+[
+1,
+"c. à soupe",
+"gingembre frais râpé",
+"Légumes & fruits"
+],
+[
+1,
+"pincée",
+"flocons de piment",
+"Conserves & épicerie"
+],
+[
+4,
+"c. à soupe",
+"sauce soja",
+"Conserves & épicerie"
+],
+[
+1,
+"c. à soupe",
+"sauce hoisin",
+"Conserves & épicerie"
+],
+[
+2,
+"c. à soupe",
+"vinaigre de riz",
+"Conserves & épicerie"
+],
+[
+2,
+"c. à soupe",
+"sucre",
+"Conserves & épicerie"
+],
+[
+1,
+"",
+"brocoli",
+"Légumes & fruits"
+],
+[
+160,
+"g",
+"riz",
+"Pâtes, riz & féculents"
+],
+[
+3,
+"",
+"oignons verts",
+"Légumes & fruits"
+],
+[
+1,
+"c. à soupe",
+"graines de sésame",
+"Conserves & épicerie"
+],
+[
+null,
+"",
+"sel",
+"Autres"
+]
+],
+"steps": [
+"Rincer {11} de riz et le cuire dans deux fois son volume d'eau salée : ébullition, couvrir, feu doux.",
+"Laisser gonfler le riz hors du feu.",
+"Pour la sauce, mélanger {6} de sauce soja, {7} de sauce hoisin, {8} de vinaigre de riz, {9} de sucre, {1:0.25} de fécule et {=10 cl} d'eau.",
+"Couper le poulet en morceaux de 3 cm et les enrober du reste de fécule.",
+"Détailler le brocoli en petits bouquets et le cuire à l'eau bouillante salée ou au micro-ondes.",
+"Chauffer {2} d'huile dans une grande poêle à feu vif. Cuire le poulet en une seule couche, en le retournant à mi-cuisson.",
+"Baisser le feu, ajouter l'ail haché, {4} de gingembre et le piment. Remuer.",
+"Remuer la sauce et la verser dans la poêle.",
+"Ajouter le brocoli et mélanger.",
+"Servir sur le riz avec les oignons verts ciselés et {13} de graines de sésame."
+],
+"stepMeta": [
+{
+"timer": 660,
+"why": "10 à 12 min.",
+"ing": [
+11,
+14
+]
+},
+{
+"ing": []
+},
+{
+"ing": [
+1,
+6,
+7,
+8,
+9
+]
+},
+{
+"why": "C'est cette fine couche qui devient croustillante et accroche la sauce.",
+"ing": [
+0,
+1
+]
+},
+{
+"timer": 180,
+"mark": "Vert vif et croquant.",
+"ing": [
+10,
+14
+]
+},
+{
+"timer": 390,
+"mark": "Doré sur toutes les faces et cuit à cœur.",
+"why": "6 à 7 min.",
+"ing": [
+0,
+2
+]
+},
+{
+"timer": 30,
+"ing": [
+3,
+4,
+5
+]
+},
+{
+"timer": 90,
+"mark": "Elle épaissit et devient brillante.",
+"why": "Remue bien avant de verser : la fécule tombe au fond. 1 à 2 min.",
+"ing": []
+},
+{
+"ing": []
+},
+{
+"ing": [
+12,
+13
+]
+}
+],
+"tip": "La fécule a deux rôles : en enrobage elle fait une croûte légère sans friture, dans la sauce elle la lie instantanément. Pense toujours à remuer la sauce juste avant de la verser, sinon la fécule reste collée au fond du bol.",
+"light": "Réduis le sucre à 1 c. à soupe et double le brocoli."
+},
+{
+"id": "picadillo-boeuf-riz",
+"portions": 4,
+"prep": 10,
+"cook": 25,
+"rest": 0,
+"difficulty": "Facile",
+"cost": "Moyen",
+"tools": [
+"Grande poêle",
+"Casserole avec couvercle"
+],
+"ingredients": [
+[
+500,
+"g",
+"bœuf haché",
+"Viandes & poissons"
+],
+[
+1,
+"",
+"oignon",
+"Légumes & fruits"
+],
+[
+1,
+"",
+"poivron vert",
+"Légumes & fruits"
+],
+[
+2,
+"gousses",
+"ail",
+"Légumes & fruits"
+],
+[
+1,
+"c. à café",
+"cumin",
+"Conserves & épicerie"
+],
+[
+1,
+"c. à café",
+"origan séché",
+"Conserves & épicerie"
+],
+[
+1,
+"boîte",
+"tomates concassées (400 g)",
+"Conserves & épicerie"
+],
+[
+60,
+"g",
+"olives vertes",
+"Conserves & épicerie"
+],
+[
+40,
+"g",
+"raisins secs",
+"Conserves & épicerie"
+],
+[
+1,
+"c. à soupe",
+"vinaigre de vin rouge",
+"Conserves & épicerie"
+],
+[
+1,
+"c. à soupe",
+"huile d'olive",
+"Conserves & épicerie"
+],
+[
+160,
+"g",
+"riz",
+"Pâtes, riz & féculents"
+],
+[
+null,
+"",
+"sel, poivre",
+"Autres"
+]
+],
+"steps": [
+"Rincer {11} de riz et le cuire dans deux fois son volume d'eau salée : ébullition, couvrir, feu doux.",
+"Laisser gonfler le riz hors du feu.",
+"Hacher l'oignon et couper le poivron vert en petits dés. Les faire revenir dans {10} d'huile d'olive à feu moyen.",
+"Monter le feu, ajouter {0} de bœuf haché et l'émietter à la spatule. Le laisser dorer sans trop remuer.",
+"Ajouter l'ail haché, {4} de cumin et {5} d'origan. Remuer.",
+"Verser les tomates, {7} d'olives en rondelles, {8} de raisins secs et {9} de vinaigre. Laisser mijoter à feu doux, à découvert.",
+"Saler prudemment et poivrer. Servir sur le riz."
+],
+"stepMeta": [
+{
+"timer": 660,
+"why": "10 à 12 min.",
+"ing": [
+11,
+12
+]
+},
+{
+"ing": []
+},
+{
+"timer": 300,
+"ing": [
+1,
+2,
+10
+]
+},
+{
+"timer": 300,
+"mark": "La viande brunit, elle ne grise pas seulement.",
+"ing": [
+0
+]
+},
+{
+"timer": 60,
+"ing": [
+3,
+4,
+5
+]
+},
+{
+"timer": 600,
+"mark": "Sauce épaisse, elle ne coule plus au fond de la poêle.",
+"ing": [
+6,
+7,
+8,
+9
+]
+},
+{
+"why": "Les olives sont déjà salées.",
+"ing": [
+12
+]
+}
+],
+"tip": "Le mélange salé sucré des olives et des raisins secs fait tout le caractère du plat cubain. Si tu n'aimes pas les raisins, garde au moins le vinaigre : c'est lui qui réveille la sauce.",
+"light": "Bœuf haché à 5 % de matière grasse et moitié riz, moitié chou fleur râpé poêlé."
+},
+{
+"id": "papillote-poisson-thai",
+"portions": 4,
+"prep": 15,
+"cook": 15,
+"rest": 0,
+"difficulty": "Facile",
+"cost": "Assez cher",
+"tools": [
+"Papier cuisson",
+"Plaque de four",
+"Casserole avec couvercle",
+"Bol"
+],
+"ingredients": [
+[
+4,
+"",
+"filets de poisson blanc",
+"Viandes & poissons"
+],
+[
+1,
+"boîte",
+"lait de coco",
+"Conserves & épicerie"
+],
+[
+1,
+"c. à soupe",
+"pâte de curry rouge",
+"Conserves & épicerie"
+],
+[
+1,
+"c. à soupe",
+"sauce poisson",
+"Conserves & épicerie"
+],
+[
+1,
+"",
+"citron vert",
+"Légumes & fruits"
+],
+[
+2,
+"gousses",
+"ail",
+"Légumes & fruits"
+],
+[
+1,
+"c. à café",
+"gingembre râpé",
+"Conserves & épicerie"
+],
+[
+2,
+"",
+"courgettes",
+"Légumes & fruits"
+],
+[
+1,
+"",
+"poivron rouge",
+"Légumes & fruits"
+],
+[
+160,
+"g",
+"riz",
+"Pâtes, riz & féculents"
+],
+[
+1,
+"bouquet",
+"coriandre",
+"Légumes & fruits"
+],
+[
+null,
+"",
+"sel, poivre",
+"Autres"
+]
+],
+"steps": [
+"Préchauffer le four à 200 °C. Découper une grande feuille de papier cuisson d'environ 40 cm par filet.",
+"Rincer {9} de riz et le cuire dans deux fois son volume d'eau salée : ébullition, couvrir, feu doux.",
+"Laisser gonfler le riz hors du feu.",
+"Tailler les courgettes et le poivron rouge en fins bâtonnets.",
+"Dans un bol, mélanger la moitié du lait de coco, {2} de pâte de curry, {3} de sauce poisson, l'ail haché, {6} de gingembre et le jus de la moitié du citron vert.",
+"Répartir les légumes au centre de chaque feuille. Poser un filet de poisson dessus, saler peu et poivrer.",
+"Relever les bords du papier pour former une barquette et verser la sauce sur le poisson.",
+"Fermer en pliant les bords plusieurs fois sur eux-mêmes.",
+"Enfourner.",
+"Ouvrir les papillotes à table et parsemer de coriandre ciselée. Servir avec le riz et le reste du citron vert en quartiers."
+],
+"stepMeta": [
+{
+"ing": []
+},
+{
+"timer": 660,
+"why": "10 à 12 min.",
+"ing": [
+9,
+11
+]
+},
+{
+"ing": []
+},
+{
+"why": "Coupés fins, ils cuisent exactement en même temps que le poisson.",
+"ing": [
+7,
+8
+]
+},
+{
+"ing": [
+1,
+2,
+3,
+4,
+5,
+6
+]
+},
+{
+"why": "Peu de sel : la sauce poisson sale déjà.",
+"ing": [
+0,
+11
+]
+},
+{
+"ing": []
+},
+{
+"why": "La papillote doit être étanche : c'est la vapeur enfermée qui cuit le poisson sans le dessécher.",
+"ing": []
+},
+{
+"timer": 810,
+"mark": "Chair blanche et opaque, elle se détache en lamelles.",
+"why": "12 à 15 min selon l'épaisseur des filets.",
+"ing": []
+},
+{
+"why": "Attention à la vapeur à l'ouverture.",
+"ing": [
+4,
+10
+]
+}
+],
+"tip": "Les filets fins de terakihi ou de hoki cuisent en 12 min ; un filet épais de 3 cm demande plutôt 15 min. Garde le reste du lait de coco pour un curry ou un dahl, il se congèle très bien dans un bac à glaçons.",
+"light": "Lait de coco allégé, et moitié moins de riz en ajoutant une poignée de pousses d'épinards dans chaque papillote."
+},
+{
+"id": "crevettes-saganaki",
+"portions": 4,
+"prep": 10,
+"cook": 20,
+"rest": 0,
+"difficulty": "Facile",
+"cost": "Assez cher",
+"tools": [
+"Grande poêle avec couvercle",
+"Papier absorbant"
+],
+"ingredients": [
+[
+500,
+"g",
+"crevettes crues décortiquées",
+"Viandes & poissons"
+],
+[
+1,
+"boîte",
+"tomates concassées (400 g)",
+"Conserves & épicerie"
+],
+[
+150,
+"g",
+"feta",
+"Frais & crémerie"
+],
+[
+1,
+"",
+"oignon",
+"Légumes & fruits"
+],
+[
+3,
+"gousses",
+"ail",
+"Légumes & fruits"
+],
+[
+1,
+"c. à café",
+"origan séché",
+"Conserves & épicerie"
+],
+[
+1,
+"pincée",
+"flocons de piment",
+"Conserves & épicerie"
+],
+[
+2,
+"c. à soupe",
+"huile d'olive",
+"Conserves & épicerie"
+],
+[
+1,
+"bouquet",
+"persil",
+"Légumes & fruits"
+],
+[
+1,
+"",
+"citron",
+"Légumes & fruits"
+],
+[
+4,
+"",
+"pains pita",
+"Pâtes, riz & féculents"
+],
+[
+null,
+"",
+"sel, poivre",
+"Autres"
+]
+],
+"steps": [
+"Décongeler les crevettes si besoin et les éponger.",
+"Faire revenir l'oignon émincé dans {7} d'huile d'olive à feu moyen.",
+"Ajouter l'ail haché, {5} d'origan et le piment.",
+"Verser les tomates, saler légèrement, poivrer et laisser mijoter à découvert.",
+"Enfoncer les crevettes dans la sauce en une seule couche et émietter {2} de feta par-dessus.",
+"Couvrir et cuire à feu doux.",
+"Parsemer de persil ciselé et arroser d'un filet de jus de citron. Servir dans la poêle avec les pains pita réchauffés."
+],
+"stepMeta": [
+{
+"ing": [
+0
+]
+},
+{
+"timer": 300,
+"ing": [
+3,
+7
+]
+},
+{
+"timer": 60,
+"ing": [
+4,
+5,
+6
+]
+},
+{
+"timer": 480,
+"mark": "La sauce épaissit, la cuillère laisse un sillon.",
+"ing": [
+1,
+11
+]
+},
+{
+"ing": [
+0,
+2
+]
+},
+{
+"timer": 270,
+"mark": "Crevettes roses et recourbées en C, la feta commence à fondre.",
+"why": "4 à 5 min. Une crevette en forme de O est trop cuite.",
+"ing": []
+},
+{
+"why": "Les pitas servent à saucer.",
+"ing": [
+8,
+9,
+10
+]
+}
+],
+"tip": "La feta sale beaucoup la sauce : n'ajoute presque pas de sel avant de l'avoir mise. Si tu as le temps, laisse la sauce réduire 5 min de plus, elle n'en sera que plus concentrée.",
+"light": "Remplace les pitas par une salade verte ou du riz complet en petite portion, et prends 100 g de feta."
+},
+{
+"id": "pavlova",
+"portions": 8,
+"prep": 25,
+"cook": 75,
+"rest": 60,
+"advance": "1 h de refroidissement dans le four éteint, ou préparée la veille",
+"difficulty": "Moyen",
+"cost": "Moyen",
+"tools": [
+"Batteur électrique",
+"Plaque de four",
+"Papier cuisson",
+"Spatule",
+"Saladier"
+],
+"ingredients": [
+[
+4,
+"",
+"blancs d'œufs",
+"Œufs"
+],
+[
+220,
+"g",
+"sucre en poudre",
+"Conserves & épicerie"
+],
+[
+1,
+"c. à café",
+"vinaigre blanc",
+"Conserves & épicerie"
+],
+[
+2,
+"c. à café",
+"maïzena",
+"Conserves & épicerie"
+],
+[
+1,
+"c. à café",
+"extrait de vanille",
+"Conserves & épicerie"
+],
+[
+300,
+"ml",
+"crème",
+"Frais & crémerie"
+],
+[
+4,
+"",
+"kiwis",
+"Légumes & fruits"
+],
+[
+250,
+"g",
+"fraises",
+"Légumes & fruits"
+],
+[
+2,
+"",
+"fruits de la passion",
+"Légumes & fruits"
+]
+],
+"steps": [
+"Préchauffer le four à 150 °C. Tracer un cercle de 22 cm sur une feuille de papier cuisson posée sur une plaque.",
+"Battre les blancs d'œufs dans un saladier parfaitement propre et sec.",
+"Ajouter {1} de sucre cuillère par cuillère en continuant de battre.",
+"Battre encore la meringue.",
+"Ajouter {2} de vinaigre, {3} de maïzena et {4} de vanille. Mélanger délicatement à la spatule.",
+"Étaler la meringue dans le cercle en creusant légèrement le centre et en relevant les bords.",
+"Enfourner, baisser aussitôt à 120 °C et cuire.",
+"Éteindre le four et laisser refroidir dedans, porte entrouverte.",
+"Juste avant de servir, fouetter {5} de crème bien froide en chantilly souple. L'étaler au centre.",
+"Garnir de kiwis et fraises coupés et de la pulpe des fruits de la passion."
+],
+"stepMeta": [
+{
+"ing": []
+},
+{
+"mark": "Des pics souples se forment.",
+"why": "Une trace de jaune ou de gras les empêche de monter.",
+"ing": [
+0
+]
+},
+{
+"ing": [
+1
+]
+},
+{
+"timer": 300,
+"mark": "Épaisse, brillante, elle ne crisse plus entre les doigts.",
+"ing": []
+},
+{
+"why": "Ce sont eux qui donnent le cœur moelleux typique de la pavlova.",
+"ing": [
+2,
+3,
+4
+]
+},
+{
+"ing": []
+},
+{
+"timer": 4500,
+"mark": "Sèche au toucher et à peine crème.",
+"ing": []
+},
+{
+"timer": 3600,
+"why": "Au moins 1 h. Un refroidissement brutal la fait s'effondrer.",
+"ing": []
+},
+{
+"ing": [
+5
+]
+},
+{
+"ing": [
+6,
+7,
+8
+]
+}
+],
+"tip": "La pavlova se fait la veille et se garde à l'air libre dans une boîte, jamais au frigo qui la ramollit. Elle se fissure toujours un peu en refroidissant : c'est normal, la crème cache tout. La garniture se pose au dernier moment, sinon la meringue fond.",
+"light": "Remplace la moitié de la chantilly par du yaourt grec à la vanille et charge en fruits."
+},
+{
+"id": "puree-pommes-de-terre",
+"portions": 4,
+"prep": 10,
+"cook": 25,
+"rest": 0,
+"difficulty": "Facile",
+"cost": "Bon marché",
+"tools": [
+"Grande casserole",
+"Petite casserole",
+"Presse-purée",
+"Cuillère en bois"
+],
+"ingredients": [
+[
+800,
+"g",
+"pommes de terre",
+"Légumes & fruits"
+],
+[
+50,
+"g",
+"beurre",
+"Frais & crémerie"
+],
+[
+200,
+"ml",
+"lait",
+"Frais & crémerie"
+],
+[
+1,
+"pincée",
+"muscade",
+"Conserves & épicerie"
+],
+[
+null,
+"",
+"sel, poivre",
+"Autres"
+]
+],
+"steps": [
+"Éplucher {0} de pommes de terre et les couper en morceaux de taille égale, environ 4 cm.",
+"Les mettre dans une grande casserole d'eau froide bien salée et porter à ébullition.",
+"Laisser cuire à petits bouillons.",
+"Pendant ce temps, faire chauffer {2} de lait dans une petite casserole sans le faire bouillir.",
+"Égoutter les pommes de terre, les remettre dans la casserole chaude et les laisser fumer sur feu doux.",
+"Écraser au presse-purée ou à la fourchette.",
+"Incorporer {1} de beurre en morceaux, puis le lait chaud petit à petit, en remuant à la cuillère en bois.",
+"Saler, poivrer et ajouter la muscade. Goûter et servir bien chaud."
+],
+"stepMeta": [
+{
+"why": "De taille égale pour qu'ils cuisent tous en même temps.",
+"ing": [
+0
+]
+},
+{
+"why": "Partir à froid cuit les morceaux de façon homogène, le cœur en même temps que l'extérieur.",
+"ing": [
+4
+]
+},
+{
+"timer": 1050,
+"mark": "La pointe d'un couteau s'enfonce sans aucune résistance.",
+"why": "15 à 20 min.",
+"ing": []
+},
+{
+"ing": [
+2
+]
+},
+{
+"timer": 90,
+"why": "1 à 2 min pour chasser l'eau restante : c'est ce qui évite une purée aqueuse.",
+"ing": []
+},
+{
+"why": "Jamais au mixeur, qui rend la purée élastique et collante.",
+"ing": []
+},
+{
+"mark": "Jusqu'à la texture voulue.",
+"ing": [
+1,
+2
+]
+},
+{
+"ing": [
+3,
+4
+]
+}
+],
+"tip": "Le lait chaud est indispensable : froid, il refroidit la purée et l'amidon se fige, elle devient pâteuse. Les variétés farineuses (étiquetées « floury » en NZ, comme Agria) donnent la purée la plus légère.",
+"light": "Remplacer la moitié du beurre par 2 c. à soupe de yaourt nature ou de crème fraîche légère, et une partie du lait par l'eau de cuisson des pommes de terre."
+},
+{
+"id": "naan-poele",
+"portions": 4,
+"prep": 20,
+"cook": 20,
+"rest": 15,
+"difficulty": "Moyen",
+"cost": "Bon marché",
+"tools": [
+"Saladier",
+"Rouleau à pâtisserie",
+"Poêle",
+"Petite casserole",
+"Torchon"
+],
+"ingredients": [
+[
+300,
+"g",
+"farine",
+"Pâtes, riz & féculents"
+],
+[
+150,
+"g",
+"yaourt nature",
+"Frais & crémerie"
+],
+[
+1,
+"c. à café",
+"levure chimique",
+"Conserves & épicerie"
+],
+[
+1,
+"c. à café",
+"sucre",
+"Conserves & épicerie"
+],
+[
+2,
+"c. à soupe",
+"huile",
+"Conserves & épicerie"
+],
+[
+100,
+"ml",
+"lait",
+"Frais & crémerie"
+],
+[
+30,
+"g",
+"beurre",
+"Frais & crémerie"
+],
+[
+1,
+"gousse",
+"ail",
+"Légumes & fruits"
+],
+[
+1,
+"bouquet",
+"coriandre",
+"Légumes & fruits"
+],
+[
+null,
+"",
+"sel, poivre",
+"Autres"
+]
+],
+"steps": [
+"Dans un saladier, mélanger {0} de farine, {2} de levure chimique, {3} de sucre et {=0,5 c. à café} de sel.",
+"Ajouter {1} de yaourt, {4} d'huile et {5} de lait tiède. Mélanger jusqu'à former une boule souple.",
+"Pétrir sur le plan de travail fariné.",
+"Couvrir et laisser reposer.",
+"Pendant ce temps, faire fondre {6} de beurre avec l'ail haché finement et un peu de coriandre ciselée.",
+"Diviser la pâte en boules égales, deux par portion. Les étaler en ovales de 3 à 4 mm d'épaisseur.",
+"Chauffer une poêle à sec à feu vif. Y poser un naan et cuire.",
+"Retourner et cuire encore.",
+"Badigeonner aussitôt de beurre à l'ail. Garder les naans empilés dans un torchon pendant la cuisson des autres."
+],
+"stepMeta": [
+{
+"ing": [
+0,
+2,
+3,
+9
+]
+},
+{
+"ing": [
+1,
+4,
+5
+]
+},
+{
+"timer": 120,
+"mark": "La pâte est lisse.",
+"ing": []
+},
+{
+"timer": 900,
+"why": "Le gluten se détend et la pâte s'étale sans se rétracter.",
+"ing": []
+},
+{
+"ing": [
+6,
+7,
+8
+]
+},
+{
+"ing": []
+},
+{
+"timer": 90,
+"mark": "Des bulles se forment, le dessous est tacheté de brun.",
+"why": "1 à 2 min.",
+"ing": []
+},
+{
+"timer": 60,
+"ing": []
+},
+{
+"ing": []
+}
+],
+"tip": "La poêle doit être très chaude et sans matière grasse : c'est le choc de chaleur qui fait gonfler la pâte en bulles. Le torchon garde les naans souples.",
+"light": "Utiliser du yaourt allégé et remplacer le beurre fondu par un pinceau d'huile d'olive à l'ail."
+}
+]

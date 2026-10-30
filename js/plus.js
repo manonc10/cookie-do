@@ -220,7 +220,7 @@ renderWeek=function(){
     const row=document.createElement('div'); row.className='rw thumb';
     const state=pct>0?`<span style="color:var(--accT);font-weight:600">${pct} % fait</span>`:(miss?(miss.length?`<span style="color:var(--warn)">${miss.length} manque${miss.length>1?'nt':''}</span>`:'<span style="color:var(--ok)">tout en stock</span>'):mealsLabel(servingsFor(r)));
     row.innerHTML=`${hasPhoto(id)?`<img class="th" src="${photoThumb(id)}" alt="" loading="lazy" onerror="${thumbFallback(id)}">`:`<div class="noph">${recipeEmoji(r)}</div>`}
-      <div class="b"><div class="t">${r.title}</div><div class="m">${r.time} min · ${state}</div><button type="button" class="when${ks.length?'':' empty'}">${when}</button></div>
+      <div class="b"><div class="t">${r.title}</div><div class="m">${fmtTime(r.time)} · ${state}</div><button type="button" class="when${ks.length?'':' empty'}">${when}</button></div>
       <button class="go" data-cook>Cuisiner</button>`;
     row.querySelector('[data-cook]').onclick=e=>{e.stopPropagation();openCook(id);};
     row.querySelector('.when').onclick=e=>{ e.stopPropagation(); openDayPicker(id); };

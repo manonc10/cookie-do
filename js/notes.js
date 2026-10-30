@@ -23,7 +23,7 @@ function noteContext(){
     appareil:navigator.userAgent, installee:standalone,
     ecran:innerWidth+'×'+innerHeight+' @'+devicePixelRatio, defilement:Math.round(scrollY),
     theme:settings.theme, sombre:matchMedia('(prefers-color-scheme: dark)').matches, texteGrand:!!settings.bigText,
-    personnes:settings.persons, portions:settings.portionSize, foyer:!!(typeof foyer!=='undefined'&&foyer),
+    personnes:settings.persons, foyer:!!(typeof foyer!=='undefined'&&foyer),
     semaine:[...selection], cochés:shopChecked.size, erreurs:recentErrors.slice()
   };
 }

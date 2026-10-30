@@ -139,7 +139,7 @@ const Sync = (()=> {
 
 
 /* ============ Cookie Do · app logic ============ */
-const APP_VERSION='4.12';
+const APP_VERSION='5.0';
 const LS = {
   custom:'mm_custom', selection:'mm_selection', shopChecked:'mm_shopChecked',
   history:'mm_history', cookState:'mm_cookState', fridge:'mm_fridge', pantry:'mm_pantry',
@@ -199,7 +199,7 @@ let searchTerm='', activeTag=null, showFavOnly=false, courseFilter='all', quickF
 
 /* ---- réglages (sur l'appareil) ---- */
 const SETTINGS_KEY='cd_settings';
-let settings=Object.assign({theme:'system',persons:2,nz:true,hidePantry:false,bigText:false,aisles:null,staples:[],vegTarget:3,fishTarget:1,portionSize:'small'},load(SETTINGS_KEY,{}));
+let settings=Object.assign({theme:'system',persons:2,nz:true,hidePantry:false,bigText:false,aisles:null,staples:[],vegTarget:3,fishTarget:1},load(SETTINGS_KEY,{}));
 /* menu jour par jour : {recetteId: ['2026-10-08|soir', ...]} */
 let plan=load('cd_plan',{});
 function saveSettings(){ save(SETTINGS_KEY,settings); try{localStorage.setItem('cd_theme',settings.theme);}catch(e){} applyTheme(); }
@@ -229,7 +229,7 @@ const $$=s=>[...document.querySelectorAll(s)];
 /* ---- cloud snapshot: gather + apply ---- */
 function snapshot(){
   return {v:4, custom:customRecipes, selection:[...selection], shopChecked:[...shopChecked],
-    history, cookState, pantry, favorites:[...favorites], ratings, prices, removedShop:[...removedShopItems], removedFrom, acquired:acquiredItems, acquiredFrom, freeShop:freeItems, notes, plan, userPhotos, prefs:{persons:settings.persons,aisles:settings.aisles,staples:settings.staples,vegTarget:settings.vegTarget,fishTarget:settings.fishTarget,nz:settings.nz,hidePantry:settings.hidePantry,portionSize:settings.portionSize}, savedAt:Date.now()};
+    history, cookState, pantry, favorites:[...favorites], ratings, prices, removedShop:[...removedShopItems], removedFrom, acquired:acquiredItems, acquiredFrom, freeShop:freeItems, notes, plan, userPhotos, prefs:{persons:settings.persons,aisles:settings.aisles,staples:settings.staples,vegTarget:settings.vegTarget,fishTarget:settings.fishTarget,nz:settings.nz,hidePantry:settings.hidePantry}, savedAt:Date.now()};
 }
 function applySnapshot(s){
   if(!s||typeof s!=='object') return;
@@ -472,8 +472,29 @@ function scaleStepText(text,factor){
   return text.replace(STEP_QTY,(m,n,sp,u)=>{ const q=roundQty(parseFloat(n.replace(',','.'))*factor,u);
     return `<b class="sq">${fmtQty(q)}${sp}${u}</b>`; });
 }
+/* Étapes réécrites : {n} = quantité de l'ingrédient n, {n:0.5} = sa moitié, {=700 ml} = quantité hors liste.
+   Tout se recalcule avec les portions. Les recettes perso sans jeton gardent le recalcul dans le texte. */
+const STEP_TOKEN=/\{(?:=(\d+(?:[.,]\d+)?) ([^}]+)|(\d+)(?::([\d.]+))?)\}/g;
+function freeQty(v,u){
+  if(/^l$/i.test(u)){ const ml=v*1000; if(ml<1000) return (Math.round(ml/50)*50||Math.round(ml))+' ml'; return fmtQty(Math.round(v*4)/4)+' L'; }
+  const q=roundQty(v,u); return fmtQty(q)+' '+(unitLabel(u,q)||u);
+}
+function stepText(r,s,factor,plain){
+  if(!/\{(=|\d)/.test(s)) return plain?s:scaleStepText(s,factor);
+  const mark=t=>plain?t:`<b class="sq">${t}</b>`;
+  return s.replace(STEP_TOKEN,(m,fv,fu,n,mult)=>{
+    if(fv) return mark(freeQty(parseFloat(fv.replace(',','.'))*factor,fu));
+    const ing=r.ingredients[+n]; if(!ing) return '';
+    const q=niceQty(ing[0]*(mult?+mult:1),ing[1],factor,ing[3]);
+    return mark(fmtQty(q)+(ing[1]?' '+unitLabel(ing[1],q):''));
+  });
+}
+function stepMeta(r,i){ return (r.stepMeta&&r.stepMeta[i])||{}; }
+function stepSecs(r,i){ const m=r.stepMeta&&r.stepMeta[i]; return m?(m.timer||null):extractMinutes(r.steps[i]); }
+function fmtSecs(s){ if(s<60) return s+' s'; if(s<3600) return (s%60?Math.floor(s/60)+' min '+String(s%60).padStart(2,'0'):s/60+' min'); const h=Math.floor(s/3600),m=Math.round(s%3600/60); return h+' h'+(m?' '+String(m).padStart(2,'0'):''); }
+function stepExtras(m){ return `${m.mark?`<div class="stp-mark">${m.mark}</div>`:''}${m.why?`<details class="stp-why"><summary>Pourquoi ?</summary><div>${m.why}</div></details>`:''}`; }
 function stepsHtml(r,factor){
-  return r.steps.map((s,i)=>{ const secs=extractMinutes(s); return `<div class="stp"><b class="mono">${String(i+1).padStart(2,'0')}</b><div>${scaleStepText(s,factor)}${secs?`<div><button class="tm" data-timer="${secs}" data-label="Étape ${i+1}"><svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2M9 2h6" stroke-linecap="round"/></svg>${Math.round(secs/60)} min</button></div>`:''}</div></div>`; }).join('');
+  return r.steps.map((s,i)=>{ const secs=stepSecs(r,i), m=stepMeta(r,i); return `<div class="stp"><b class="mono">${String(i+1).padStart(2,'0')}</b><div>${stepText(r,s,factor)}${stepExtras(m)}${secs?`<div><button class="tm" data-timer="${secs}" data-label="Étape ${i+1}"><svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2M9 2h6" stroke-linecap="round"/></svg>${fmtSecs(secs)}</button></div>`:''}</div></div>`; }).join('');
 }
 /* quantité lisible après mise à l'échelle : grammes et ml arrondis à 5 ou 10,
    pièces et cuillères à la demi-unité (« 1,4 courgette » devient « 1½ courgette ») */
@@ -489,13 +510,8 @@ function roundQty(v,u){
 function niceQty(q,u,factor,aisle){ if(q==null) return null; const v=q*factor; const n=Math.abs(factor-1)<0.01?v:roundQty(v,u);
   return !u&&aisle==='Légumes & fruits'&&n>0?Math.max(1,Math.ceil(n-0.05)):n; }
 function servingsFor(r){ const cs=cookState[r.id]; return (cs&&cs.servings)||r.portions; }
-/* Taille des portions (réglage) : les plats d'origine laissaient trop de restes.
-   « Petites » = 30 % de moins, « Moyennes » = 15 % de moins. Les desserts et les
-   sauces ne bougent pas : un gâteau se fait pour son moule, une sauce au goût. */
-const PORTION_FACTOR={small:0.7,medium:0.85,normal:1};
-function portionFactor(r){ if(r&&(isDessert(r)||(r.tags||[]).includes('sauce'))) return 1; return PORTION_FACTOR[settings.portionSize]||1; }
-function portionLabel(){ return settings.portionSize==='small'?'petites portions':settings.portionSize==='medium'?'portions moyennes':''; }
-function scaleFactor(r){ return servingsFor(r)/r.portions*portionFactor(r); }
+/* Les quantités des recettes sont déjà calées (40 g de riz, 70 g de pâtes par personne) : seul le nombre de portions les fait varier. */
+function scaleFactor(r){ return servingsFor(r)/r.portions; }
 /* scaled quantity of an ingredient for current servings */
 function scaledQty(r, q){ if(q==null)return null; return q*scaleFactor(r); }
 /* price reference key for an ingredient name */
@@ -771,7 +787,7 @@ function recipeCard(r){
     <div class="tags">${tag}${warn}</div>
     <button class="tap" data-open="${r.id}" aria-label="${r.title}"></button>
     <button class="fav ${isFav(r.id)?'on':''}" data-fav aria-label="Favori">${heartSvg()}</button>
-    <div class="t">${r.title}<small>${r.time} min · ${mealsLabel(r.portions)}${protOf(r.id)&&!isDessert(r)?' · '+protOf(r.id)+' g prot.':''}</small></div>
+    <div class="t">${r.title}<small>${fmtTime(r.time)} · ${mealsLabel(r.portions)}${protOf(r.id)&&!isDessert(r)?' · '+protOf(r.id)+' g prot.':''}</small></div>
     <button class="pick" data-pick aria-label="${selection.has(r.id)?'Retirer de la semaine':'Ajouter à la semaine'}">${selection.has(r.id)?checkSvg():'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 5v14M5 12h14" stroke-linecap="round"/></svg>'}</button>`;
   card.querySelector('[data-open]').onclick=()=>openRecipeDetail(r.id);
   card.querySelector('[data-pick]').onclick=(e)=>{e.stopPropagation();toggleSelect(r.id);};
@@ -998,7 +1014,7 @@ function renderFridge(){
   ranked.forEach(({r,miss})=>{
     const row=document.createElement('div'); row.className='rw thumb';
     row.innerHTML=`${hasPhoto(r.id)?`<img class="th" src="${photoThumb(r.id)}" alt="" loading="lazy" onerror="${thumbFallback(r.id)}">`:`<div class="noph">${recipeEmoji(r)}</div>`}
-      <div class="b"><div class="t">${r.title}</div><div class="m ${miss.length?'warn':'ok'}">${r.time} min · ${miss.length?'il manque '+miss.join(', '):'tout est en stock'}</div></div>
+      <div class="b"><div class="t">${r.title}</div><div class="m ${miss.length?'warn':'ok'}">${fmtTime(r.time)} · ${miss.length?'il manque '+miss.join(', '):'tout est en stock'}</div></div>
       <button class="go" data-pick>${selection.has(r.id)?'✓':'+'}</button>`;
     row.querySelector('.b').onclick=()=>openRecipeDetail(r.id);
     row.querySelector('[data-pick]').onclick=(e)=>{e.stopPropagation();toggleSelect(r.id);};
@@ -1325,7 +1341,7 @@ function renderWeek(){
     const row=document.createElement('div'); row.className='rw thumb';
     const state=pct>0?`<span style="color:var(--accT);font-weight:600">${pct} % fait</span>`:(miss?(miss.length?`<span class="warn" style="color:var(--warn)">${miss.length} article${miss.length>1?'s':''} manque${miss.length>1?'nt':''}</span>`:'<span style="color:var(--ok)">tout est en stock</span>'):mealsLabel(servingsFor(r)));
     row.innerHTML=`${hasPhoto(id)?`<img class="th" src="${photoThumb(id)}" alt="" loading="lazy" onerror="${thumbFallback(id)}">`:`<div class="noph">${recipeEmoji(r)}</div>`}
-      <div class="b"><div class="t">${r.title}</div><div class="m">${r.time} min · ${state}</div></div>
+      <div class="b"><div class="t">${r.title}</div><div class="m">${fmtTime(r.time)} · ${state}</div></div>
       <button class="go" data-cook>Cuisiner</button>`;
     row.querySelector('[data-cook]').onclick=e=>{e.stopPropagation();openCook(id);};
     row.querySelector('.b').onclick=()=>openRecipeDetail(id);
@@ -1338,6 +1354,24 @@ function renderWeek(){
 /* ---------- COOK ---------- */
 let currentCook=null;
 /* ---- recipe preview / detail sheet ---- */
+function fmtTime(m){ if(!m) return ''; if(m<60) return m+' min'; const h=Math.floor(m/60), r=m%60; return h+' h'+(r?' '+String(r).padStart(2,'0'):''); }
+/* nom accordé à la quantité affichée : « 2 poivrons », « 1 carotte » (avant « de » ou une parenthèse seulement) */
+function itemFor(item,q,u){
+  if(u||q==null) return item;
+  const m=item.match(/^([^(]*?)(\s+(?:de|d'|d’|à|au|en|\().*)?$/); if(!m) return item;
+  const conv=q>=2?(w=>/[sx]$/.test(w)?w:/eau$/.test(w)?w+'x':w+'s'):(w=>/eaux$/.test(w)?w.slice(0,-1):/s$/.test(w)&&w.length>3?w.slice(0,-1):w);
+  return m[1].split(' ').map(conv).join(' ')+(m[2]||'');
+}
+/* Résumé de la fiche façon Marmiton : temps détaillés, difficulté, coût, ce qu'il faut prévoir */
+function factsHtml(r){
+  if(r.prep==null) return r.advance?`<div class="advance"><b>À prévoir</b>${r.advance}</div>`:'';
+  const cell=(v,l)=>`<div><b>${v}</b><span>${l}</span></div>`;
+  return `<div class="facts">${cell(fmtTime(r.time),'total')}${r.prep?cell(fmtTime(r.prep),'préparation'):''}${r.cook?cell(fmtTime(r.cook),'cuisson'):''}${r.rest?cell(fmtTime(r.rest),'repos'):''}${r.difficulty?cell(r.difficulty,r.cost?r.cost.toLowerCase():''):''}</div>${r.advance?`<div class="advance"><b>À prévoir</b>${r.advance}</div>`:''}`;
+}
+function toolsHtml(r){ return r.tools&&r.tools.length?`<div class="sec" style="padding-left:0;padding-right:0"><span>Ustensiles</span></div><div class="tools">${r.tools.join(' · ')}</div>`:''; }
+const ING_KEY='cd_ingChecks'; let ingChecks=load(ING_KEY,{});
+function ingChecked(id,i){ return !!(ingChecks[id]&&ingChecks[id].includes(i)); }
+function toggleIng(id,i){ const a=ingChecks[id]||[]; ingChecks[id]=a.includes(i)?a.filter(x=>x!==i):[...a,i]; if(!ingChecks[id].length) delete ingChecks[id]; save(ING_KEY,ingChecks); }
 function openRecipeDetail(id){
   const r=byId(id); if(!r)return;
   const inWeek=selection.has(id), made=lastMade(id);
@@ -1348,13 +1382,13 @@ function openRecipeDetail(id){
       <button class="cb r ${isFav(id)?'on':''}" id="rdFav" aria-label="Favori">${heartSvg()}</button>
     </div>
     <div class="rd">
-      <div class="kic">${kicker(r)}${r.time?' · '+r.time+' min':''}${r.custom?' · modifiée':''}</div>
+      <div class="kic">${kicker(r)}${r.prep==null&&r.time?' · '+fmtTime(r.time):''}${r.custom?' · modifiée':''}</div>
       <h2>${r.title}</h2>
       <div class="rate">${starsHtml(id,{size:'sm',interactive:true})}<span id="rdRateLbl">${getRating(id)?'Ta note':'Note cette recette'}</span>${made?`<span style="margin-left:auto;color:var(--ok);font-weight:600">Fait ${daysSince(made)===0?"aujourd'hui":daysSince(made)===1?'hier':'il y a '+daysSince(made)+' j'}</span>`:''}</div>
-      <div class="meta"><div class="stepper"><button id="rdMinus" aria-label="Moins">−</button><span id="rdServ"></span><button id="rdPlus" aria-label="Plus">+</button></div><span id="rdMeals"></span></div>
+      ${factsHtml(r)}<div class="meta"><div class="stepper"><button id="rdMinus" aria-label="Moins">−</button><span id="rdServ"></span><button id="rdPlus" aria-label="Plus">+</button></div><span id="rdMeals"></span></div>
       <div class="btns"><button class="btn ${inWeek?'sub':'pri'}" id="rdToggle">${inWeek?'✓ Dans la semaine':'+ Dans la semaine'}</button><button class="btn" id="rdCook"><svg viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 0-7 7c0 3 2 4 2 7h10c0-3 2-4 2-7a7 7 0 0 0-7-7zM7 20h10M9 22h6" stroke-linecap="round" stroke-linejoin="round"/></svg>Cuisiner</button></div>
       <div class="sec" style="padding-left:0;padding-right:0"><span>Ingrédients</span><span id="rdMiss"></span></div>
-      <div class="grp" id="rdIngList"></div>
+      <div class="grp" id="rdIngList"></div>${toolsHtml(r)}
       <div id="rdCost" style="font-size:0.8125rem;color:var(--mut);padding:8px 2px 0"></div>
       <div class="sec" style="padding-left:0;padding-right:0"><span>Préparation</span><span>${r.steps.length} étapes</span></div>
       <div class="grp" id="rdSteps" style="padding:2px 12px">${stepRows}</div>
@@ -1370,18 +1404,13 @@ function openRecipeDetail(id){
   openSheet(); bindStars(sh);
   function renderIng(){
     const miss=missingFor(r); const missSet=new Set(miss.map(m=>singular(m)));
-    const rows=r.ingredients.map(([q,u,item,aisle])=>{ const sq=niceQty(q,u,scaleFactor(r),aisle); const qs=sq!=null?fmtQty(sq)+(u?' '+unitLabel(u,sq):''):(u||''); const base=baseIngredientName(item); const st=base&&!isStaple(base)?(missSet.has(singular(base))?'<span class="miss">manque</span>':(pantry.length?'<span class="have">en stock</span>':'')):''; const nz=settings.nz?nzName(item):''; return `<div class="ing-row"><span class="tile">${pantryEmo(item)}</span><span class="n">${qs?`<b class="q">${qs}</b> `:''}${item}${nz?`<small>${nz}</small>`:''}</span>${st}</div>`; }).join('');
+    const rows=r.ingredients.map(([q,u,item,aisle],ix)=>{ const sq=niceQty(q,u,scaleFactor(r),aisle); const qs=sq!=null?fmtQty(sq)+(u?' '+unitLabel(u,sq):''):(u||''); const base=baseIngredientName(item); const st=base&&!isStaple(base)?(missSet.has(singular(base))?'<span class="miss">manque</span>':(pantry.length?'<span class="have">en stock</span>':'')):''; const nz=settings.nz?nzName(item):''; return `<div class="ing-row ing-chk${ingChecked(id,ix)?' on':''}" data-ix="${ix}" role="checkbox" aria-checked="${ingChecked(id,ix)}" tabindex="0"><span class="box" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="tile">${pantryEmo(item)}</span><span class="n">${qs?`<b class="q">${qs}</b> `:''}${itemFor(item,sq,u)}${nz?`<small>${nz}</small>`:''}</span>${st}</div>`; }).join('');
     $('#rdIngList').innerHTML=rows;
+    $$('#rdIngList .ing-chk').forEach(el=>{ const go=()=>{ toggleIng(id,+el.dataset.ix); const on=ingChecked(id,+el.dataset.ix); el.classList.toggle('on',on); el.setAttribute('aria-checked',on); }; el.onclick=go; el.onkeydown=e=>{ if(e.key===' '||e.key==='Enter'){ e.preventDefault(); go(); } }; });
     const stp=$('#rdSteps'); if(stp){ stp.innerHTML=stepsHtml(r,scaleFactor(r)); stp.querySelectorAll('.tm').forEach(b=>b.onclick=()=>startTimer(+b.dataset.timer,b.dataset.label)); }
     $('#rdServ').textContent=servingsFor(r)+' portion'+(servingsFor(r)>1?'s':'');
-    $('#rdMeals').textContent=mealsLabel(servingsFor(r))+' pour '+settings.persons+' pers.'+(portionFactor(r)<1?' · '+portionLabel():'');
+    $('#rdMeals').textContent=mealsLabel(servingsFor(r))+' pour '+settings.persons+' pers.';
     $('#rdMiss').textContent=pantry.length?(miss.length?miss.length+' manque'+(miss.length>1?'nt':''):'tout est en stock'):'';
-    (function(){
-      const box=$('#rdProt'); if(!box)return;
-      const p=protOf(r.id), c=protComplement(r.id);
-      if(!p){box.innerHTML='';return}
-      box.innerHTML=`<div class="note prot"><div><b>Protéines</b>≈ ${p} g par portion. ${c?`Pour approcher ${PROT_CIBLE} g sur ce repas, il manque environ <strong>${c.manque} g</strong> : ${c.choix.map(x=>x.n+' (+'+x.p+' g)').join(', ')}.`:(PROT_DESSERT[r.id]?'Un dessert, on ne compte pas dessus.':'Ce plat couvre bien un repas principal.')}</div></div>`;
-    })();
     const c=recipeCost(r);
     if(c.known>0){ $('#rdCost').innerHTML=`≈ ${fmtPrice(c.perServing)} par portion · ${fmtPrice(c.total)} au total${c.unknown?` · ${c.unknown} sans prix`:''} · <button style="color:var(--accT);font-weight:600" id="rdAddPrices">modifier les prix</button>`; }
     else { $('#rdCost').innerHTML=`<button style="color:var(--accT);font-weight:600" id="rdAddPrices">Estimer le coût (saisir les prix)</button>`; }
@@ -1435,7 +1464,9 @@ function openPriceSheet(id){
   };
 }
 function ensureCookState(id){ const r=byId(id); if(!cookState[id])cookState[id]={servings:r.portions,steps:{}}; const cs=cookState[id]; if(cs.servings==null)cs.servings=cs.portions||r.portions; delete cs.portions; return cs; }
-function extractMinutes(t){ let m=t.match(/(\d+)\s*(?:à|-)\s*(\d+)\s*min/); if(m)return(+m[2])*60; m=t.match(/(\d+)\s*min/); if(m)return(+m[1])*60; m=t.match(/(\d+)\s*h/); if(m)return(+m[1])*3600; return null; }
+function extractMinutes(t){
+  const clean=t.replace(/\d+\s*(?:à\s*\d+\s*)?(?:min|h)\w*\s*(?:avant|de plus|à l.avance)/gi,'').replace(/(^|[^\d\s])\s*à \d+\s*min\w*/gi,'$1');
+  let m=clean.match(/(\d+)\s*(?:à|-)\s*(\d+)\s*min/); if(m)return(+m[2])*60; m=clean.match(/(\d+)\s*min/); if(m)return(+m[1])*60; m=clean.match(/(\d+)\s*h\b/); if(m)return(+m[1])*3600; m=clean.match(/(\d+)\s*secondes?/); if(m&&+m[1]>=10)return +m[1]; return null; }
 /* l'écran reste allumé pendant qu'on cuisine (iOS 16.4+, Android) */
 let wakeLock=null;
 async function keepAwake(on){ try{ if(on&&'wakeLock' in navigator){ wakeLock=await navigator.wakeLock.request('screen'); } else if(!on&&wakeLock){ await wakeLock.release(); wakeLock=null; } }catch(e){} }
@@ -1444,7 +1475,7 @@ function openCook(id){ keepAwake(true); currentCook=id; ensureCookState(id); $('
 function closeCook(){ keepAwake(false); $('#cookModal').classList.remove('open'); document.body.style.overflow=''; currentCook=null; window._splitMode=false; }
 function renderCookBody(){
   const r=byId(currentCook),cs=cookState[currentCook],factor=scaleFactor(r);
-  $('#cookMeta').textContent=r.time+' min · '+cs.servings+' portions · '+mealsLabel(cs.servings)+(portionFactor(r)<1?' · '+portionLabel():'');
+  $('#cookMeta').textContent=fmtTime(r.time)+' · '+cs.servings+' portions · '+mealsLabel(cs.servings);
   const anyAssigned=Object.values(cs.steps).some(s=>s&&s.assign);
   const doneCount=Object.values(cs.steps).filter(s=>s&&s.done).length,allDone=doneCount===r.steps.length;
   let html=`<div class="cook-tools">
@@ -1453,16 +1484,16 @@ function renderCookBody(){
     <button class="tbtn" id="shareBtn"><svg viewBox="0 0 24 24"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8M16 6l-4-4-4 4M12 2v13" stroke-linecap="round" stroke-linejoin="round"/></svg>Partager</button>
   </div>`;
   html+=`<div class="sec" style="padding-left:0;padding-right:0"><span>Ingrédients</span></div><div class="grp">`;
-  r.ingredients.forEach(([q,u,item,aisle])=>{ const sc=niceQty(q,u,factor,aisle); const qs=sc!=null?fmtQty(sc)+(u?' '+unitLabel(u,sc):''):(u||''); html+=`<div class="ing-row"><span class="tile">${pantryEmo(item)}</span><span class="n">${qs?`<b class="q">${qs}</b> `:''}${item}</span></div>`; });
+  r.ingredients.forEach(([q,u,item,aisle])=>{ const sc=niceQty(q,u,factor,aisle); const qs=sc!=null?fmtQty(sc)+(u?' '+unitLabel(u,sc):''):(u||''); html+=`<div class="ing-row"><span class="tile">${pantryEmo(item)}</span><span class="n">${qs?`<b class="q">${qs}</b> `:''}${itemFor(item,sc,u)}</span></div>`; });
   html+=`</div>`;
   if(anyAssigned) html+=`<div class="legend" style="margin-top:10px"><span><span class="sw" style="background:var(--acc)"></span>Moi</span><span><span class="sw" style="background:var(--warn)"></span>L’autre</span></div>`;
   html+=`<div class="sec" style="padding-left:0;padding-right:0"><span>Préparation</span><span class="mono">${doneCount}/${r.steps.length}</span></div>`;
   r.steps.forEach((s,i)=>{
-    const st=cs.steps[i]||{},secs=extractMinutes(s);
+    const st=cs.steps[i]||{},secs=stepSecs(r,i);
     const badge=st.assign?`<span class="mine ${st.assign==='b'?'b':''}">${st.assign==='a'?'Moi':'L’autre'}</span>`:'';
     html+=`<div class="step ${st.done?'done':''}" data-step="${i}"><div class="num">${i+1}</div>
-      <div class="step-body"><div class="step-txt">${scaleStepText(s,factor)}</div>${badge}
-      ${secs?`<div><button class="tm" style="display:inline-flex;align-items:center;gap:4px;font-size:0.75rem;color:var(--accT);font-weight:600;background:var(--accW);padding:4px 9px;border-radius:999px;margin-top:6px" data-timer="${secs}" data-label="Étape ${i+1}"><svg viewBox="0 0 24 24" style="width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2M9 2h6" stroke-linecap="round"/></svg>${Math.round(secs/60)} min</button></div>`:''}</div>
+      <div class="step-body"><div class="step-txt">${stepText(r,s,factor)}</div>${stepExtras(stepMeta(r,i))}${badge}
+      ${secs?`<div><button class="tm" style="display:inline-flex;align-items:center;gap:4px;font-size:0.75rem;color:var(--accT);font-weight:600;background:var(--accW);padding:4px 9px;border-radius:999px;margin-top:6px" data-timer="${secs}" data-label="Étape ${i+1}"><svg viewBox="0 0 24 24" style="width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2M9 2h6" stroke-linecap="round"/></svg>${fmtSecs(secs)}</button></div>`:''}</div>
       <div class="cbtn"><div class="chk ${st.done?'d':''}" style="${st.done?'background:var(--ok);border-color:var(--ok)':''}"><svg viewBox="0 0 24 24" style="${st.done?'opacity:1':''}"><path d="M20 6 9 17l-5-5" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div></div>`;
   });
   html+=`${r.tip?`<div class="note tip" style="margin-top:10px"><div><b>Astuce</b>${r.tip}</div></div>`:''}${r.light?`<div class="note light" style="margin-top:10px"><div><b>Version légère</b>${r.light}</div></div>`:''}
@@ -1497,9 +1528,9 @@ function openShareSheet(){
   const r=byId(currentCook),cs=cookState[currentCook];
   const assigned=r.steps.map((s,i)=>({s,i,a:(cs.steps[i]||{}).assign})).filter(x=>x.a==='b');
   const forOther=assigned.length?assigned:r.steps.map((s,i)=>({s,i}));
-  const payload={t:r.title,p:cs.servings,steps:forOther.map(x=>x.s)};
+  const shareF=scaleFactor(r); const payload={t:r.title,p:cs.servings,steps:forOther.map(x=>stepText(r,x.s,shareF,true))};
   const link=buildShareLink(payload);
-  const plain=`${r.title} : mes étapes\n\n`+forOther.map((x,k)=>`${k+1}. ${x.s}`).join('\n');
+  const plain=`${r.title} : mes étapes\n\n`+forOther.map((x,k)=>`${k+1}. ${stepText(r,x.s,shareF,true)}`).join('\n');
   const sh=$('#sheet');
   sh.innerHTML=`<div class="grab"></div>
     <div class="sh-head"><h3>Partager les étapes</h3><button class="sh-x" id="shClose" aria-label="Fermer"><svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12" stroke-linecap="round"/></svg></button></div>
@@ -1522,7 +1553,7 @@ function fbCopy(t){ const a=document.createElement('textarea'); a.value=t; docum
 
 /* consume pantry items used by a recipe; returns array of consumed names */
 function consumePantryFor(r, portions){
-  const factor = (portions && r.portions ? portions/r.portions : 1)*portionFactor(r);
+  const factor = (portions && r.portions ? portions/r.portions : 1);
   const used=[];
   r.ingredients.forEach(([q,u,item])=>{
     const base=baseIngredientName(item); if(!base||isStaple(base))return;
@@ -1552,7 +1583,7 @@ function markDone(id){
   const used=consumePantryFor(r, portions);
   // remove from the week and reset its cook progress
   selection.delete(id); save(LS.selection,[...selection]);
-  if(cookState[id])cookState[id].steps={}; save(LS.cookState,cookState);
+  if(cookState[id]){ cookState[id].steps={}; delete cookState[id].cur; } save(LS.cookState,cookState); delete ingChecks[id]; save(ING_KEY,ingChecks);
   // its bought items are consumed: clear from shopping tracking
   touch();
   closeCook();
@@ -1755,7 +1786,7 @@ function openRecipeForm(existing){
     <div class="frow"><div class="two"><div><label>Portions</label><input id="rfPortions" type="number" inputmode="numeric" min="1" value="${e.portions||4}"></div><div><label>Temps (min)</label><input id="rfTime" type="number" inputmode="numeric" min="1" value="${e.time||30}"></div></div></div>
     <div class="frow"><label>Tags (virgules)</label><input id="rfTags" value="${e.tags?e.tags.join(', '):'végé'}" placeholder="végé, rapide, four"></div>
     <div class="frow"><label>Ingrédients</label><textarea id="rfIng" placeholder="1 boîte de pois chiches&#10;2 carottes&#10;160 g de riz">${e.ingredients?e.ingredients.map(fmtIngLine).join('\n'):''}</textarea></div>
-    <div class="frow"><label>Étapes</label><textarea id="rfSteps" placeholder="Cuire le riz.&#10;Faire revenir l'oignon.">${e.steps?e.steps.join('\n'):''}</textarea></div>
+    <div class="frow"><label>Étapes</label><textarea id="rfSteps" placeholder="Cuire le riz.&#10;Faire revenir l'oignon.">${e.steps?e.steps.map(s=>stepText(e,s,1,true)).join('\n'):''}</textarea></div>
     <div class="frow"><label>Astuce (optionnel)</label><input id="rfTip" value="${e.tip?e.tip.replace(/"/g,'&quot;'):''}" placeholder="Se réchauffe très bien"></div>
     <div class="btns"><button class="btn pri" id="rfSave">${existing?'Enregistrer':'Ajouter la recette'}</button></div>
     </div>`;
@@ -1772,7 +1803,7 @@ function saveRecipeForm(existing){
   const tip=$('#rfTip').value.trim();
   if(!ingredients.length||!steps.length){toast('Ajoute au moins un ingrédient et une étape');return;}
   if(existing){ const idx=customRecipes.findIndex(r=>r.id===existing.id);
-    const upd={...existing,title,portions,time,tags,ingredients,steps,tip,custom:true};
+    const upd={...existing,title,portions,time,tags,ingredients,steps,tip,custom:true}; delete upd.stepMeta; if(time!==existing.time){ delete upd.prep; delete upd.cook; delete upd.rest; }
     if(existing.dessert||(existing.tags||[]).includes('dessert')||tags.includes('dessert')) upd.dessert=true;
     if(idx>=0)customRecipes[idx]=upd; else{upd.id=existing.id;customRecipes.push(upd);} toast('Recette mise à jour');
   } else { customRecipes.push({id:'c'+Date.now().toString(36),title,portions,time,tags,ingredients,steps,tip,custom:true}); toast('Recette ajoutée'); }
@@ -1792,7 +1823,7 @@ function startTimer(secs,label){
   $('#tpLbl').textContent=timer.label; updateTimerDisplay(); $('#timerPop').classList.add('open'); $('#tpTime').classList.remove('done'); $('#tpToggle').textContent='Pause';
   clearInterval(timer.int);
   timer.int=setInterval(()=>{ if(!timer.running)return; timer.secs--; updateTimerDisplay(); if(timer.secs<=0){clearInterval(timer.int);timer.running=false;timerDone();} },1000);
-  toast('Minuteur lancé : '+Math.round(secs/60)+' min');
+  toast('Minuteur lancé : '+fmtSecs(secs));
 }
 function updateTimerDisplay(){ const m=Math.floor(Math.max(0,timer.secs)/60),s=Math.max(0,timer.secs)%60; $('#tpTime').textContent=String(m).padStart(2,'0')+':'+String(s).padStart(2,'0'); }
 function timerDone(){
@@ -1839,8 +1870,6 @@ function renderSettingsSheet(){
     <div class="sec"><span>Cuisine</span></div>
     <div class="grp" style="margin:0 16px">
       <div class="rw"><span class="ico" style="background:var(--acc);color:var(--accFg)">${settings.persons}</span><span>Personnes à la maison</span><div class="stepper" style="margin-left:auto"><button id="persMinus" aria-label="Moins">−</button><span id="persVal">${settings.persons}</span><button id="persPlus" aria-label="Plus">+</button></div></div>
-      <div class="rw"><span class="ico" style="background:#A86400">¾</span><span>Portions</span>${segHtml('segPortion',[['small','Petites'],['medium','Moyennes'],['normal','Normales']],settings.portionSize||'small')}</div>
-      <div class="rw"><span class="sh-sub" style="padding:0">Petites : 30 % de moins que la recette d’origine, Moyennes : 15 % de moins. Ça joue sur les quantités affichées et sur les courses, sauf pour les desserts et les sauces.</span></div>
       <div class="rw"><span class="ico" style="background:#2C6FBF">NZ</span><span>Noms anglais en rayon</span><button class="tog ${settings.nz?'on':''}" id="togNz" role="switch" aria-label="Noms anglais en rayon" aria-checked="${!!settings.nz}"></button></div>
       <div class="rw"><span class="ico" style="background:#C77800"><svg viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M4 11h16" stroke-linecap="round"/></svg></span><span>Masquer dans les courses ce qui est en stock</span><button class="tog ${settings.hidePantry?'on':''}" id="togHide" role="switch" aria-label="Masquer dans les courses ce qui est en stock" aria-checked="${!!settings.hidePantry}"></button></div>
       <div class="rw" id="rowNew" style="cursor:pointer"><span class="ico" style="background:#5856D6"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" stroke-linecap="round"/></svg></span><span>Nouvelle recette</span><span class="chev">›</span></div>
@@ -1854,7 +1883,6 @@ function renderSettingsSheet(){
   tg('togBig','bigText'); tg('togNz','nz',()=>{renderShop();}); tg('togHide','hidePantry',()=>{renderShop();});
   const pers=d=>{ settings.persons=Math.min(8,Math.max(1,(settings.persons||2)+d)); saveSettings(); $('#persVal').textContent=settings.persons; renderRecipes(); renderWeek(); };
   $('#persMinus').onclick=()=>pers(-1); $('#persPlus').onclick=()=>pers(1);
-  $('#segPortion').querySelectorAll('button').forEach(b=>b.onclick=()=>{ settings.portionSize=b.dataset.v; saveSettings(); touch(); $('#segPortion').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b)); renderRecipes(); renderWeek(); renderShop(); });
   $('#rowNew').onclick=()=>openRecipeForm(null);
   $('#pcOpen2').onclick=openPhotoCredits;
   const body=$('#acBody');

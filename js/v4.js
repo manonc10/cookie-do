@@ -51,7 +51,6 @@ function renderCourseSeg(){
 
 /* ================= CARTES ================= */
 /* 330 min -> « 5 h 30 » (desserts qui passent au frais) */
-function fmtTime(m){ if(!m) return ''; if(m<60) return m+' min'; const h=Math.floor(m/60), r=m%60; return h+' h'+(r?' '+String(r).padStart(2,'0'):''); }
 function cardMeta(r,small){
   const veg=(r.tags||[]).includes('végé')&&!isDessert(r)&&!isExtra(r)?'Végé · ':'';   // l'étiquette Végé vit dans le texte, plus sur la photo
   if(isSauce(r)) return `${fmtTime(r.time)} · ${r.yield||mealsLabel(r.portions)}`;

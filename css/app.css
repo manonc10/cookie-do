@@ -547,3 +547,41 @@ body.boot #courseSeg,body.boot #quickChips,body.boot #rails,body.boot #view-reci
 .nt-tag.run{background:var(--sur3);color:var(--fg)}
 .tn-when{color:var(--accT);font-weight:600;font-size:0.9375rem;padding:6px 0 0;position:relative}
 .tn-when::after{content:"";position:absolute;inset:-8px}
+
+/* ======= Cookie Do 5 : fiche et pas à pas ======= */
+.facts{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;background:var(--sur);border-radius:var(--r);box-shadow:var(--sh);padding:10px 2px;margin:0 0 10px;text-align:center}
+.facts>div{min-width:0;padding:0 3px}.facts>div+div{border-left:1px solid var(--lnS)}
+.facts b{display:block;font-size:0.875rem;font-weight:700;color:var(--fg);font-variant-numeric:tabular-nums}
+.facts span{display:block;font-size:0.6875rem;color:var(--mut);line-height:1.2;margin-top:1px}
+.advance{background:var(--warnW);color:var(--warn);border-radius:var(--r);padding:10px 12px;font-size:0.875rem;line-height:1.35;margin:0 0 10px}
+.advance b{display:block;font-size:0.75rem;text-transform:uppercase;letter-spacing:.04em;margin-bottom:1px}
+.tools{background:var(--sur);border-radius:var(--r);box-shadow:var(--sh);padding:10px 12px;font-size:0.875rem;color:var(--fg2);line-height:1.4}
+.ing-chk{cursor:pointer}.ing-chk .box{flex:0 0 22px;height:22px;border:1.5px solid var(--mut);border-radius:6px;display:flex;align-items:center;justify-content:center}
+.ing-chk .box svg{width:15px;height:15px;fill:none;stroke:#fff;stroke-width:3;opacity:0}
+.ing-chk.on .box{background:var(--ok);border-color:var(--ok)}.ing-chk.on .box svg{opacity:1}
+.ing-chk.on .n{color:var(--mut);text-decoration:line-through}.ing-chk.on .n .q,.ing-chk.on .n b{color:inherit}
+.ing-chk .tile{flex:none}
+.ing-chk .n b{color:var(--accT)}
+.rd .ing-row+.ing-row::before,.ing-chk+.ing-chk::before{left:88px}
+b.sq{color:var(--accT);font-weight:700;font-size:inherit;padding:0;flex:none}
+.stp-mark{font-size:0.8125rem;color:var(--mut);margin-top:3px}
+.stp-why{margin-top:5px;font-size:0.8125rem;color:var(--mut)}
+.stp-why summary{display:inline-block;cursor:pointer;background:var(--bg);border-radius:999px;padding:3px 9px;font-size:0.75rem;font-weight:600;list-style:none;color:var(--mut)}
+.stp-why summary::-webkit-details-marker{display:none}
+.stp-why[open] summary{margin-bottom:5px}
+.stp-why>div{line-height:1.4}
+.finish{position:static;margin:14px 0 0;max-width:none}
+.ck-bar{height:4px;background:var(--ln);border-radius:2px;margin:0 0 16px;overflow:hidden}.ck-bar i{display:block;height:100%;background:var(--acc);transition:width .2s}
+.ck-body{display:flex;flex-direction:column;gap:14px;min-height:calc(100dvh - 300px)}
+.ck-head{display:flex;justify-content:space-between;align-items:center;gap:10px}.ck-head h3{margin:0;font-size:1.25rem}
+.ck-lab{font-size:0.75rem;text-transform:uppercase;letter-spacing:.04em;color:var(--mut);margin-bottom:-8px}
+.ck-txt{font-size:1.4rem;line-height:1.32;font-weight:500;color:var(--fg)}
+.ck-ings{display:flex;flex-wrap:wrap;gap:6px}.ck-ings span{background:var(--sur);box-shadow:var(--sh);border-radius:999px;padding:5px 11px;font-size:0.875rem}.ck-ings b{color:var(--accT)}
+.ck-mark{font-size:0.9375rem;color:var(--fg2)}
+.ck-timer{background:var(--accW);color:var(--accT);border-radius:var(--r);padding:12px;font-weight:600;font-size:0.9375rem;width:100%;text-align:center}
+.ck-timer b{display:block;font-size:1.75rem;line-height:1.2;font-variant-numeric:tabular-nums}
+.ck-why summary{background:var(--sur)}.ck-why{font-size:0.9375rem}
+.ck-all{display:block;margin:14px auto 0;color:var(--accT);font-weight:600;font-size:0.875rem;min-height:44px;padding:0 10px}
+.ck-nav{position:fixed;left:0;right:0;bottom:0;display:grid;grid-template-columns:1fr 2fr;gap:8px;padding:10px 16px calc(10px + var(--safe-bot));background:var(--bg);border-top:1px solid var(--lnS);z-index:61;max-width:640px;margin:0 auto}
+.ck-nav .btn{min-height:50px}
+.wk-adv{font-size:0.75rem;color:var(--warn);font-weight:600;margin-top:2px}
