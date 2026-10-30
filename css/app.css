@@ -623,3 +623,32 @@ b.sq{color:var(--accT);font-weight:700;font-size:inherit;padding:0;flex:none}
 /* les messages passent au-dessus de l'écran quand des minuteurs occupent le bas, et ne sont plus coupés */
 .toast{white-space:normal;width:max-content;max-width:calc(100vw - 32px)}
 body.has-timers .toast{top:calc(var(--safe-top) + 10px);bottom:auto}
+
+/* ======= Cookie Do 5.2 : défilement stable ======= */
+/* la barre du haut ne change plus de hauteur : le titre reste accroché, le sous-titre part avec la page */
+.hdr{display:contents}
+.hdr .top{position:sticky;top:0;z-index:20;background:var(--bg);padding:calc(var(--safe-top) + 8px) 16px 6px}
+.hdr .sub{padding:0 16px 8px;margin-top:0}
+.hdr h1{transition:transform .18s ease;transform-origin:left bottom}
+body.scrolled .hdr{background:none;backdrop-filter:none;-webkit-backdrop-filter:none;border:0}
+body.scrolled .hdr h1{font-size:2.25rem;transform:scale(.62)}
+body.scrolled .hdr .sub{display:block}
+body.scrolled .view.active .hdr .top{box-shadow:0 1px 0 var(--ln)}
+@media (min-width:640px){ .hdr .top,.hdr .sub{padding-left:calc(50% - 304px);padding-right:calc(50% - 304px)} }
+/* pas de flou sur les barres : c'est lui qui fait scintiller Safari au-dessus des photos */
+.tabbar{background:var(--bg);backdrop-filter:none;-webkit-backdrop-filter:none}
+.modal-top{background:var(--bg);backdrop-filter:none;-webkit-backdrop-filter:none}
+.rd-hero .cb{backdrop-filter:none;-webkit-backdrop-filter:none;background:rgba(0,0,0,.55)}
+/* cartes : moins à peindre, et les cartes hors de l'écran ne sont pas dessinées */
+.gcard .ph-wrap img,.gcard .noph{box-shadow:none}
+.gcard:active .ph-wrap img{transform:none}
+.gcard .ph-wrap img{transition:none}
+.ggrid>.gcard{content-visibility:auto;contain-intrinsic-size:auto 230px}
+.swrow .rw{will-change:auto}
+/* rangées horizontales : elles ne retiennent plus le geste vertical */
+.rail-s{overflow-y:hidden;scroll-snap-type:x proximity;padding-top:6px;overscroll-behavior-x:contain}
+.chips,.pair-s,.seg-course{overflow-y:hidden}
+/* fiche : trois boutons tiennent dans la largeur, plus de glissement de côté */
+.sheet{overflow-x:hidden}
+.btns:has(#rdMine){flex-wrap:wrap}
+#rdMine{flex:1 1 100%;order:3}
