@@ -139,7 +139,7 @@ const Sync = (()=> {
 
 
 /* ============ Cookie Do · app logic ============ */
-const APP_VERSION='5.0';
+const APP_VERSION='5.1';
 const LS = {
   custom:'mm_custom', selection:'mm_selection', shopChecked:'mm_shopChecked',
   history:'mm_history', cookState:'mm_cookState', fridge:'mm_fridge', pantry:'mm_pantry',
@@ -660,17 +660,24 @@ const TAGS_DEJA_COUVERTS=new Set(['végé','poulet','poisson','viande','boeuf','
 function activeFilterCount(){
   return (courseFilter!=='all'?1:0)+(dietFilter?1:0)+(quickFilter?1:0)+(activeTag?1:0)+(sortMode!=='default'?1:0);
 }
+const DIFFS=[['Facile','Facile'],['Moyen','Moyen'],['Difficile','Difficile']];
+const TOOLS_OUT=[['mixeur','Sans mixeur'],['batteur','Sans batteur'],['moule','Sans moule']];
+const TOOL_RE={mixeur:/mixeur|blender|robot/i,batteur:/batteur/i,moule:/moule/i};
+let diffFilter=null, toolFilter=null;
 function filterLabels(){
   const out=[];
   if(courseFilter!=='all') out.push(['course',(COURSES.find(c=>c[0]===courseFilter)||[])[1]]);
   if(dietFilter) out.push(['diet',(DIETS.find(c=>c[0]===dietFilter)||[])[1]]);
   if(quickFilter) out.push(['qf',(ENVIES.find(c=>c[0]===quickFilter)||[])[1]]);
+  if(diffFilter) out.push(['diff',diffFilter]);
+  if(toolFilter) out.push(['tool',(TOOLS_OUT.find(c=>c[0]===toolFilter)||[])[1]]);
   if(activeTag) out.push(['tag','#'+activeTag]);
   if(sortMode!=='default') out.push(['tri',(TRIS.find(c=>c[0]===sortMode)||[])[1]]);
   return out;
 }
 function clearFilter(kind){
   if(kind==='course')courseFilter='all'; else if(kind==='diet')dietFilter=null;
+  else if(kind==='diff')diffFilter=null; else if(kind==='tool')toolFilter=null;
   else if(kind==='qf')quickFilter=null; else if(kind==='tag')activeTag=null;
   else if(kind==='tri')sortMode='default';
 }
@@ -724,6 +731,8 @@ function openFilterSheet(){
     ${group('Type de plat',COURSES,courseFilter,'course')}
     ${group('Ingrédient principal',DIETS,dietFilter,'diet')}
     ${group('Envie du jour',ENVIES,quickFilter,'qf')}
+    ${group('Difficulté',DIFFS,diffFilter,'diff')}
+    ${group('Ustensiles',TOOLS_OUT,toolFilter,'tool')}
     ${group('Tags',tagUniverse().filter(t=>!TAGS_DEJA_COUVERTS.has(t)).map(t=>[t,'#'+t]),activeTag,'tag')}
     ${group('Trier par',TRIS,sortMode,'tri')}
     <div class="fs-foot">
@@ -733,7 +742,7 @@ function openFilterSheet(){
   const refresh=()=>{
     sh.querySelectorAll('.fopt').forEach(b=>{
       const k=b.dataset.kind,v=b.dataset.v;
-      const cur=k==='course'?courseFilter:k==='diet'?dietFilter:k==='qf'?quickFilter:k==='tri'?sortMode:activeTag;
+      const cur=k==='course'?courseFilter:k==='diet'?dietFilter:k==='qf'?quickFilter:k==='diff'?diffFilter:k==='tool'?toolFilter:k==='tri'?sortMode:activeTag;
       b.classList.toggle('on',cur===v);
     });
     const n=allRecipes.filter(recipeMatches).length;
@@ -744,11 +753,13 @@ function openFilterSheet(){
     if(k==='course') courseFilter=v;
     else if(k==='diet') dietFilter=dietFilter===v?null:v;
     else if(k==='qf') quickFilter=quickFilter===v?null:v;
+    else if(k==='diff') diffFilter=diffFilter===v?null:v;
+    else if(k==='tool') toolFilter=toolFilter===v?null:v;
     else if(k==='tri') sortMode=v;
     else activeTag=activeTag===v?null:v;
     refresh(); renderChips(); renderRecipes();
   });
-  $('#fsClear').onclick=()=>{ courseFilter='all'; dietFilter=null; quickFilter=null; activeTag=null; sortMode='default'; refresh(); renderChips(); renderRecipes(); };
+  $('#fsClear').onclick=()=>{ courseFilter='all'; dietFilter=null; quickFilter=null; diffFilter=null; toolFilter=null; activeTag=null; sortMode='default'; refresh(); renderChips(); renderRecipes(); };
   $('#fsApply').onclick=closeSheet;
   $('#fsClose').onclick=closeSheet;
   refresh(); openSheet();
@@ -766,6 +777,8 @@ function recipeMatches(r){
     if(dietFilter==='viande' && !(t.includes('viande')||t.includes('boeuf')))return false;
   }
   if(showFavOnly && !isFav(r.id))return false;
+  if(diffFilter && r.difficulty!==diffFilter)return false;
+  if(toolFilter && (r.tools||[]).some(t=>TOOL_RE[toolFilter].test(t)))return false;
   if(quickFilter==='rapide' && r.time>25)return false;
   if(quickFilter==='sansfour' && !((r.tags||[]).includes('sans four')||(r.tags||[]).includes('sans cuisson')||(r.tags||[]).includes('une poêle')))return false;
   if(quickFilter==='sanscuisson' && !(r.tags||[]).includes('sans cuisson'))return false;

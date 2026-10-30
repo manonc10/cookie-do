@@ -585,3 +585,41 @@ b.sq{color:var(--accT);font-weight:700;font-size:inherit;padding:0;flex:none}
 .ck-nav{position:fixed;left:0;right:0;bottom:0;display:grid;grid-template-columns:1fr 2fr;gap:8px;padding:10px 16px calc(10px + var(--safe-bot));background:var(--bg);border-top:1px solid var(--lnS);z-index:61;max-width:640px;margin:0 auto}
 .ck-nav .btn{min-height:50px}
 .wk-adv{font-size:0.75rem;color:var(--warn);font-weight:600;margin-top:2px}
+
+/* ======= Cookie Do 5.1 ======= */
+/* une seule police, celle du téléphone : plus de titres à empattements ni de chiffres à machine à écrire */
+:root{ --serif:var(--font); }
+.hdr h1,.rd h2,.sh-head h3,.rail-h,#weekTonight .tn-t{letter-spacing:-.02em}
+.mono{font-family:inherit}
+.timer-pop .tp-time{font-family:inherit;font-variant-numeric:tabular-nums}
+/* assiettes rondes dans les listes ; la fiche garde sa grande photo */
+.gcard .ph-wrap{aspect-ratio:1;border-radius:50%;overflow:visible;background:none;box-shadow:none;margin:0 6%}
+.gcard .ph-wrap img,.gcard .noph{border-radius:50%;box-shadow:var(--shC);background:var(--sur3)}
+.gcard .gb{text-align:center}
+.gcard .tgs{left:-6%;top:-2px;right:auto}
+.gcard .fav{top:-4px;right:-8%;color:var(--mut)}
+.gcard .fav svg{filter:none}
+.gcard .pick{right:-3%;bottom:-1%;box-shadow:0 1px 4px rgba(0,0,0,.2)}
+.gcard.picked .ph-wrap{outline:none}.gcard.picked .ph-wrap img{outline:2.5px solid var(--acc);outline-offset:2px}
+.rw img.th,.rw .noph,.pair-c img,.pair-c .noph,.pick-recipe .th{border-radius:50%}
+/* plusieurs minuteurs */
+.timer-pop{flex-direction:column;align-items:stretch;gap:0;padding:4px 14px;width:min(92vw,420px);max-height:45vh;overflow-y:auto}
+.tp-one{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:7px 0}
+.tp-one+.tp-one{border-top:1px solid rgba(128,128,128,.35)}
+.tp-info{min-width:0}.tp-info .tp-lbl{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tp-one.done .tp-time{color:var(--ok)}
+.tp-row{flex:none}.tp-row button{min-height:36px}
+/* restes */
+.left-box[hidden]{display:none}
+.left-box{display:grid;gap:6px;margin-top:8px}
+.left-r{display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--accW);color:var(--fg2);border-radius:var(--r);padding:8px 12px;font-size:0.8125rem;line-height:1.3}
+.left-r button{flex:none;color:var(--accT);font-weight:600;min-height:32px}
+.shop-left{margin:0 16px 8px}
+/* mes quantités */
+.mq-r{justify-content:space-between;gap:10px}.mq-r label{flex:1;min-width:0;font-size:0.875rem}
+.mq-in{display:flex;align-items:center;gap:6px;flex:none;font-size:0.8125rem;color:var(--mut)}
+.mq-in input{width:72px;padding:6px 8px;border:1px solid var(--ln);border-radius:8px;background:var(--sur);color:var(--fg);text-align:right;font-size:1rem}
+.mq-in span{width:66px}
+/* les messages passent au-dessus de l'écran quand des minuteurs occupent le bas, et ne sont plus coupés */
+.toast{white-space:normal;width:max-content;max-width:calc(100vw - 32px)}
+body.has-timers .toast{top:calc(var(--safe-top) + 10px);bottom:auto}

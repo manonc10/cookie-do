@@ -55,7 +55,7 @@ function cardMeta(r,small){
   const veg=(r.tags||[]).includes('végé')&&!isDessert(r)&&!isExtra(r)?'Végé · ':'';   // l'étiquette Végé vit dans le texte, plus sur la photo
   if(isSauce(r)) return `${fmtTime(r.time)} · ${r.yield||mealsLabel(r.portions)}`;
   if(small) return `${veg}${fmtTime(r.time)} · ${mealsLabel(r.portions)}`;
-  return `${veg}${fmtTime(r.time)} · ${mealsLabel(r.portions)}${protOf(r.id)&&!isDessert(r)?' · '+protOf(r.id)+' g prot.':''}`;
+  return `${veg}${fmtTime(r.time)} · ${mealsLabel(r.portions)}`;
 }
 /* une seule étiquette sur la photo, la plus utile : déjà fait > nouveau > de saison */
 function cardTags(r){

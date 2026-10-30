@@ -1,13 +1,13 @@
 /* Cookie Do hors ligne : le site, ses scripts et les photos déjà vues restent disponibles sans réseau.
    Page (index.html) : réseau d'abord, pour recevoir les mises à jour ; cache si pas de réseau.
    Fichiers versionnés (?v=N) et photos : cache d'abord, ils ne changent pas sous un même nom. */
-const CACHE='cookiedo-v15';
-const SHELL=['./','index.html','css/app.css?v=30','js/data.js?v=30','js/app.js?v=30','js/plus.js?v=30','js/foyer.js?v=30','js/v4.js?v=30','js/v5.js?v=30','js/notes.js?v=30','manifest.webmanifest','favicon.png','apple-touch-icon.png'];
+const CACHE='cookiedo-v16';
+const SHELL=['./','index.html','css/app.css?v=31','js/data.js?v=31','js/app.js?v=31','js/plus.js?v=31','js/foyer.js?v=31','js/v4.js?v=31','js/v5.js?v=31','js/v51.js?v=31','js/notes.js?v=31','manifest.webmanifest','favicon.png','apple-touch-icon.png'];
 self.addEventListener('install',e=>{ e.waitUntil(caches.open(CACHE).then(c=>c.addAll(SHELL)).then(()=>self.skipWaiting())); });
 self.addEventListener('activate',e=>{ e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim())); });
 self.addEventListener('fetch',e=>{
   const u=new URL(e.request.url);
-  if(e.request.method!=='GET'||u.origin!==location.origin) return; // Supabase et le reste : pas touché
+  if(e.request.method!=='GET'||u.origin!==location.origin||u.pathname.startsWith('/.netlify/')) return; // Supabase et le reste : pas touché
   const immutable=u.pathname.includes('/photos')||u.searchParams.has('v');
   if(immutable){
     e.respondWith(caches.match(e.request).then(hit=>hit||fetch(e.request).then(r=>{ if(r.ok){ const cp=r.clone(); caches.open(CACHE).then(c=>c.put(e.request,cp)); } return r; })));
