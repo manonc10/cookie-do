@@ -139,7 +139,7 @@ const Sync = (()=> {
 
 
 /* ============ Cookie Do · app logic ============ */
-const APP_VERSION='5.2';
+const APP_VERSION='5.3';
 const LS = {
   custom:'mm_custom', selection:'mm_selection', shopChecked:'mm_shopChecked',
   history:'mm_history', cookState:'mm_cookState', fridge:'mm_fridge', pantry:'mm_pantry',
